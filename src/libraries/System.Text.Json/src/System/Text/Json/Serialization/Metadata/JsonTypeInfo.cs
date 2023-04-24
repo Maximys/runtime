@@ -952,7 +952,7 @@ namespace System.Text.Json.Serialization.Metadata
                             other.MemberName == memberName ||
                             // Was a property with the same CLR name ignored? That property hid the current property,
                             // thus, if it was ignored, the current property should be ignored too.
-                            state.IgnoredProperties?.ContainsKey(memberName) == true;
+                            IsPropertyAlreadyIgnored(memberName, ref state);
                     }
                     else
                     {
@@ -975,7 +975,8 @@ namespace System.Text.Json.Serialization.Metadata
                 }
             }
 
-            if (jsonPropertyInfo.IsIgnored)
+            if ((jsonPropertyInfo.IsIgnored)
+                && !IsPropertyAlreadyIgnored(memberName, ref state))
             {
                 (state.IgnoredProperties ??= new()).Add(memberName, jsonPropertyInfo);
             }
@@ -1228,6 +1229,11 @@ namespace System.Text.Json.Serialization.Metadata
             {
                 SetCreateObject(createObject);
             }
+        }
+
+        private static bool IsPropertyAlreadyIgnored(string memberName, ref PropertyHierarchyResolutionState state)
+        {
+            return state.IgnoredProperties?.ContainsKey(memberName) == true;
         }
 
         private static bool IsByRefLike(Type type)

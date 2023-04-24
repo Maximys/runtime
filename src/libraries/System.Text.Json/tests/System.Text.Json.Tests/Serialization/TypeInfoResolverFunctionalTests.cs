@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Xunit;
 
@@ -89,6 +90,16 @@ namespace System.Text.Json.Serialization.Tests
             TestClass deserialized = JsonSerializer.Deserialize<TestClass>(json, options);
             Assert.Equal(originalObj.TestField, deserialized.TestField);
             Assert.Equal(originalObj.TestProperty, deserialized.TestProperty);
+        }
+
+        [Fact]
+        public static void CorrectlyIgnorePropertyWithNewModifier()
+        {
+            SecondClassWithSameName instanceOfSecondClassWithSameName;
+
+            instanceOfSecondClassWithSameName = new SecondClassWithSameName();
+
+            Assert.NotEmpty(JsonSerializer.Serialize(instanceOfSecondClassWithSameName));
         }
 
         [Fact]
@@ -843,6 +854,16 @@ namespace System.Text.Json.Serialization.Tests
             public List<int> ListProperty2 { get; set; }
         }
 
+        public class FirstClassWithSameName
+        {
+        }
+
+        public class SecondClassWithSameName : NamespaceBase.SecondClassWithSameName
+        {
+            [JsonIgnore]
+            public new FirstClassWithSameName firstClassWithSameName => new FirstClassWithSameName();
+        }
+
         internal class TestClassWithDictionaries
         {
             public Dictionary<string, int> DictionaryProperty1 { get; set; }
@@ -970,5 +991,18 @@ namespace System.Text.Json.Serialization.Tests
                 writer.WriteEndObject();
             }
         }
+    }
+}
+
+namespace NamespaceBase
+{
+    public class FirstClassWithSameName
+    {
+    }
+
+    public class SecondClassWithSameName
+    {
+        [JsonIgnore]
+        public FirstClassWithSameName firstClassWithSameName => new FirstClassWithSameName();
     }
 }
