@@ -65,9 +65,9 @@ namespace System.Memory.Tests.SequenceReader
 
             SequenceReader<byte> reader = new SequenceReader<byte>(bytes);
             reader.Advance(1);
-            Assert.Equal(1, reader.CurrentSpanIndex);
+            Assert.Equal(0, reader.CurrentSpanIndex);
             Assert.Equal(0, reader.CurrentSpan.Length);
-            Assert.False(reader.TryPeek(out byte value));
+            Assert.False(reader.TryPeek(out byte _));
             ReadOnlySequence<byte> sequence = reader.Sequence.Slice(reader.Position);
             Assert.Equal(0, sequence.Length);
         }
