@@ -133,7 +133,7 @@ namespace System.Memory.Tests
             ReadOnlySequence<byte>.Enumerator enumerator = buffer.GetEnumerator();
             {
                 Assert.Equal(default, enumerator.Current);
-                Assert.True(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
                 ReadOnlyMemory<byte> memory = enumerator.Current;
                 Assert.True(memory.IsEmpty);
 
@@ -142,7 +142,7 @@ namespace System.Memory.Tests
             enumerator = new ReadOnlySequence<byte>.Enumerator(buffer);
             {
                 Assert.Equal(default, enumerator.Current);
-                Assert.True(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
                 ReadOnlyMemory<byte> memory = enumerator.Current;
                 Assert.True(memory.IsEmpty);
 
