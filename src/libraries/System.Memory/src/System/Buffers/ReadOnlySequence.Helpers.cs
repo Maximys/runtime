@@ -11,57 +11,71 @@ namespace System.Buffers
     public readonly partial struct ReadOnlySequence<T>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool TryGetBuffer(in SequencePosition position, out ReadOnlyMemory<T> memory, out SequencePosition next)
+        internal MoveResult MoveToNextItem(
+            ref SequencePosition position,
+            bool advance)
         {
-            object? positionObject = position.GetObject();
+            object? positionObject;
+            ReadOnlyMemory<T> item;
+            SequencePosition positionOfResult;
+            MoveStatus status;
+            MoveResult returnValue;
+
+            positionObject = position.GetObject();
 
             if (positionObject == null)
             {
-                memory = default;
-                next = default;
-                return false;
-            }
-
-            SequenceType type = GetSequenceType();
-            object? endObject = _endObject;
-
-            if (type == SequenceType.MultiSegment)
-            {
-                GetBufferForMultiSegment(in position, endObject, positionObject, out memory, out next);
+                item = default;
+                positionOfResult = default;
+                status = MoveStatus.NotExist;
             }
             else
             {
-                if (positionObject != endObject)
+                SequenceType type = GetSequenceType();
+                object? endObject = _endObject;
+
+                switch (type)
                 {
-                    ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                    case SequenceType.Array:
+                        {
+                            MoveToNextItemForArray(in position, positionObject, out item);
+                            positionOfResult = default;
+                            break;
+                        }
+                    case SequenceType.MemoryManager:
+                        {
+                            MoveToNextItemForMemoryManager(in position, positionObject, out item);
+                            positionOfResult = default;
+                            break;
+                        }
+                    case SequenceType.MultiSegment:
+                        {
+                            MoveToNextItemForMultiSegment(in position, endObject, positionObject, out item, out positionOfResult);
+                            break;
+                        }
+                    case SequenceType.String
+                        when typeof(T) == typeof(char):
+                        {
+                            MoveToNextItemForString(in position, positionObject, out item);
+                            positionOfResult = default;
+                            break;
+                        }
+                    default:
+                        {
+                            throw new NotImplementedException();
+                        }
                 }
 
-                int startIndex = position.GetInteger();
-                int endIndex = GetIndex(_endInteger);
-                if (type == SequenceType.Array)
-                {
-                    Debug.Assert(positionObject is T[]);
-
-                    memory = new ReadOnlyMemory<T>((T[])positionObject, startIndex, endIndex - startIndex);
-                }
-                else if (typeof(T) == typeof(char) && type == SequenceType.String)
-                {
-                    Debug.Assert(positionObject is string);
-
-                    memory = (ReadOnlyMemory<T>)(object)((string)positionObject).AsMemory(startIndex, endIndex - startIndex);
-                }
-                else // type == SequenceType.MemoryManager
-                {
-                    Debug.Assert(type == SequenceType.MemoryManager);
-                    Debug.Assert(positionObject is MemoryManager<T>);
-
-                    memory = ((MemoryManager<T>)positionObject).Memory.Slice(startIndex, endIndex - startIndex);
-                }
-
-                next = default;
+                status = item.IsEmpty ? MoveStatus.Empty : MoveStatus.Success;
             }
 
-            return !memory.IsEmpty;
+            if (advance)
+            {
+                position = positionOfResult;
+            }
+
+            returnValue = new MoveResult(item, positionOfResult, status);
+            return returnValue;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -659,12 +673,71 @@ namespace System.Buffers
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static ReadOnlySpan<T> GetFirstSpanSlow(object startObject, int startIndex, int endIndex, bool hasMultipleSegments)
+        {
+            Debug.Assert(startIndex < 0);
+            if (hasMultipleSegments)
+                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+
+            // The type == char check here is redundant. However, we still have it to allow
+            // the JIT to see when that the code is unreachable and eliminate it.
+            if (typeof(T) == typeof(char) && endIndex < 0)
+            {
+                // Negative start and negative end index == string
+                ReadOnlySpan<char> spanOfChar = ((string)startObject).AsSpan(startIndex & ReadOnlySequence.IndexBitMask, endIndex - startIndex);
+                return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<char, T>(ref MemoryMarshal.GetReference(spanOfChar)), spanOfChar.Length);
+            }
+            else
+            {
+                // Negative start and positive end index == MemoryManager<T>
+                startIndex &= ReadOnlySequence.IndexBitMask;
+                return ((MemoryManager<T>)startObject).Memory.Span.Slice(startIndex, endIndex - startIndex);
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void GetBufferForMultiSegment(
+        private void MoveToNextItemForArray(
+            in SequencePosition position,
+            object? positionObject,
+            out ReadOnlyMemory<T> nextItem)
+        {
+            if (positionObject != _endObject)
+            {
+                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+            }
+
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            Debug.Assert(positionObject is T[]);
+            nextItem = new ReadOnlyMemory<T>((T[])positionObject, startIndex, endIndex - startIndex);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MoveToNextItemForMemoryManager(
+            in SequencePosition position,
+            object? positionObject,
+            out ReadOnlyMemory<T> nextItem)
+        {
+            if (positionObject != _endObject)
+            {
+                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+            }
+
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            Debug.Assert(positionObject is MemoryManager<T>);
+            nextItem = ((MemoryManager<T>)positionObject).Memory.Slice(startIndex, endIndex - startIndex);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MoveToNextItemForMultiSegment(
             in SequencePosition position,
             object? endObject,
             object? positionObject,
-            out ReadOnlyMemory<T> memory,
+            out ReadOnlyMemory<T> nextItem,
             out SequencePosition next)
         {
             Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
@@ -697,37 +770,66 @@ namespace System.Buffers
             if (processedSlice.IsEmpty)
             {
                 int endIndex = GetIndex(_endInteger);
-                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
-                next = processedPosition;
+                nextItem = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                next = default;
             }
             else
             {
-                memory = processedSlice;
+                nextItem = processedSlice;
                 next = processedPosition;
             }
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static ReadOnlySpan<T> GetFirstSpanSlow(object startObject, int startIndex, int endIndex, bool hasMultipleSegments)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void MoveToNextItemForString(
+            in SequencePosition position,
+            object? positionObject,
+            out ReadOnlyMemory<T> nextItem)
         {
-            Debug.Assert(startIndex < 0);
-            if (hasMultipleSegments)
+            if (positionObject != _endObject)
+            {
                 ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+            }
 
-            // The type == char check here is redundant. However, we still have it to allow
-            // the JIT to see when that the code is unreachable and eliminate it.
-            if (typeof(T) == typeof(char) && endIndex < 0)
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            Debug.Assert(positionObject is string);
+            nextItem = (ReadOnlyMemory<T>)(object)((string)positionObject).AsMemory(startIndex, endIndex - startIndex);
+        }
+
+        internal struct MoveResult
+        {
+            public MoveResult(
+                ReadOnlyMemory<T> item,
+                SequencePosition position,
+                MoveStatus status)
             {
-                // Negative start and negative end index == string
-                ReadOnlySpan<char> spanOfChar = ((string)startObject).AsSpan(startIndex & ReadOnlySequence.IndexBitMask, endIndex - startIndex);
-                return MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<char, T>(ref MemoryMarshal.GetReference(spanOfChar)), spanOfChar.Length);
+                Item = item;
+                Position = position;
+                Status = status;
             }
-            else
+
+            public bool IsSuccess
             {
-                // Negative start and positive end index == MemoryManager<T>
-                startIndex &= ReadOnlySequence.IndexBitMask;
-                return ((MemoryManager<T>)startObject).Memory.Span.Slice(startIndex, endIndex - startIndex);
+                get
+                {
+                    return Status == MoveStatus.Success;
+                }
             }
+
+            public ReadOnlyMemory<T> Item { get; }
+
+            public SequencePosition Position { get; }
+
+            public MoveStatus Status { get; }
+        }
+
+        internal enum MoveStatus
+        {
+            Empty,
+            NotExist,
+            Success
         }
     }
 }
