@@ -14,11 +14,11 @@ namespace System.Buffers
         internal bool TryGetBuffer(in SequencePosition position, out ReadOnlyMemory<T> memory, out SequencePosition next)
         {
             object? positionObject = position.GetObject();
-            next = default;
 
             if (positionObject == null)
             {
                 memory = default;
+                next = default;
                 return false;
             }
 
@@ -29,24 +29,7 @@ namespace System.Buffers
 
             if (type == SequenceType.MultiSegment)
             {
-                Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
-
-                ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
-
-                if (startSegment != endObject)
-                {
-                    ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
-
-                    if (nextSegment == null)
-                        ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
-
-                    next = new SequencePosition(nextSegment, 0);
-                    memory = startSegment.Memory.Slice(startIndex);
-                }
-                else
-                {
-                    memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
-                }
+                GetBufferForMultiSegment(endObject, endIndex, positionObject, startIndex, out memory, out next);
             }
             else
             {
@@ -72,6 +55,8 @@ namespace System.Buffers
 
                     memory = ((MemoryManager<T>)positionObject).Memory.Slice(startIndex, endIndex - startIndex);
                 }
+
+                next = default;
             }
 
             return true;
@@ -669,6 +654,36 @@ namespace System.Buffers
                 {
                     first = GetFirstSpanSlow(startObject, startIndex, endIndex, hasMultipleSegments);
                 }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void GetBufferForMultiSegment(
+            object? endObject,
+            int endIndex,
+            object? positionObject,
+            int startIndex,
+            out ReadOnlyMemory<T> memory,
+            out SequencePosition next)
+        {
+            Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
+
+            ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
+
+            if (startSegment != endObject)
+            {
+                ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
+
+                if (nextSegment == null)
+                    ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+
+                memory = startSegment.Memory.Slice(startIndex);
+                next = new SequencePosition(nextSegment, 0);
+            }
+            else
+            {
+                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                next = default;
             }
         }
 
