@@ -23,18 +23,20 @@ namespace System.Buffers
             }
 
             SequenceType type = GetSequenceType();
-            object? endObject = _endObject;
-            int startIndex = position.GetInteger();
-            int endIndex = GetIndex(_endInteger);
 
             if (type == SequenceType.MultiSegment)
             {
-                GetBufferForMultiSegment(endObject, endIndex, positionObject, startIndex, out memory, out next);
+                GetBufferForMultiSegment(in position, positionObject, out memory, out next);
             }
             else
             {
+                object? endObject = _endObject;
+                int startIndex = position.GetInteger();
+                int endIndex = GetIndex(_endInteger);
                 if (positionObject != endObject)
+                {
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                }
 
                 if (type == SequenceType.Array)
                 {
@@ -48,7 +50,7 @@ namespace System.Buffers
 
                     memory = (ReadOnlyMemory<T>)(object)((string)positionObject).AsMemory(startIndex, endIndex - startIndex);
                 }
-                else // type == SequenceType.MemoryManager
+                else
                 {
                     Debug.Assert(type == SequenceType.MemoryManager);
                     Debug.Assert(positionObject is MemoryManager<T>);
@@ -658,16 +660,17 @@ namespace System.Buffers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void GetBufferForMultiSegment(
-            object? endObject,
-            int endIndex,
+        private void GetBufferForMultiSegment(
+            in SequencePosition position,
             object? positionObject,
-            int startIndex,
             out ReadOnlyMemory<T> memory,
             out SequencePosition next)
         {
             Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
 
+            object? endObject = _endObject;
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
             ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
 
             if (startSegment != endObject)
