@@ -586,8 +586,8 @@ namespace System.Memory.Tests
                 sizes.Add(memory.Length);
             }
 
-            Assert.Equal(2, sizes.Count);
-            Assert.Equal(new[] { 100, 0 }, sizes);
+            Assert.Equal(1, sizes.Count);
+            Assert.Equal(new[] { 100 }, sizes);
         }
 
         #endregion
