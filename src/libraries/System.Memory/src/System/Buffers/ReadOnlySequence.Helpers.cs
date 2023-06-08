@@ -24,18 +24,20 @@ namespace System.Buffers
 
             SequenceType type = GetSequenceType();
             object? endObject = _endObject;
-            int startIndex = position.GetInteger();
-            int endIndex = GetIndex(_endInteger);
 
             if (type == SequenceType.MultiSegment)
             {
-                GetBufferForMultiSegment(endObject, endIndex, positionObject, startIndex, out memory, out next);
+                GetBufferForMultiSegment(in position, endObject, positionObject, out memory, out next);
             }
             else
             {
                 if (positionObject != endObject)
+                {
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                }
 
+                int startIndex = position.GetInteger();
+                int endIndex = GetIndex(_endInteger);
                 if (type == SequenceType.Array)
                 {
                     Debug.Assert(positionObject is T[]);
@@ -658,32 +660,50 @@ namespace System.Buffers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void GetBufferForMultiSegment(
+        private void GetBufferForMultiSegment(
+            in SequencePosition position,
             object? endObject,
-            int endIndex,
             object? positionObject,
-            int startIndex,
             out ReadOnlyMemory<T> memory,
             out SequencePosition next)
         {
             Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
 
+            ReadOnlyMemory<T> processedSlice;
             ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
+            SequencePosition processedPosition;
+            int startIndex;
 
-            if (startSegment != endObject)
+            processedSlice = default;
+            processedPosition = default;
+            startIndex = position.GetInteger();
+
+            while ((startSegment != endObject)
+               && (processedSlice.IsEmpty))
             {
                 ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
 
                 if (nextSegment == null)
+                {
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                }
 
-                memory = startSegment.Memory.Slice(startIndex);
-                next = new SequencePosition(nextSegment, 0);
+                processedSlice = startSegment.Memory.Slice(startIndex);
+                processedPosition = new SequencePosition(nextSegment, 0);
+                startSegment = nextSegment;
+                startIndex = processedPosition.GetInteger();
+            };
+
+            if (processedSlice.IsEmpty)
+            {
+                int endIndex = GetIndex(_endInteger);
+                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                next = processedPosition;
             }
             else
             {
-                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
-                next = default;
+                memory = processedSlice;
+                next = processedPosition;
             }
         }
 
