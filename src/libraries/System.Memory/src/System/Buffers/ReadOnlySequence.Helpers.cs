@@ -61,7 +61,7 @@ namespace System.Buffers
                 next = default;
             }
 
-            return true;
+            return !memory.IsEmpty;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
