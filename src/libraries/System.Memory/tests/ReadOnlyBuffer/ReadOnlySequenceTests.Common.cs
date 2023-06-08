@@ -511,7 +511,7 @@ namespace System.Memory.Tests
             SequencePosition start = buffer.Start;
             Assert.True(buffer.TryGet(ref start, out ReadOnlyMemory<T> memory));
             Assert.Equal(100, memory.Length);
-            Assert.True(buffer.TryGet(ref start, out memory));
+            Assert.False(buffer.TryGet(ref start, out memory));
             Assert.Equal(0, memory.Length);
             Assert.False(buffer.TryGet(ref start, out memory));
         }
@@ -527,7 +527,7 @@ namespace System.Memory.Tests
             SequencePosition start = buffer.Start;
             Assert.True(buffer.TryGet(ref start, out ReadOnlyMemory<T> memory));
             Assert.Equal(100, memory.Length);
-            Assert.True(buffer.TryGet(ref start, out memory));
+            Assert.False(buffer.TryGet(ref start, out memory));
             Assert.Equal(0, memory.Length);
             Assert.False(buffer.TryGet(ref start, out memory));
         }
