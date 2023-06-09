@@ -303,6 +303,7 @@ namespace System.Text.Json
                 Debug.Assert(!_isMultiSegment || _currentPosition.GetObject() != null);
                 SequencePosition copy = _currentPosition;
                 _currentPosition = _nextPosition;
+//QWERTY
                 bool noMoreData = !_sequence.TryGet(ref _nextPosition, out memory, advance: true);
                 if (noMoreData)
                 {
