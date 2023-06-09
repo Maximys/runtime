@@ -798,7 +798,7 @@ namespace System.Buffers
             nextItem = (ReadOnlyMemory<T>)(object)((string)positionObject).AsMemory(startIndex, endIndex - startIndex);
         }
 
-        internal struct MoveResult
+        internal readonly struct MoveResult
         {
             public MoveResult(
                 ReadOnlyMemory<T> item,
