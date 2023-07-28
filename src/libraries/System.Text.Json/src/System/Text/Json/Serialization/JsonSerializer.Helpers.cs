@@ -141,5 +141,23 @@ namespace System.Text.Json
 
             return (T?)value;
         }
+
+        internal static bool TryMoveToPropertyName(ref Utf8JsonReader reader, scoped ref ReadStack state)
+        {
+            bool returnValue;
+
+            if (state.Current.PropertyState == StackFramePropertyState.None)
+            {
+                state.Current.PropertyState = StackFramePropertyState.ReadName;
+
+                returnValue = reader.Read();
+            }
+            else
+            {
+                returnValue = true;
+            }
+
+            return returnValue;
+        }
     }
 }

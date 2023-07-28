@@ -29,15 +29,9 @@ namespace System.Text.Json
 
             while (true)
             {
-                if (state.Current.PropertyState == StackFramePropertyState.None)
+                if (!TryMoveToPropertyName(ref reader, ref state))
                 {
-                    state.Current.PropertyState = StackFramePropertyState.ReadName;
-
-                    // Read the property name.
-                    if (!reader.Read())
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
                 if (state.Current.PropertyState < StackFramePropertyState.Name)

@@ -145,18 +145,12 @@ namespace System.Text.Json.Serialization.Converters
                 // Process all properties.
                 while (true)
                 {
-                    // Determine the property.
-                    if (state.Current.PropertyState == StackFramePropertyState.None)
+                    if (!JsonSerializer.TryMoveToPropertyName(ref reader, ref state))
                     {
-                        state.Current.PropertyState = StackFramePropertyState.ReadName;
-
-                        if (!reader.Read())
-                        {
-                            // The read-ahead functionality will do the Read().
-                            state.Current.ReturnValue = obj;
-                            value = default;
-                            return false;
-                        }
+                        // The read-ahead functionality will do the Read().
+                        state.Current.ReturnValue = obj;
+                        value = default;
+                        return false;
                     }
 
                     JsonPropertyInfo jsonPropertyInfo;

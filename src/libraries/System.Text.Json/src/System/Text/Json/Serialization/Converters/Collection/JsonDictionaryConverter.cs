@@ -228,16 +228,10 @@ namespace System.Text.Json.Serialization
                 _valueConverter ??= GetConverter<TValue>(elementTypeInfo);
                 while (true)
                 {
-                    if (state.Current.PropertyState == StackFramePropertyState.None)
+                    if (!JsonSerializer.TryMoveToPropertyName(ref reader, ref state))
                     {
-                        state.Current.PropertyState = StackFramePropertyState.ReadName;
-
-                        // Read the key name.
-                        if (!reader.Read())
-                        {
-                            value = default;
-                            return false;
-                        }
+                        value = default;
+                        return false;
                     }
 
                     // Determine the property.

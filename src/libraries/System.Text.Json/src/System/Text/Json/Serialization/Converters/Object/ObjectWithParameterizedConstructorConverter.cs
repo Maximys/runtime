@@ -380,16 +380,9 @@ namespace System.Text.Json.Serialization.Converters
             // Process all properties.
             while (true)
             {
-                // Determine the property.
-                if (state.Current.PropertyState == StackFramePropertyState.None)
+                if (!JsonSerializer.TryMoveToPropertyName(ref reader, ref state))
                 {
-                    state.Current.PropertyState = StackFramePropertyState.ReadName;
-
-                    if (!reader.Read())
-                    {
-                        // The read-ahead functionality will do the Read().
-                        return false;
-                    }
+                    return false;
                 }
 
                 JsonParameterInfo? jsonParameterInfo;
