@@ -24,42 +24,56 @@ namespace System.Buffers
 
             SequenceType type = GetSequenceType();
 
-            if (type == SequenceType.MultiSegment)
+            switch (type)
             {
-                Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
-                ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
-                GetBufferForMultiSegment(in position, startSegment, out memory, out next);
-            }
-            else
-            {
-                object? endObject = _endObject;
-                if (positionObject != endObject)
-                {
-                    ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
-                }
+                case SequenceType.MultiSegment:
+                    {
+                        Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
+                        ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
+                        GetBufferForMultiSegment(in position, startSegment, out memory, out next);
+                        break;
+                    }
+                case SequenceType.Array:
+                    {
+                        object? endObject = _endObject;
+                        if (positionObject != endObject)
+                        {
+                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                        }
+                        Debug.Assert(positionObject is T[]);
 
-                if (type == SequenceType.Array)
-                {
-                    Debug.Assert(positionObject is T[]);
+                        T[] array = (T[])positionObject;
+                        GetBufferForArray(in position, array, out memory, out next);
+                        break;
+                    }
+                case SequenceType.String
+                    when typeof(T) == typeof(char):
+                    {
+                        object? endObject = _endObject;
+                        if (positionObject != endObject)
+                        {
+                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                        }
+                        Debug.Assert(positionObject is string);
 
-                    T[] array = (T[])positionObject;
-                    GetBufferForArray(in position, array, out memory, out next);
-                }
-                else if (typeof(T) == typeof(char) && type == SequenceType.String)
-                {
-                    Debug.Assert(positionObject is string);
+                        string @string = (string)positionObject;
+                        GetBufferForString(in position, @string, out memory, out next);
+                        break;
+                    }
+                default:
+                    {
+                        object? endObject = _endObject;
+                        if (positionObject != endObject)
+                        {
+                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                        }
+                        Debug.Assert(type == SequenceType.MemoryManager);
+                        Debug.Assert(positionObject is MemoryManager<T>);
 
-                    string @string = (string)positionObject;
-                    GetBufferForString(in position, @string, out memory, out next);
-                }
-                else
-                {
-                    Debug.Assert(type == SequenceType.MemoryManager);
-                    Debug.Assert(positionObject is MemoryManager<T>);
-
-                    MemoryManager<T> memoryManager = (MemoryManager<T>)positionObject;
-                    GetBufferForMemoryManager(in position, memoryManager, out memory, out next);
-                }
+                        MemoryManager<T> memoryManager = (MemoryManager<T>)positionObject;
+                        GetBufferForMemoryManager(in position, memoryManager, out memory, out next);
+                        break;
+                    }
             }
 
             return true;
