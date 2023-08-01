@@ -38,30 +38,28 @@ namespace System.Buffers
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
                 }
 
-                int startIndex = position.GetInteger();
-                int endIndex = GetIndex(_endInteger);
-
                 if (type == SequenceType.Array)
                 {
                     Debug.Assert(positionObject is T[]);
 
-                    memory = new ReadOnlyMemory<T>((T[])positionObject, startIndex, endIndex - startIndex);
+                    T[] array = (T[])positionObject;
+                    GetBufferForArray(in position, array, out memory, out next);
                 }
                 else if (typeof(T) == typeof(char) && type == SequenceType.String)
                 {
                     Debug.Assert(positionObject is string);
 
-                    memory = (ReadOnlyMemory<T>)(object)((string)positionObject).AsMemory(startIndex, endIndex - startIndex);
+                    string @string = (string)positionObject;
+                    GetBufferForString(in position, @string, out memory, out next);
                 }
                 else
                 {
                     Debug.Assert(type == SequenceType.MemoryManager);
                     Debug.Assert(positionObject is MemoryManager<T>);
 
-                    memory = ((MemoryManager<T>)positionObject).Memory.Slice(startIndex, endIndex - startIndex);
+                    MemoryManager<T> memoryManager = (MemoryManager<T>)positionObject;
+                    GetBufferForMemoryManager(in position, memoryManager, out memory, out next);
                 }
-
-                next = default;
             }
 
             return true;
@@ -663,6 +661,34 @@ namespace System.Buffers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetBufferForArray(
+            in SequencePosition position,
+            T[] array,
+            out ReadOnlyMemory<T> memory,
+            out SequencePosition next)
+        {
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            memory = new ReadOnlyMemory<T>(array, startIndex, endIndex - startIndex);
+            next = default;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetBufferForMemoryManager(
+            in SequencePosition position,
+            MemoryManager<T> memoryManager,
+            out ReadOnlyMemory<T> memory,
+            out SequencePosition next)
+        {
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            memory = memoryManager.Memory.Slice(startIndex, endIndex - startIndex);
+            next = default;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void GetBufferForMultiSegment(
             in SequencePosition position,
             ReadOnlySequenceSegment<T> startSegment,
@@ -690,6 +716,20 @@ namespace System.Buffers
                 memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
                 next = default;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void GetBufferForString(
+            in SequencePosition position,
+            string @string,
+            out ReadOnlyMemory<T> memory,
+            out SequencePosition next)
+        {
+            int startIndex = position.GetInteger();
+            int endIndex = GetIndex(_endInteger);
+
+            memory = (ReadOnlyMemory<T>)(object)@string.AsMemory(startIndex, endIndex - startIndex);
+            next = default;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
