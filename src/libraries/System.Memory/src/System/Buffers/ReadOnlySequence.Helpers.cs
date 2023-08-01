@@ -26,17 +26,20 @@ namespace System.Buffers
 
             if (type == SequenceType.MultiSegment)
             {
-                GetBufferForMultiSegment(in position, positionObject, out memory, out next);
+                Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
+                ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
+                GetBufferForMultiSegment(in position, startSegment, out memory, out next);
             }
             else
             {
                 object? endObject = _endObject;
-                int startIndex = position.GetInteger();
-                int endIndex = GetIndex(_endInteger);
                 if (positionObject != endObject)
                 {
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
                 }
+
+                int startIndex = position.GetInteger();
+                int endIndex = GetIndex(_endInteger);
 
                 if (type == SequenceType.Array)
                 {
@@ -662,23 +665,22 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void GetBufferForMultiSegment(
             in SequencePosition position,
-            object? positionObject,
+            ReadOnlySequenceSegment<T> startSegment,
             out ReadOnlyMemory<T> memory,
             out SequencePosition next)
         {
-            Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
-
             object? endObject = _endObject;
             int startIndex = position.GetInteger();
             int endIndex = GetIndex(_endInteger);
-            ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
 
             if (startSegment != endObject)
             {
                 ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
 
                 if (nextSegment == null)
+                {
                     ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                }
 
                 memory = startSegment.Memory.Slice(startIndex);
                 next = new SequencePosition(nextSegment, 0);
