@@ -13,70 +13,76 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool TryGetBuffer(in SequencePosition position, out ReadOnlyMemory<T> memory, out SequencePosition next)
         {
+            bool returnValue;
+
             object? positionObject = position.GetObject();
 
             if (positionObject == null)
             {
                 memory = default;
                 next = default;
-                return false;
+                returnValue = false;
             }
-
-            SequenceType type = GetSequenceType();
-
-            switch (type)
+            else
             {
-                case SequenceType.MultiSegment:
-                    {
-                        Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
-                        ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
-                        GetBufferForMultiSegment(in position, startSegment, out memory, out next);
-                        break;
-                    }
-                case SequenceType.Array:
-                    {
-                        object? endObject = _endObject;
-                        if (positionObject != endObject)
-                        {
-                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
-                        }
-                        Debug.Assert(positionObject is T[]);
+                SequenceType type = GetSequenceType();
 
-                        T[] array = (T[])positionObject;
-                        GetBufferForArray(in position, array, out memory, out next);
-                        break;
-                    }
-                case SequenceType.String
-                    when typeof(T) == typeof(char):
-                    {
-                        object? endObject = _endObject;
-                        if (positionObject != endObject)
+                switch (type)
+                {
+                    case SequenceType.MultiSegment:
                         {
-                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                            Debug.Assert(positionObject is ReadOnlySequenceSegment<T>);
+                            ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)positionObject;
+                            GetBufferForMultiSegment(in position, startSegment, out memory, out next);
+                            break;
                         }
-                        Debug.Assert(positionObject is string);
-
-                        string @string = (string)positionObject;
-                        GetBufferForString(in position, @string, out memory, out next);
-                        break;
-                    }
-                default:
-                    {
-                        object? endObject = _endObject;
-                        if (positionObject != endObject)
+                    case SequenceType.Array:
                         {
-                            ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
-                        }
-                        Debug.Assert(type == SequenceType.MemoryManager);
-                        Debug.Assert(positionObject is MemoryManager<T>);
+                            object? endObject = _endObject;
+                            if (positionObject != endObject)
+                            {
+                                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                            }
+                            Debug.Assert(positionObject is T[]);
 
-                        MemoryManager<T> memoryManager = (MemoryManager<T>)positionObject;
-                        GetBufferForMemoryManager(in position, memoryManager, out memory, out next);
-                        break;
-                    }
+                            T[] array = (T[])positionObject;
+                            GetBufferForArray(in position, array, out memory, out next);
+                            break;
+                        }
+                    case SequenceType.String
+                        when typeof(T) == typeof(char):
+                        {
+                            object? endObject = _endObject;
+                            if (positionObject != endObject)
+                            {
+                                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                            }
+                            Debug.Assert(positionObject is string);
+
+                            string @string = (string)positionObject;
+                            GetBufferForString(in position, @string, out memory, out next);
+                            break;
+                        }
+                    default:
+                        {
+                            object? endObject = _endObject;
+                            if (positionObject != endObject)
+                            {
+                                ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                            }
+                            Debug.Assert(type == SequenceType.MemoryManager);
+                            Debug.Assert(positionObject is MemoryManager<T>);
+
+                            MemoryManager<T> memoryManager = (MemoryManager<T>)positionObject;
+                            GetBufferForMemoryManager(in position, memoryManager, out memory, out next);
+                            break;
+                        }
+                }
+
+                returnValue = !memory.IsEmpty;
             }
 
-            return true;
+            return returnValue;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
