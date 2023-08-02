@@ -715,27 +715,35 @@ namespace System.Buffers
             out ReadOnlyMemory<T> memory,
             out SequencePosition next)
         {
+            ReadOnlySequenceSegment<T> currentSegment, segmentForNextProcessing;
             object? endObject = _endObject;
             int startIndex = position.GetInteger();
             int endIndex = GetIndex(_endInteger);
 
-            if (startSegment != endObject)
+            segmentForNextProcessing = startSegment;
+            do
             {
-                ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
-
-                if (nextSegment == null)
+                currentSegment = segmentForNextProcessing;
+                if (currentSegment != endObject)
                 {
-                    ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
-                }
+                    ReadOnlySequenceSegment<T>? nextSegment = currentSegment.Next;
 
-                memory = startSegment.Memory.Slice(startIndex);
-                next = new SequencePosition(nextSegment, 0);
-            }
-            else
-            {
-                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
-                next = default;
-            }
+                    if (nextSegment == null)
+                    {
+                        ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                    }
+
+                    memory = currentSegment.Memory.Slice(startIndex);
+                    next = new SequencePosition(nextSegment, 0);
+                    segmentForNextProcessing = nextSegment;
+                }
+                else
+                {
+                    memory = currentSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                    next = default;
+                }
+            } while (memory.IsEmpty
+            && currentSegment != endObject);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
