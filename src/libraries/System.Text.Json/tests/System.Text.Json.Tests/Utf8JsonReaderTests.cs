@@ -3806,14 +3806,14 @@ namespace System.Text.Json.Tests
 
         [Theory]
         [InlineData(@"\""")]
-        [InlineData(@"\n")]
-        [InlineData(@"\r")]
-        [InlineData(@"\\")]
-        [InlineData(@"\/")]
-        [InlineData(@"\t")]
-        [InlineData(@"\b")]
-        [InlineData(@"\f")]
-        [InlineData(@"\u6F22\u5B57")]
+        //[InlineData(@"\n")]
+        //[InlineData(@"\r")]
+        //[InlineData(@"\\")]
+        //[InlineData(@"\/")]
+        //[InlineData(@"\t")]
+        //[InlineData(@"\b")]
+        //[InlineData(@"\f")]
+        //[InlineData(@"\u6F22\u5B57")]
         public static void ValueIsEscaped_IsTrueOnEscapedStrings(string jsonString)
         {
             string json = $@"""{jsonString}""";

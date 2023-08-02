@@ -20,6 +20,8 @@ namespace System.Buffers
         private readonly int _startInteger;
         private readonly int _endInteger;
 
+        private string CreationLog { get; }
+
         /// <summary>
         /// Returns empty <see cref="ReadOnlySequence{T}"/>
         /// </summary>
@@ -85,6 +87,8 @@ namespace System.Buffers
             _endObject = endSegment;
             _startInteger = startIndexAndFlags;
             _endInteger = endIndexAndFlags;
+
+            CreationLog = Environment.StackTrace.ToString();
         }
 
         /// <summary>
@@ -105,6 +109,8 @@ namespace System.Buffers
             _endObject = endSegment;
             _startInteger = startIndex;
             _endInteger = endIndex;
+
+            CreationLog = Environment.StackTrace.ToString();
         }
 
         /// <summary>
@@ -119,6 +125,8 @@ namespace System.Buffers
             _endObject = array;
             _startInteger = 0;
             _endInteger = ReadOnlySequence.ArrayToSequenceEnd(array.Length);
+
+            CreationLog = Environment.StackTrace.ToString();
         }
 
         /// <summary>
@@ -135,6 +143,8 @@ namespace System.Buffers
             _endObject = array;
             _startInteger = start;
             _endInteger = ReadOnlySequence.ArrayToSequenceEnd(start + length);
+
+            CreationLog = Environment.StackTrace.ToString();
         }
 
         /// <summary>
@@ -178,6 +188,8 @@ namespace System.Buffers
                 _startInteger = 0;
                 _endInteger = 0;
             }
+
+            CreationLog = Environment.StackTrace.ToString();
         }
 
         /// <summary>
@@ -495,16 +507,16 @@ namespace System.Buffers
 
                 if (charSequence.TryGetString(out string? text, out int start, out int length))
                 {
-                    return text.Substring(start, length);
+                    return string.Concat(text.Substring(start, length), "\nLog is:", CreationLog);
                 }
 
                 if (Length < int.MaxValue)
                 {
-                    return string.Create((int)Length, charSequence, (span, sequence) => sequence.CopyTo(span));
+                    return string.Concat(string.Create((int)Length, charSequence, (span, sequence) => sequence.CopyTo(span)), "\nLog is:", CreationLog);
                 }
             }
 
-            return $"System.Buffers.ReadOnlySequence<{typeof(T).Name}>[{Length}]";
+            return string.Concat($"System.Buffers.ReadOnlySequence<{typeof(T).Name}>[{Length}]", "\nLog is:", CreationLog);
         }
 
         /// <summary>
