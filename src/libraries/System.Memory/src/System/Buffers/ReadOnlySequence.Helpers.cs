@@ -711,11 +711,12 @@ namespace System.Buffers
         {
             SequencePosition currentPosition, nextPosition;
             ReadOnlySequenceSegment<T> currentSegment;
-            ReadOnlySequenceSegment<T>? nextSegment = startSegment;
+            ReadOnlySequenceSegment<T>? nextSegment;
             object? endObject = _endObject;
             int endIndex = GetIndex(_endInteger);
 
             nextPosition = position;
+            nextSegment = startSegment;
             do
             {
                 currentPosition = nextPosition;
