@@ -709,27 +709,41 @@ namespace System.Buffers
             out ReadOnlyMemory<T> memory,
             out SequencePosition next)
         {
+            SequencePosition currentPosition, nextPosition;
+            ReadOnlySequenceSegment<T> currentSegment;
+            ReadOnlySequenceSegment<T>? nextSegment = startSegment;
             object? endObject = _endObject;
-            int startIndex = position.GetInteger();
             int endIndex = GetIndex(_endInteger);
 
-            if (startSegment != endObject)
+            nextPosition = position;
+            do
             {
-                ReadOnlySequenceSegment<T>? nextSegment = startSegment.Next;
-
-                if (nextSegment == null)
+                currentPosition = nextPosition;
+                currentSegment = nextSegment!;
+                int startIndex = currentPosition.GetInteger();
+                if (currentSegment != endObject)
                 {
-                    ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                    nextSegment = currentSegment.Next;
+
+                    if (nextSegment == null)
+                    {
+                        ThrowHelper.ThrowInvalidOperationException_EndPositionNotReached();
+                    }
+
+                    memory = currentSegment.Memory.Slice(startIndex);
+                    nextPosition = new SequencePosition(nextSegment, 0);
+                }
+                else
+                {
+                    memory = currentSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                    nextPosition = default;
                 }
 
-                memory = startSegment.Memory.Slice(startIndex);
-                next = new SequencePosition(nextSegment, 0);
-            }
-            else
-            {
-                memory = startSegment.Memory.Slice(startIndex, endIndex - startIndex);
-                next = default;
-            }
+                break;//”ƒ¿À»“‹
+            } while (memory.IsEmpty
+            && (currentSegment != endObject));
+
+            next = nextPosition;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
