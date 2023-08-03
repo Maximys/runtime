@@ -65,31 +65,12 @@ namespace System.Text.Json
                 _currentPosition = jsonData.Start;
                 _nextPosition = _currentPosition;
 
-                bool firstSegmentIsEmpty = _buffer.Length == 0;
-                if (firstSegmentIsEmpty)
+                if (jsonData.TryGet(ref _nextPosition, out ReadOnlyMemory<byte> memory, advance: true))
                 {
-                    // Once we find a non-empty segment, we need to set current position to it.
-                    // Therefore, track the next position in a copy before it gets advanced to the next segment.
-                    SequencePosition previousNextPosition = _nextPosition;
-                    while (jsonData.TryGet(ref _nextPosition, out ReadOnlyMemory<byte> memory, advance: true))
-                    {
-                        // _currentPosition should point to the segment right befor the segment that _nextPosition points to.
-                        _currentPosition = previousNextPosition;
-                        if (memory.Length != 0)
-                        {
-                            _buffer = memory.Span;
-                            break;
-                        }
-                        previousNextPosition = _nextPosition;
-                    }
+                    _buffer = memory.Span;
                 }
 
-                // If firstSegmentIsEmpty is true,
-                //    only check if we have reached the last segment but do not advance _nextPosition. The while loop above already advanced it.
-                //    Otherwise, we would end up skipping a segment (i.e. advance = false).
-                // If firstSegmentIsEmpty is false,
-                //    make sure to advance _nextPosition so that it is no longer the same as _currentPosition (i.e. advance = true).
-                _isLastSegment = !jsonData.TryGet(ref _nextPosition, out _, advance: !firstSegmentIsEmpty) && isFinalBlock; // Don't re-order to avoid short-circuiting
+                _isLastSegment = !jsonData.TryGet(ref _nextPosition, out _, advance: false) && isFinalBlock; // Don't re-order to avoid short-circuiting
 
                 Debug.Assert(!_nextPosition.Equals(_currentPosition));
 

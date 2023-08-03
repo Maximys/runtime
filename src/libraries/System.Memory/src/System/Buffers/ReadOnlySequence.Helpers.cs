@@ -739,8 +739,6 @@ namespace System.Buffers
                     memory = currentSegment.Memory.Slice(startIndex, endIndex - startIndex);
                     nextPosition = default;
                 }
-
-                break;//”ƒ¿À»“‹
             } while (memory.IsEmpty
             && (currentSegment != endObject));
 
