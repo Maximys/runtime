@@ -294,6 +294,7 @@ namespace System.Text.Json
                 }
                 if (memory.Length != 0)
                 {
+                    _currentPosition = _currentPosition.PositionOfSegment(memory);
                     break;
                 }
                 // _currentPosition needs to point to last non-empty segment
