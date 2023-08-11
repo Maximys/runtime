@@ -68,11 +68,7 @@ namespace System.Text.Json
                 if (jsonData.TryGet(ref _nextPosition, out ReadOnlyMemory<byte> memory, advance: true))
                 {
                     _buffer = memory.Span;
-                    while ((_currentPosition.GetObject() is ReadOnlySequenceSegment<byte> currentSegment)
-                            && (!memory.Equals(currentSegment.Memory)))
-                    {
-                        _currentPosition = new SequencePosition(currentSegment.Next, 0);
-                    }
+                    _currentPosition = _currentPosition.PositionOfSegment(memory);
                 }
 
                 _isLastSegment = !jsonData.TryGet(ref _nextPosition, out _, advance: false) && isFinalBlock; // Don't re-order to avoid short-circuiting
