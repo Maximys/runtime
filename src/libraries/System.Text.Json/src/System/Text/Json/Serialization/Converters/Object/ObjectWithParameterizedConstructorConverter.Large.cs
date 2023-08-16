@@ -31,7 +31,7 @@ namespace System.Text.Json.Serialization.Converters
             return success;
         }
 
-        protected sealed override object CreateObject(ref ReadStackFrame frame)
+        protected sealed override T CreateObject(ref ReadStackFrame frame)
         {
             Debug.Assert(frame.CtorArgumentState != null);
             Debug.Assert(frame.JsonTypeInfo.CreateObjectWithArgs != null);
@@ -41,7 +41,7 @@ namespace System.Text.Json.Serialization.Converters
 
             Func<object[], T> createObject = (Func<object[], T>)frame.JsonTypeInfo.CreateObjectWithArgs;
 
-            object obj = createObject(arguments);
+            T obj = createObject(arguments);
 
             ArrayPool<object>.Shared.Return(arguments, clearArray: true);
             return obj;

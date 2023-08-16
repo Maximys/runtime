@@ -14,7 +14,7 @@ namespace System.Text.Json.Serialization.Converters
     /// </summary>
     internal sealed class SmallObjectWithParameterizedConstructorConverter<T, TArg0, TArg1, TArg2, TArg3> : ObjectWithParameterizedConstructorConverter<T> where T : notnull
     {
-        protected override object CreateObject(ref ReadStackFrame frame)
+        protected override T CreateObject(ref ReadStackFrame frame)
         {
             var createObject = (JsonTypeInfo.ParameterizedConstructorDelegate<T, TArg0, TArg1, TArg2, TArg3>)
                 frame.JsonTypeInfo.CreateObjectWithArgs!;
