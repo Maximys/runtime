@@ -213,11 +213,11 @@ namespace System.Text.Json.Serialization
 
                     if ((state.Current.MetadataPropertyNames & MetadataPropertyName.Id) != 0)
                     {
-                        Debug.Assert(state.ReferenceId != null);
+                        Debug.Assert(state.Metadata.ReferenceId != null);
                         Debug.Assert(options.ReferenceHandlingStrategy == ReferenceHandlingStrategy.Preserve);
                         Debug.Assert(state.Current.ReturnValue is TDictionary);
-                        state.ReferenceResolver.AddReference(state.ReferenceId, state.Current.ReturnValue);
-                        state.ReferenceId = null;
+                        state.ReferenceResolver.AddReference(state.Metadata.ReferenceId, state.Current.ReturnValue);
+                        state.Metadata.ReferenceId = null;
                     }
 
                     state.Current.ObjectState = StackFrameObjectState.CreatedObject;

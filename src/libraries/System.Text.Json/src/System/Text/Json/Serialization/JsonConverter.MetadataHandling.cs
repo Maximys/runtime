@@ -25,10 +25,10 @@ namespace System.Text.Json.Serialization
             {
                 case PolymorphicSerializationState.None:
                     Debug.Assert(!state.IsContinuation);
-                    Debug.Assert(state.PolymorphicTypeDiscriminator != null);
+                    Debug.Assert(state.Metadata.PolymorphicTypeDiscriminator != null);
 
                     PolymorphicTypeResolver resolver = jsonTypeInfo.PolymorphicTypeResolver;
-                    if (resolver.TryGetDerivedJsonTypeInfo(state.PolymorphicTypeDiscriminator, out JsonTypeInfo? resolvedType))
+                    if (resolver.TryGetDerivedJsonTypeInfo(state.Metadata.PolymorphicTypeDiscriminator, out JsonTypeInfo? resolvedType))
                     {
                         Debug.Assert(Type!.IsAssignableFrom(resolvedType.Type));
 
@@ -43,7 +43,7 @@ namespace System.Text.Json.Serialization
                         state.Current.PolymorphicSerializationState = PolymorphicSerializationState.PolymorphicReEntryNotFound;
                     }
 
-                    state.PolymorphicTypeDiscriminator = null;
+                    state.Metadata.PolymorphicTypeDiscriminator = null;
                     break;
 
                 case PolymorphicSerializationState.PolymorphicReEntrySuspended:

@@ -112,10 +112,10 @@ namespace System.Text.Json.Serialization.Converters
 
                 if ((state.Current.MetadataPropertyNames & MetadataPropertyName.Id) != 0)
                 {
-                    Debug.Assert(state.ReferenceId != null);
+                    Debug.Assert(state.Metadata.ReferenceId != null);
                     Debug.Assert(options.ReferenceHandlingStrategy == ReferenceHandlingStrategy.Preserve);
-                    state.ReferenceResolver.AddReference(state.ReferenceId, obj);
-                    state.ReferenceId = null;
+                    state.ReferenceResolver.AddReference(state.Metadata.ReferenceId, obj);
+                    state.Metadata.ReferenceId = null;
                 }
 
                 jsonTypeInfo.OnDeserializing?.Invoke(obj);

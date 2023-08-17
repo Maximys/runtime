@@ -61,6 +61,11 @@ namespace System.Text.Json
         public bool IsContinuation => _continuationCount != 0;
 
         /// <summary>
+        /// Metadata of the currently read object.
+        /// </summary>
+        public ReadMetadata Metadata;
+
+        /// <summary>
         /// Internal flag to let us know that we need to read ahead in the inner read loop.
         /// </summary>
         public bool ReadAhead;
@@ -72,16 +77,6 @@ namespace System.Text.Json
         /// Whether we need to read ahead in the inner read loop.
         /// </summary>
         public bool SupportContinuation;
-
-        /// <summary>
-        /// Holds the value of $id or $ref of the currently read object
-        /// </summary>
-        public string? ReferenceId;
-
-        /// <summary>
-        /// Holds the value of $type of the currently read object
-        /// </summary>
-        public object? PolymorphicTypeDiscriminator;
 
         /// <summary>
         /// Global flag indicating whether we can read preserved references.
@@ -232,7 +227,6 @@ namespace System.Text.Json
 
             return derivedJsonTypeInfo.Converter;
         }
-
 
         /// <summary>
         /// Configures the current frame for a continuation of a polymorphic converter.
