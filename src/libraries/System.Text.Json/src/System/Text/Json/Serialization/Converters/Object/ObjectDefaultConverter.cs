@@ -54,68 +54,77 @@ namespace System.Text.Json.Serialization.Converters
             }
 
             // Handle the metadata properties.
-            if (state.Current.CanContainMetadata && state.Current.ObjectState < StackFrameObjectState.ReadMetadata)
+            ReadStack metadataState = state;
+            Utf8JsonReader metadataReader = reader;
+            if (metadataState.Current.CanContainMetadata && metadataState.Current.ObjectState < StackFrameObjectState.ReadMetadata)
             {
-                if (!JsonSerializer.TryReadMetadata(this, jsonTypeInfo, ref reader, ref state))
+                if (!JsonSerializer.TryReadMetadata(this, jsonTypeInfo, ref metadataReader, ref metadataState))
                 {
+                    state = metadataState;
+                    reader = metadataReader;
                     value = default;
                     return false;
                 }
 
-                if (state.Current.MetadataPropertyNames == MetadataPropertyName.Ref)
+                if (metadataState.Current.MetadataPropertyNames == MetadataPropertyName.Ref)
                 {
+                    state = metadataState;
+                    reader = metadataReader;
                     value = JsonSerializer.ResolveReferenceId<T>(ref state);
                     return true;
                 }
 
-                state.Current.ObjectState = StackFrameObjectState.ReadMetadata;
+                metadataState.Current.ObjectState = StackFrameObjectState.ReadMetadata;
             }
 
             // Dispatch to any polymorphic converters: should always be entered regardless of ObjectState progress
-            if ((state.Current.MetadataPropertyNames & MetadataPropertyName.Type) != 0 &&
-                state.Current.PolymorphicSerializationState != PolymorphicSerializationState.PolymorphicReEntryStarted &&
-                ResolvePolymorphicConverter(jsonTypeInfo, ref state) is JsonConverter polymorphicConverter)
+            if ((metadataState.Current.MetadataPropertyNames & MetadataPropertyName.Type) != 0 &&
+                metadataState.Current.PolymorphicSerializationState != PolymorphicSerializationState.PolymorphicReEntryStarted &&
+                ResolvePolymorphicConverter(jsonTypeInfo, ref metadataState) is JsonConverter polymorphicConverter)
             {
                 Debug.Assert(!IsValueType);
-                bool success = polymorphicConverter.OnTryReadAsObject(ref reader, polymorphicConverter.Type!, options, ref state, out object? objectResult);
+                bool success = polymorphicConverter.OnTryReadAsObject(ref metadataReader, polymorphicConverter.Type!, options, ref metadataState, out object? objectResult);
                 value = (T)objectResult!;
-                state.ExitPolymorphicConverter(success);
+                metadataState.ExitPolymorphicConverter(success);
+                state = metadataState;
+                reader = metadataReader;
                 return success;
             }
 
-            if (state.Current.ObjectState < StackFrameObjectState.CreatedObject)
+            JsonSerializer.TryMoveToPropertyName(ref reader, ref state);
+            if (metadataState.Current.ObjectState < StackFrameObjectState.CreatedObject)
             {
-                if (state.Current.CanContainMetadata)
+                if (metadataState.Current.CanContainMetadata)
                 {
-                    JsonSerializer.ValidateMetadataForObjectConverter(ref state);
+                    JsonSerializer.ValidateMetadataForObjectConverter(ref metadataState);
                 }
 
-                if (state.Current.MetadataPropertyNames == MetadataPropertyName.Ref)
+                if (metadataState.Current.MetadataPropertyNames == MetadataPropertyName.Ref)
                 {
-                    value = JsonSerializer.ResolveReferenceId<T>(ref state);
+                    value = JsonSerializer.ResolveReferenceId<T>(ref metadataState);
                     return true;
                 }
 
-                if (state.ParentProperty?.TryGetPrePopulatedValue(ref state) == true)
+                if (metadataState.ParentProperty?.TryGetPrePopulatedValue(ref metadataState) == true)
                 {
-                    obj = state.Current.ReturnValue!;
+                    obj = metadataState.Current.ReturnValue!;
                 }
                 else
                 {
                     if (jsonTypeInfo.CreateObject == null)
                     {
-                        ThrowHelper.ThrowNotSupportedException_DeserializeNoConstructor(jsonTypeInfo.Type, ref reader, ref state);
+                        ThrowHelper.ThrowNotSupportedException_DeserializeNoConstructor(jsonTypeInfo.Type, ref metadataReader, ref metadataState);
                     }
 
                     obj = jsonTypeInfo.CreateObject()!;
                 }
 
-                if ((state.Current.MetadataPropertyNames & MetadataPropertyName.Id) != 0)
+                if ((metadataState.Current.MetadataPropertyNames & MetadataPropertyName.Id) != 0)
                 {
-                    Debug.Assert(state.Metadata.ReferenceId != null);
+                    Debug.Assert(metadataState.Metadata.ReferenceId != null);
                     Debug.Assert(options.ReferenceHandlingStrategy == ReferenceHandlingStrategy.Preserve);
-                    state.ReferenceResolver.AddReference(state.Metadata.ReferenceId, obj);
-                    state.Metadata.ReferenceId = null;
+                    state.ReferenceResolver.AddReference(metadataState.Metadata.ReferenceId, obj);
+                    metadataState.Metadata.ReferenceId = null;
                 }
 
                 jsonTypeInfo.OnDeserializing?.Invoke(obj);
@@ -214,7 +223,7 @@ namespace System.Text.Json.Serialization.Converters
                 // Read method would have thrown if otherwise.
                 Debug.Assert(tokenType == JsonTokenType.PropertyName);
 
-                ReadOnlySpan<byte> unescapedPropertyName = JsonSerializer.GetPropertyName(ref state, ref reader);
+                ReadOnlySpan<byte> unescapedPropertyName = JsonSerializer.GetPropertyName(ref reader);
                 JsonPropertyInfo jsonPropertyInfo = JsonSerializer.LookupProperty(
                     obj,
                     unescapedPropertyName,
@@ -262,7 +271,7 @@ namespace System.Text.Json.Serialization.Converters
                     // Read method would have thrown if otherwise.
                     Debug.Assert(tokenType == JsonTokenType.PropertyName);
 
-                    ReadOnlySpan<byte> unescapedPropertyName = JsonSerializer.GetPropertyName(ref state, ref reader);
+                    ReadOnlySpan<byte> unescapedPropertyName = JsonSerializer.GetPropertyName(ref reader);
                     jsonPropertyInfo = JsonSerializer.LookupProperty(
                         obj,
                         unescapedPropertyName,

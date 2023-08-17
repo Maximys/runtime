@@ -79,7 +79,6 @@ namespace System.Text.Json
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ReadOnlySpan<byte> GetPropertyName(
-            scoped ref ReadStack state,
             ref Utf8JsonReader reader)
         {
             ReadOnlySpan<byte> unescapedPropertyName;
@@ -92,14 +91,6 @@ namespace System.Text.Json
             else
             {
                 unescapedPropertyName = propertyName;
-            }
-
-            if (state.Current.CanContainMetadata)
-            {
-                if (IsMetadataPropertyName(propertyName, state.Current.BaseJsonTypeInfo.PolymorphicTypeResolver))
-                {
-                    ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
-                }
             }
 
             return unescapedPropertyName;
