@@ -14,6 +14,11 @@ namespace System.Text.Json.Serialization.Converters
     /// </summary>
     internal class ObjectDefaultConverter<T> : JsonObjectConverter<T> where T : notnull
     {
+        private static readonly HashSet<MetadataPropertyName> MetadataPropertyNamesWhichShouldNotHaveNeighbors = new HashSet<MetadataPropertyName>
+        {
+            MetadataPropertyName.Ref
+        };
+
         internal override bool CanHaveMetadata => true;
         internal override bool SupportsCreateObjectDelegate => true;
 
@@ -256,6 +261,10 @@ namespace System.Text.Json.Serialization.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool PopulatePropertiesSlowPath(object obj, JsonSerializerOptions options, ref Utf8JsonReader reader, scoped ref ReadStack state)
         {
+            bool someOtherPropertyExists;
+
+            someOtherPropertyExists = false;
+
             while (true)
             {
                 if (!JsonSerializer.TryMoveToPropertyName(ref reader, ref state))
@@ -280,7 +289,7 @@ namespace System.Text.Json.Serialization.Converters
                     // Read method would have thrown if otherwise.
                     Debug.Assert(tokenType == JsonTokenType.PropertyName);
 
-                    ReadOnlySpan<byte> unescapedPropertyName = JsonSerializer.GetPropertyName(ref reader);
+                    ReadOnlySpan<byte> unescapedPropertyName = GetPropertyName(ref state, ref reader, someOtherPropertyExists);
                     jsonPropertyInfo = JsonSerializer.LookupProperty(
                         obj,
                         unescapedPropertyName,
@@ -340,6 +349,8 @@ namespace System.Text.Json.Serialization.Converters
 
                     state.Current.EndProperty();
                 }
+
+                someOtherPropertyExists = true;
             }
 
             return true;
@@ -485,6 +496,24 @@ namespace System.Text.Json.Serialization.Converters
             jsonTypeInfo.OnSerialized?.Invoke(obj);
 
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static ReadOnlySpan<byte> GetPropertyName(
+            scoped ref ReadStack state,
+            ref Utf8JsonReader reader,
+            bool someOtherPropertyExists)
+        {
+            ReadOnlySpan<byte> propertyName = reader.GetSpan();
+
+            if (someOtherPropertyExists)
+            {
+                if (MetadataPropertyNamesWhichShouldNotHaveNeighbors.Contains(JsonSerializer.GetMetadataPropertyName(propertyName, resolver: null)))
+                {
+                    ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
+                }
+            }
+            return JsonSerializer.GetPropertyName(ref reader);
         }
 
         // AggressiveInlining since this method is only called from two locations and is on a hot path.
