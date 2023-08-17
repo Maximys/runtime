@@ -70,6 +70,11 @@ namespace System.Text.Json
         /// </summary>
         public bool ReadAhead;
 
+        /// <summary>
+        /// State of the current object reading.
+        /// </summary>
+        public ReadStates State { get; set; }
+
         // The bag of preservable references.
         public ReferenceResolver ReferenceResolver;
 

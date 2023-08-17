@@ -261,10 +261,6 @@ namespace System.Text.Json.Serialization.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool PopulatePropertiesSlowPath(object obj, JsonSerializerOptions options, ref Utf8JsonReader reader, scoped ref ReadStack state)
         {
-            bool someOtherPropertyExists;
-
-            someOtherPropertyExists = false;
-
             while (true)
             {
                 if (!JsonSerializer.TryMoveToPropertyName(ref reader, ref state))
@@ -289,7 +285,7 @@ namespace System.Text.Json.Serialization.Converters
                     // Read method would have thrown if otherwise.
                     Debug.Assert(tokenType == JsonTokenType.PropertyName);
 
-                    ReadOnlySpan<byte> unescapedPropertyName = GetPropertyName(ref state, ref reader, someOtherPropertyExists);
+                    ReadOnlySpan<byte> unescapedPropertyName = GetPropertyName(ref state, ref reader);
                     jsonPropertyInfo = JsonSerializer.LookupProperty(
                         obj,
                         unescapedPropertyName,
@@ -349,8 +345,6 @@ namespace System.Text.Json.Serialization.Converters
 
                     state.Current.EndProperty();
                 }
-
-                someOtherPropertyExists = true;
             }
 
             return true;
@@ -501,18 +495,26 @@ namespace System.Text.Json.Serialization.Converters
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static ReadOnlySpan<byte> GetPropertyName(
             scoped ref ReadStack state,
-            ref Utf8JsonReader reader,
-            bool someOtherPropertyExists)
+            ref Utf8JsonReader reader)
         {
             ReadOnlySpan<byte> propertyName = reader.GetSpan();
 
-            if (someOtherPropertyExists)
+            MetadataPropertyName name = JsonSerializer.GetMetadataPropertyName(propertyName, resolver: null);
+            switch (name)
             {
-                if (MetadataPropertyNamesWhichShouldNotHaveNeighbors.Contains(JsonSerializer.GetMetadataPropertyName(propertyName, resolver: null)))
-                {
+                case MetadataPropertyName.Id
+                    when state.State != ReadStates.None:
                     ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
-                }
+                    break;
+                default:
+                    if (MetadataPropertyNamesWhichShouldNotHaveNeighbors.Contains(name))
+                    {
+                        ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
+                    }
+                    break;
             }
+
+            state.State |= (ReadStates)name;
             return JsonSerializer.GetPropertyName(ref reader);
         }
 
