@@ -58,12 +58,21 @@ namespace System.Text.Json.Serialization.Converters
             Utf8JsonReader metadataReader = reader;
             if (metadataState.Current.CanContainMetadata && metadataState.Current.ObjectState < StackFrameObjectState.ReadMetadata)
             {
-                if (!JsonSerializer.TryReadMetadata(this, jsonTypeInfo, ref metadataReader, ref metadataState))
+                try
+                {
+                    if (!JsonSerializer.TryReadMetadata(this, jsonTypeInfo, ref metadataReader, ref metadataState))
+                    {
+                        state = metadataState;
+                        reader = metadataReader;
+                        value = default;
+                        return false;
+                    }
+                }
+                catch
                 {
                     state = metadataState;
                     reader = metadataReader;
-                    value = default;
-                    return false;
+                    throw;
                 }
 
                 if (metadataState.Current.MetadataPropertyNames == MetadataPropertyName.Ref)
