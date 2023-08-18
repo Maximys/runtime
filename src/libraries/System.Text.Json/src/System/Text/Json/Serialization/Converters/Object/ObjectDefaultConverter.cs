@@ -89,6 +89,7 @@ namespace System.Text.Json.Serialization.Converters
                 }
 
                 metadataState.Current.ObjectState = StackFrameObjectState.ReadMetadata;
+                JsonSerializer.TryMoveToPropertyName(ref reader, ref state);
             }
 
             // Dispatch to any polymorphic converters: should always be entered regardless of ObjectState progress
@@ -105,7 +106,6 @@ namespace System.Text.Json.Serialization.Converters
                 return success;
             }
 
-            JsonSerializer.TryMoveToPropertyName(ref reader, ref state);
             if (metadataState.Current.ObjectState < StackFrameObjectState.CreatedObject)
             {
                 if (metadataState.Current.CanContainMetadata)
