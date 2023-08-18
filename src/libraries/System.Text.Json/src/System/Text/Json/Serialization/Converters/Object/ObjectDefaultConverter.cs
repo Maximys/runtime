@@ -503,7 +503,7 @@ namespace System.Text.Json.Serialization.Converters
             switch (name)
             {
                 case MetadataPropertyName.Id
-                    when state.State != ReadStates.None:
+                    when state.Current.State != ReadStates.None:
                     ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
                     break;
                 default:
@@ -514,7 +514,7 @@ namespace System.Text.Json.Serialization.Converters
                     break;
             }
 
-            state.State |= (ReadStates)name;
+            state.Current.State |= (ReadStates)name;
             return JsonSerializer.GetPropertyName(ref reader);
         }
 

@@ -78,6 +78,11 @@ namespace System.Text.Json
         public bool HasParentObject;
         public bool IsPopulating;
 
+        /// <summary>
+        /// State of the current object reading.
+        /// </summary>
+        public ReadStates State { get; set; }
+
         public void EndConstructorParameter()
         {
             CtorArgumentState!.JsonParameterInfo = null;
