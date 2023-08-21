@@ -144,6 +144,7 @@ namespace System.Text.Json.Serialization.Converters
                 jsonTypeInfo.OnDeserializing?.Invoke(obj);
 
                 state.Current.ReturnValue = obj;
+                state.Current.IsPopulating = metadataState.Current.IsPopulating;
                 state.Current.ObjectState = StackFrameObjectState.CreatedObject;
                 state.Current.InitializeRequiredPropertiesValidationState(jsonTypeInfo);
             }
