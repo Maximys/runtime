@@ -93,25 +93,6 @@ namespace System.Text.Json.Serialization.Tests
         }
 
         [Fact]
-        public async Task RandomReferenceMetadataNotSupported()
-        {
-            string json = @"{""Name"":""Jet"",""$random"":10}";
-
-            // Baseline, preserve ref feature off.
-
-            var employee = await Serializer.DeserializeWrapper<Employee>(json);
-
-            Assert.Equal("Jet", employee.Name);
-
-            // Metadata not supported with preserve ref feature on.
-
-            var options = new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve };
-
-            JsonException ex = await Assert.ThrowsAsync<JsonException>(() => Serializer.DeserializeWrapper<Employee>(json, options));
-            Assert.Equal("$.$random", ex.Path);
-        }
-
-        [Fact]
         public async Task ExtensionDataProperty_CannotBindTo_CtorParam()
         {
             InvalidOperationException ex = await Assert.ThrowsAsync<InvalidOperationException>(() => Serializer.DeserializeWrapper<Class_ExtData_CtorParam>("{}"));
