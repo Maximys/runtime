@@ -138,7 +138,7 @@ namespace System.Text.Json.Serialization.Converters
                     Debug.Assert(metadataState.Metadata.ReferenceId != null);
                     Debug.Assert(options.ReferenceHandlingStrategy == ReferenceHandlingStrategy.Preserve);
                     state.ReferenceResolver.AddReference(metadataState.Metadata.ReferenceId, obj);
-                    metadataState.Metadata.ReferenceId = null;
+                    state.Metadata.ReferenceId = null;
                 }
 
                 jsonTypeInfo.OnDeserializing?.Invoke(obj);
