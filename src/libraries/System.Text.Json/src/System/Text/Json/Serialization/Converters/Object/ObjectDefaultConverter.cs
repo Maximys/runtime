@@ -515,7 +515,15 @@ namespace System.Text.Json.Serialization.Converters
                     break;
             }
 
-            state.Current.State |= (ReadStates)name;
+            if (name != MetadataPropertyName.None)
+            {
+                state.Current.State |= (ReadStates)name;
+            }
+            else
+            {
+                state.Current.State |= ReadStates.Other;
+            }
+
             return JsonSerializer.GetPropertyName(ref reader);
         }
 

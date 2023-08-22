@@ -11,5 +11,6 @@ namespace System.Text.Json
         Id      = MetadataPropertyName.Id,
         Ref     = MetadataPropertyName.Ref,
         Type    = MetadataPropertyName.Type,
+        Other   = MetadataPropertyName.Type << 1,
     }
 }
