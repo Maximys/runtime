@@ -503,12 +503,19 @@ namespace System.Text.Json.Serialization.Converters
             MetadataPropertyName name = JsonSerializer.GetMetadataPropertyName(propertyName, resolver: null);
             switch (name)
             {
+                case MetadataPropertyName.None
+                    when propertyName.Length > 0 && propertyName[0] == '$':
+                    ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
+                    break;
+                case MetadataPropertyName.None:
+                    break;
                 case MetadataPropertyName.Id
                     when state.Current.State != ReadStates.None:
                     ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
                     break;
                 default:
-                    if (MetadataPropertyNamesWhichShouldNotHaveNeighbors.Contains(name))
+                    if (MetadataPropertyNamesWhichShouldNotHaveNeighbors.Contains(name)
+                        || state.Current.State.HasFlag(ReadStates.Other))
                     {
                         ThrowHelper.ThrowUnexpectedMetadataException(propertyName, ref reader, ref state);
                     }
