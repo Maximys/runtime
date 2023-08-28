@@ -547,6 +547,7 @@ namespace System.Xml.Serialization
         protected static char ToChar(string value) { throw null; }
         protected static System.DateTime ToDate(string value) { throw null; }
         protected static System.DateTime ToDateTime(string value) { throw null; }
+        protected static System.DateOnly ToDateOnly(string value) { throw null; }
         protected static long ToEnum(string value, System.Collections.Hashtable h, string typeName) { throw null; }
         protected static System.DateTime ToTime(string value) { throw null; }
         [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute("value")]
@@ -605,6 +606,7 @@ namespace System.Xml.Serialization
         protected static string? FromByteArrayHex(byte[]? value) { throw null; }
         protected static string FromChar(char value) { throw null; }
         protected static string FromDate(System.DateTime value) { throw null; }
+        protected static string FromDate(System.DateOnly value) { throw null; }
         protected static string FromDateTime(System.DateTime value) { throw null; }
         protected static string FromEnum(long value, string[] values, long[] ids) { throw null; }
         protected static string FromEnum(long value, string[] values, long[] ids, string typeName) { throw null; }

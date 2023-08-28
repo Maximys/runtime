@@ -110,6 +110,20 @@ namespace System.Xml.Serialization
             WriteElementStringRaw(@"dateTime", @"", FromDateTime(((System.DateTime)o)));
         }
 
+        internal void Write_dateOnly(DateOnly? dateOnly)
+        {
+            WriteStartDocument();
+            if (dateOnly == null)
+            {
+                WriteEmptyTag(TypeScope.DateOnlyDataTypeName, @"");
+                return;
+            }
+            else
+            {
+                WriteElementStringRaw(TypeScope.DateOnlyDataTypeName, @"", FromDate(dateOnly.Value));
+            }
+        }
+
         internal void Write_dateTimeOffset(object? o)
         {
             WriteStartDocument();
@@ -466,6 +480,30 @@ namespace System.Xml.Serialization
             return (object?)o;
         }
 
+        internal DateOnly? Read_dateOnly()
+        {
+            DateOnly? returnValue;
+
+            Reader.MoveToContent();
+            if (Reader.NodeType == XmlNodeType.Element)
+            {
+                if ((Reader.LocalName == _id21_dateOnly && Reader.NamespaceURI == _id2_Item))
+                {
+                    returnValue = ToDateOnly(Reader.ReadElementString());
+                }
+                else
+                {
+                    throw CreateUnknownNodeException();
+                }
+            }
+            else
+            {
+                UnknownNode(null);
+                returnValue = null;
+            }
+            return returnValue;
+        }
+
         internal object? Read_dateTimeOffset()
         {
             object? o = null;
@@ -763,6 +801,7 @@ namespace System.Xml.Serialization
         private string _id7_float = null!;
         private string _id10_dateTime = null!;
         private string _id20_dateTimeOffset = null!;
+        private string _id21_dateOnly = null!;
         private string _id6_long = null!;
         private string _id9_decimal = null!;
         private string _id8_double = null!;
@@ -787,6 +826,7 @@ namespace System.Xml.Serialization
             _id7_float = Reader.NameTable.Add(@"float");
             _id10_dateTime = Reader.NameTable.Add(@"dateTime");
             _id20_dateTimeOffset = Reader.NameTable.Add(@"dateTimeOffset");
+            _id21_dateOnly = Reader.NameTable.Add(TypeScope.DateOnlyDataTypeName);
             _id6_long = Reader.NameTable.Add(@"long");
             _id9_decimal = Reader.NameTable.Add(@"decimal");
             _id8_double = Reader.NameTable.Add(@"double");

@@ -1087,6 +1087,11 @@ namespace System.Xml.Serialization
             return XmlCustomFormatter.ToDateTime(value);
         }
 
+        protected static DateOnly ToDateOnly(string value)
+        {
+            return XmlCustomFormatter.ToDateOnly(value);
+        }
+
         protected static DateTime ToDate(string value)
         {
             return XmlCustomFormatter.ToDate(value);

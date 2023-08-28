@@ -214,6 +214,9 @@ namespace System.Xml
         public static bool ToBoolean(string s) { throw null; }
         public static byte ToByte(string s) { throw null; }
         public static char ToChar(string s) { throw null; }
+        public static System.DateOnly ToDateOnly(string s) { throw null; }
+        public static System.DateOnly ToDateOnly(string s, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("DateOnlyFormat")] string format) { throw null; }
+        public static System.DateOnly ToDateOnly(string s, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("DateOnlyFormat")] string[] formats) { throw null; }
         [System.ObsoleteAttribute("Use XmlConvert.ToDateTime() that accepts an XmlDateTimeSerializationMode instead.")]
         public static System.DateTime ToDateTime(string s) { throw null; }
         public static System.DateTime ToDateTime(string s, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("DateTimeFormat")] string format) { throw null; }
@@ -234,6 +237,7 @@ namespace System.Xml
         public static string ToString(bool value) { throw null; }
         public static string ToString(byte value) { throw null; }
         public static string ToString(char value) { throw null; }
+        public static string ToString(System.DateOnly value, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("DateOnlyFormat")] string format) { throw null; }
         [System.ObsoleteAttribute("Use XmlConvert.ToString() that accepts an XmlDateTimeSerializationMode instead.")]
         public static string ToString(System.DateTime value) { throw null; }
         public static string ToString(System.DateTime value, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("DateTimeFormat")] string format) { throw null; }

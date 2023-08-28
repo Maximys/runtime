@@ -115,6 +115,13 @@ public static partial class XmlSerializerTests
 <dateTime>9999-12-31T23:59:59.9999999Z</dateTime>"), DateTime.SpecifyKind(DateTime.MaxValue, DateTimeKind.Utc));
     }
 
+    [Theory]
+    [MemberData(nameof(DateOnlyAsRoot_TestData))]
+    public static void DateOnlyAsRoot(DateOnly dateOnly, string expectedValue)
+    {
+        Assert.StrictEqual(SerializeAndDeserialize(dateOnly, expectedValue), dateOnly);
+    }
+
     [Fact]
     public static void Xml_DecimalAsRoot()
     {
@@ -3097,5 +3104,11 @@ public static partial class XmlSerializerTests
         var value = new PrimiveAttributeTestDerived() { Number = 5 };
         var actual = SerializeAndDeserialize(value, "<?xml version=\"1.0\"?><PrimiveAttributeTestDerived xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">5</PrimiveAttributeTestDerived>");
         Assert.Equal(value.Number, actual.Number);
+    }
+
+    public static IEnumerable<object[]> DateOnlyAsRoot_TestData()
+    {
+        yield return new object[] { new DateOnly(1991, 8, 20), @"<?xml version=""1.0""?><dateOnly>1991-08-20</dateOnly>" };
+        yield return new object[] { new DateOnly(2013, 1, 2), @"<?xml version=""1.0""?><dateOnly>2013-01-02</dateOnly>" };
     }
 }

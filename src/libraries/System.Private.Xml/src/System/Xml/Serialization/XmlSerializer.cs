@@ -893,6 +893,10 @@ namespace System.Xml.Serialization
                     {
                         writer.Write_dateTimeOffset(o);
                     }
+                    else if (_primitiveType == typeof(DateOnly))
+                    {
+                        writer.Write_dateOnly((DateOnly?)o);
+                    }
                     else
                     {
                         throw new InvalidOperationException(SR.Format(SR.XmlUnxpectedType, _primitiveType!.FullName));
@@ -974,6 +978,10 @@ namespace System.Xml.Serialization
                     else if (_primitiveType == typeof(DateTimeOffset))
                     {
                         o = reader.Read_dateTimeOffset();
+                    }
+                    else if (_primitiveType == typeof(DateOnly))
+                    {
+                        o = reader.Read_dateOnly();
                     }
                     else
                     {

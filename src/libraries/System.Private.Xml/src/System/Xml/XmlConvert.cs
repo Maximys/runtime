@@ -688,6 +688,11 @@ namespace System.Xml
             return new XsdDuration(value).ToString();
         }
 
+        public static string ToString(DateOnly value, [StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string format)
+        {
+            return value.ToString(format, CultureInfo.InvariantCulture);
+        }
+
         [Obsolete("Use XmlConvert.ToString() that accepts an XmlDateTimeSerializationMode instead.")]
         public static string ToString(DateTime value)
         {
@@ -1143,6 +1148,21 @@ namespace System.Xml
             }
         }
 
+        private static volatile string[]? s_allDateOnlyFormats;
+
+        private static string[] AllDateOnlyFormats
+        {
+            get
+            {
+                if (s_allDateOnlyFormats == null)
+                {
+                    CreateAllDateOnlyFormats();
+                }
+
+                return s_allDateOnlyFormats!;
+            }
+        }
+
         // use AllDateTimeFormats property to access the formats
         private static volatile string[]? s_allDateTimeFormats;
 
@@ -1158,6 +1178,13 @@ namespace System.Xml
 
                 return s_allDateTimeFormats!;
             }
+        }
+
+        private static void CreateAllDateOnlyFormats()
+        {
+            s_allDateOnlyFormats ??= new string[] {
+                "yyyy-MM-dd",
+            };
         }
 
         private static void CreateAllDateTimeFormats()
@@ -1189,6 +1216,21 @@ namespace System.Xml
                 "--MM--Z",
                 "--MM--zzzzzz",
             };
+        }
+
+        public static DateOnly ToDateOnly(string s)
+        {
+            return ToDateOnly(s, AllDateOnlyFormats);
+        }
+
+        public static DateOnly ToDateOnly(string s, [StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string format)
+        {
+            return DateOnly.ParseExact(s, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowLeadingWhite | DateTimeStyles.AllowTrailingWhite);
+        }
+
+        public static DateOnly ToDateOnly(string s, [StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string[] formats)
+        {
+            return DateOnly.ParseExact(s, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowLeadingWhite | DateTimeStyles.AllowTrailingWhite);
         }
 
         [Obsolete("Use XmlConvert.ToDateTime() that accepts an XmlDateTimeSerializationMode instead.")]

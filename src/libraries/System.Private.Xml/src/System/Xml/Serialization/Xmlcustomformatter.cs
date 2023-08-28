@@ -80,6 +80,11 @@ namespace System.Xml.Serialization
             return XmlConvert.ToString(value, "yyyy-MM-dd");
         }
 
+        internal static string FromDate(DateOnly value)
+        {
+            return XmlConvert.ToString(value, "yyyy-MM-dd");
+        }
+
         internal static string FromTime(DateTime value)
         {
             if (!LocalAppContextSwitches.IgnoreKindInUtcTimeSerialization && value.Kind == DateTimeKind.Utc)
@@ -391,6 +396,11 @@ namespace System.Xml.Serialization
         internal static DateTime ToDate(string value)
         {
             return ToDateTime(value, s_allDateFormats);
+        }
+
+        internal static DateOnly ToDateOnly(string value)
+        {
+            return XmlConvert.ToDateOnly(value);
         }
 
         internal static DateTime ToTime(string value)

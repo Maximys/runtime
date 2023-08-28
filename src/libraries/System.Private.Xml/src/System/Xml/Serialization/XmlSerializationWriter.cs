@@ -133,6 +133,11 @@ namespace System.Xml.Serialization
             return XmlCustomFormatter.FromDate(value);
         }
 
+        protected static string FromDate(DateOnly value)
+        {
+            return XmlCustomFormatter.FromDate(value);
+        }
+
         protected static string FromTime(DateTime value)
         {
             return XmlCustomFormatter.FromTime(value);
