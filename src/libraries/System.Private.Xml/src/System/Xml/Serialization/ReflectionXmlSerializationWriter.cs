@@ -1079,7 +1079,7 @@ namespace System.Xml.Serialization
 
         private bool WritePrimitiveValue(TypeDesc typeDesc, object? o, out string? stringValue)
         {
-            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.FormatterName == "String")
+            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
             {
                 stringValue = (string?)o;
                 return true;
@@ -1091,26 +1091,26 @@ namespace System.Xml.Serialization
                     stringValue = ConvertPrimitiveToString(o!, typeDesc);
                     return true;
                 }
-                else if (o is byte[] && typeDesc.FormatterName == "ByteArrayHex")
+                else if (o is byte[] byteArray && typeDesc.FormatterName == "ByteArrayHex")
                 {
-                    stringValue = FromByteArrayHex((byte[])o);
+                    stringValue = FromByteArrayHex(byteArray);
                     return true;
                 }
-                else if (o is DateTime)
+                else if (o is DateTime dateTime)
                 {
-                    if (typeDesc.FormatterName == "DateTime")
+                    if (typeDesc.FormatterName == TypeScope.DateTimeFormatterName)
                     {
-                        stringValue = FromDateTime((DateTime)o);
+                        stringValue = FromDateTime(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == "Date")
+                    else if (typeDesc.FormatterName == TypeScope.DateFormatterName)
                     {
-                        stringValue = FromDate((DateTime)o);
+                        stringValue = FromDate(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == "Time")
+                    else if (typeDesc.FormatterName == TypeScope.TimeFormatterName)
                     {
-                        stringValue = FromTime((DateTime)o);
+                        stringValue = FromTime(dateTime);
                         return true;
                     }
                     else
@@ -1123,21 +1123,21 @@ namespace System.Xml.Serialization
                     stringValue = FromXmlQualifiedName((XmlQualifiedName?)o);
                     return true;
                 }
-                else if (o is string)
+                else if (o is string str)
                 {
                     switch (typeDesc.FormatterName)
                     {
-                        case "XmlName":
-                            stringValue = FromXmlName((string)o);
+                        case TypeScope.XmlNameFormatterName:
+                            stringValue = FromXmlName(str);
                             break;
-                        case "XmlNCName":
-                            stringValue = FromXmlNCName((string)o);
+                        case TypeScope.NoncolonizedNameFormatterName:
+                            stringValue = FromXmlNCName(str);
                             break;
-                        case "XmlNmToken":
-                            stringValue = FromXmlNmToken((string)o);
+                        case TypeScope.XmlNmTokenFormatterName:
+                            stringValue = FromXmlNmToken(str);
                             break;
-                        case "XmlNmTokens":
-                            stringValue = FromXmlNmTokens((string)o);
+                        case TypeScope.XmlNmTokensFormatterName:
+                            stringValue = FromXmlNmTokens(str);
                             break;
                         default:
                             stringValue = null;
@@ -1146,9 +1146,9 @@ namespace System.Xml.Serialization
 
                     return true;
                 }
-                else if (o is char && typeDesc.FormatterName == "Char")
+                else if (o is char ch && typeDesc.FormatterName == TypeScope.CharFormatterName)
                 {
-                    stringValue = FromChar((char)o);
+                    stringValue = FromChar(ch);
                     return true;
                 }
                 else if (o is byte[])

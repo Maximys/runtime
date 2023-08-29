@@ -13,10 +13,71 @@ namespace System.Xml.Serialization.Types
 {
     internal sealed class TypeScope
     {
+        internal const string BooleanDataTypeName = "boolean";
+        internal const string BooleanFormatterName = "Boolean";
+        internal const string ByteArrayBase64DataTypeName = "base64Binary";
+        internal const string ByteArrayBase64FormatterName = "ByteArrayBase64";
+        internal const string ByteArrayHexDataTypeName = "hexBinary";
+        internal const string ByteArrayHexFormatterName = "ByteArrayHex";
+        internal const string ByteDataTypeName = "unsignedByte";
+        internal const string ByteFormatterName = "Byte";
+        internal const string CharDataTypeName = "char";
+        internal const string CharFormatterName = "Char";
+        internal const string DateDataTypeName = "date";
+        internal const string DateFormatterName = "Date";
         internal const string DateOnlyDataTypeName = "dateOnly";
         internal const string DateOnlyFormatterName = "DateOnly";
+        internal const string DateTimeDataTypeName = "dateTime";
+        internal const string DateTimeFormatterName = "DateTime";
+        internal const string DateTimeOffsetDataTypeName = "dateTimeOffset";
+        internal const string DateTimeOffsetFormatterName = "DateTimeOffset";
+        internal const string DecimalDataTypeName = "decimal";
+        internal const string DecimalFormatterName = "Decimal";
+        internal const string DoubleDataTypeName = "double";
+        internal const string DoubleFormatterName = "Double";
+        internal const string GuidDataTypeName = "guid";
+        internal const string GuidFormatterName = "Guid";
+        internal const string Int16DataTypeName = "short";
+        internal const string Int16FormatterName = "Int16";
+        internal const string Int32DataTypeName = "int";
+        internal const string Int32FormatterName = "Int32";
+        internal const string Int64DataTypeName = "long";
+        internal const string Int64FormatterName = "Int64";
+        internal const string NoncolonizedNameDataTypeName = "NCName";
+        internal const string NoncolonizedNameFormatterName = "XmlNCName";
+        internal const string SByteDataTypeName = "byte";
+        internal const string SByteFormatterName = "SByte";
+        internal const string SingleDataTypeName = "float";
+        internal const string SingleFormatterName = "Single";
+        internal const string StringDataTypeName = "string";
+        internal const string StringFormatterName = "String";
+        internal const string TimeDataTypeName = "time";
+        internal const string TimeFormatterName = "Time";
         internal const string TimeOnlyDataTypeName = "timeOnly";
         internal const string TimeOnlyFormatterName = "TimeOnly";
+        internal const string TimeSpanDataTypeName = "TimeSpan";
+        internal const string TimeSpanFormatterName = "TimeSpan";
+        internal const string UInt16DataTypeName = "unsignedShort";
+        internal const string UInt16FormatterName = "UInt16";
+        internal const string UInt32DataTypeName = "unsignedInt";
+        internal const string UInt32FormatterName = "UInt32";
+        internal const string UInt64DataTypeName = "unsignedLong";
+        internal const string UInt64FormatterName = "UInt64";
+        internal const string UnsupportedDataTypeName = "normalizedString";
+        internal const string UnsupportedFormatterName = "String";
+        internal const string XmlNameDataTypeName = "Name";
+        internal const string XmlNameFormatterName = "XmlName";
+        internal const string XmlNmTokenDataTypeName = "NMTOKEN";
+        internal const string XmlNmTokenFormatterName = "XmlNmToken";
+        internal const string XmlNmTokensDataTypeName = "NMTOKENS";
+        internal const string XmlNmTokensFormatterName = "XmlNmTokens";
+        internal const string XmlQualifiedNameDataTypeName = "QName";
+        internal const string XmlQualifiedNameFormatterName = "XmlQualifiedName";
+
+        private const TypeFlags BaseFlags = TypeFlags.CanBeAttributeValue
+            | TypeFlags.CanBeElementValue;
+        private const TypeFlags WithoutDirectMappingFlags = TypeFlags.AmbiguousDataType
+            | BaseFlags;
 
         private readonly Hashtable _typeDescs = new Hashtable();
         private readonly Hashtable _arrayTypeDescs = new Hashtable();
@@ -52,35 +113,35 @@ namespace System.Xml.Serialization.Types
 
         static TypeScope()
         {
-            AddPrimitive(typeof(string), "string", "String", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
-            AddPrimitive(typeof(int), "int", "Int32", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(bool), "boolean", "Boolean", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(short), "short", "Int16", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(long), "long", "Int64", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(float), "float", "Single", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(double), "double", "Double", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(decimal), "decimal", "Decimal", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(DateOnly), DateOnlyDataTypeName, DateOnlyFormatterName, TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(DateTime), "dateTime", "DateTime", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(XmlQualifiedName), "QName", "XmlQualifiedName", TypeFlags.CanBeAttributeValue | TypeFlags.HasCustomFormatter | TypeFlags.HasIsEmpty | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.Reference);
-            AddPrimitive(typeof(TimeOnly), TimeOnlyDataTypeName, TimeOnlyFormatterName, TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(byte), "unsignedByte", "Byte", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(sbyte), "byte", "SByte", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(ushort), "unsignedShort", "UInt16", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(uint), "unsignedInt", "UInt32", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(ulong), "unsignedLong", "UInt64", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(string), StringDataTypeName, StringFormatterName, BaseFlags | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
+            AddPrimitive(typeof(int), Int32DataTypeName, Int32FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(bool), BooleanDataTypeName, BooleanFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(short), Int16DataTypeName, Int16FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(long), Int64DataTypeName, Int64FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(float), SingleDataTypeName, SingleFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(double), DoubleDataTypeName, DoubleFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(decimal), DecimalDataTypeName, DecimalFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(DateOnly), DateOnlyDataTypeName, DateOnlyFormatterName, BaseFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(DateTime), DateTimeDataTypeName, DateTimeFormatterName, BaseFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(XmlQualifiedName), XmlQualifiedNameDataTypeName, XmlQualifiedNameFormatterName, TypeFlags.CanBeAttributeValue | TypeFlags.HasCustomFormatter | TypeFlags.HasIsEmpty | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.Reference);
+            AddPrimitive(typeof(TimeOnly), TimeOnlyDataTypeName, TimeOnlyFormatterName, BaseFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(byte), ByteDataTypeName, ByteFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(sbyte), SByteDataTypeName, SByteFormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(ushort), UInt16DataTypeName, UInt16FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(uint), UInt32DataTypeName, UInt32FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(ulong), UInt64DataTypeName, UInt64FormatterName, BaseFlags | TypeFlags.XmlEncodingNotRequired);
 
             // Types without direct mapping (ambiguous)
-            AddPrimitive(typeof(DateTime), "date", "Date", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddPrimitive(typeof(DateTime), "time", "Time", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(DateTime), DateDataTypeName, DateFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddPrimitive(typeof(DateTime), TimeDataTypeName, TimeFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
 
-            AddPrimitive(typeof(string), "Name", "XmlName", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddPrimitive(typeof(string), "NCName", "XmlNCName", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddPrimitive(typeof(string), "NMTOKEN", "XmlNmToken", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddPrimitive(typeof(string), "NMTOKENS", "XmlNmTokens", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddPrimitive(typeof(string), XmlNameDataTypeName, XmlNameFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddPrimitive(typeof(string), NoncolonizedNameDataTypeName, NoncolonizedNameFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddPrimitive(typeof(string), XmlNmTokenDataTypeName, XmlNmTokenFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddPrimitive(typeof(string), XmlNmTokensDataTypeName, XmlNmTokensFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
 
-            AddPrimitive(typeof(byte[]), "base64Binary", "ByteArrayBase64", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired | TypeFlags.HasDefaultConstructor);
-            AddPrimitive(typeof(byte[]), "hexBinary", "ByteArrayHex", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired | TypeFlags.HasDefaultConstructor);
+            AddPrimitive(typeof(byte[]), ByteArrayBase64DataTypeName, ByteArrayBase64FormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired | TypeFlags.HasDefaultConstructor);
+            AddPrimitive(typeof(byte[]), ByteArrayHexDataTypeName, ByteArrayHexFormatterName, WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired | TypeFlags.HasDefaultConstructor);
             // NOTE, Micorosft: byte[] can also be used to mean array of bytes. That datatype is not a primitive, so we
             // can't use the AmbiguousDataType mechanism. To get an array of bytes in literal XML, apply [XmlArray] or
             // [XmlArrayItem].
@@ -88,20 +149,20 @@ namespace System.Xml.Serialization.Types
             XmlSchemaPatternFacet guidPattern = new XmlSchemaPatternFacet();
             guidPattern.Value = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 
-            AddNonXsdPrimitive(typeof(Guid), "guid", UrtTypes.Namespace, "Guid", new XmlQualifiedName("string", XmlSchema.Namespace), new XmlSchemaFacet[] { guidPattern }, TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.IgnoreDefault);
-            AddNonXsdPrimitive(typeof(char), "char", UrtTypes.Namespace, "Char", new XmlQualifiedName("unsignedShort", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.IgnoreDefault);
-            AddNonXsdPrimitive(typeof(TimeSpan), "TimeSpan", UrtTypes.Namespace, "TimeSpan", new XmlQualifiedName("duration", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddNonXsdPrimitive(typeof(DateTimeOffset), "dateTimeOffset", UrtTypes.Namespace, "DateTimeOffset", new XmlQualifiedName("dateTime", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
+            AddNonXsdPrimitive(typeof(Guid), GuidDataTypeName, UrtTypes.Namespace, GuidFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), new XmlSchemaFacet[] { guidPattern }, BaseFlags | TypeFlags.XmlEncodingNotRequired | TypeFlags.IgnoreDefault);
+            AddNonXsdPrimitive(typeof(char), CharDataTypeName, UrtTypes.Namespace, CharFormatterName, new XmlQualifiedName("unsignedShort", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), BaseFlags | TypeFlags.HasCustomFormatter | TypeFlags.IgnoreDefault);
+            AddNonXsdPrimitive(typeof(TimeSpan), TimeSpanDataTypeName, UrtTypes.Namespace, TimeSpanFormatterName, new XmlQualifiedName("duration", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddNonXsdPrimitive(typeof(DateTimeOffset), DateTimeOffsetDataTypeName, UrtTypes.Namespace, DateTimeOffsetFormatterName, new XmlQualifiedName("dateTime", XmlSchema.Namespace), Array.Empty<XmlSchemaFacet>(), BaseFlags | TypeFlags.XmlEncodingNotRequired);
 
             AddSoapEncodedTypes(Soap.Encoding);
 
-            // Unsuppoted types that we map to string, if in the future we decide
+            // Unsupported types that we map to string, if in the future we decide
             // to add support for them we would need to create custom formatters for them
-            // normalizedString is the only one unsupported type that suppose to preserve whitesapce
-            AddPrimitive(typeof(string), "normalizedString", "String", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
+            // normalizedString is the only one unsupported type that suppose to preserve whitespace
+            AddPrimitive(typeof(string), UnsupportedDataTypeName, UnsupportedFormatterName, WithoutDirectMappingFlags | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
             for (int i = 0; i < s_unsupportedTypes.Length; i++)
             {
-                AddPrimitive(typeof(string), s_unsupportedTypes[i], "String", TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.CollapseWhitespace);
+                AddPrimitive(typeof(string), s_unsupportedTypes[i], UnsupportedFormatterName, WithoutDirectMappingFlags | TypeFlags.CanBeTextValue | TypeFlags.Reference | TypeFlags.CollapseWhitespace);
             }
         }
 
@@ -149,42 +210,42 @@ namespace System.Xml.Serialization.Types
 
         private static void AddSoapEncodedTypes(string ns)
         {
-            AddSoapEncodedPrimitive(typeof(string), "normalizedString", ns, "String", new XmlQualifiedName("normalizedString", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
+            AddSoapEncodedPrimitive(typeof(string), UnsupportedDataTypeName, ns, UnsupportedFormatterName, new XmlQualifiedName("normalizedString", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.Reference | TypeFlags.HasDefaultConstructor);
             for (int i = 0; i < s_unsupportedTypes.Length; i++)
             {
-                AddSoapEncodedPrimitive(typeof(string), s_unsupportedTypes[i], ns, "String", new XmlQualifiedName(s_unsupportedTypes[i], XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.Reference | TypeFlags.CollapseWhitespace);
+                AddSoapEncodedPrimitive(typeof(string), s_unsupportedTypes[i], ns, UnsupportedFormatterName, new XmlQualifiedName(s_unsupportedTypes[i], XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.Reference | TypeFlags.CollapseWhitespace);
             }
 
-            AddSoapEncodedPrimitive(typeof(string), "string", ns, "String", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.CanBeTextValue | TypeFlags.Reference);
-            AddSoapEncodedPrimitive(typeof(int), "int", ns, "Int32", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(bool), "boolean", ns, "Boolean", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(short), "short", ns, "Int16", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(long), "long", ns, "Int64", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(float), "float", ns, "Single", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(double), "double", ns, "Double", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(decimal), "decimal", ns, "Decimal", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(DateTime), "dateTime", ns, "DateTime", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(XmlQualifiedName), "QName", ns, "XmlQualifiedName", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.HasCustomFormatter | TypeFlags.HasIsEmpty | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.Reference);
-            AddSoapEncodedPrimitive(typeof(byte), "unsignedByte", ns, "Byte", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(sbyte), "byte", ns, "SByte", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(ushort), "unsignedShort", ns, "UInt16", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(uint), "unsignedInt", ns, "UInt32", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(ulong), "unsignedLong", ns, "UInt64", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(string), StringDataTypeName, ns, StringFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.CanBeTextValue | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(int), Int32DataTypeName, ns, Int32FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(bool), BooleanDataTypeName, ns, BooleanFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(short), Int16DataTypeName, ns, Int16FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(long), Int64DataTypeName, ns, Int64FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(float), SingleDataTypeName, ns, SingleFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(double), DoubleDataTypeName, ns, DoubleFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(decimal), DecimalDataTypeName, ns, DecimalFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(DateTime), DateTimeDataTypeName, ns, DateTimeFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(XmlQualifiedName), XmlQualifiedNameDataTypeName, ns, XmlQualifiedNameFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.HasCustomFormatter | TypeFlags.HasIsEmpty | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(byte), ByteDataTypeName, ns, ByteFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(sbyte), SByteDataTypeName, ns, SByteFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(ushort), UInt16DataTypeName, ns, UInt16FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(uint), UInt32DataTypeName, ns, UInt32FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(ulong), UInt64DataTypeName, ns, UInt64FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags | TypeFlags.XmlEncodingNotRequired);
 
             // Types without direct mapping (ambiguous)
-            AddSoapEncodedPrimitive(typeof(DateTime), "date", ns, "Date", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(DateTime), "time", ns, "Time", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(DateTime), DateDataTypeName, ns, DateFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(DateTime), TimeDataTypeName, ns, TimeFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
 
-            AddSoapEncodedPrimitive(typeof(string), "Name", ns, "XmlName", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddSoapEncodedPrimitive(typeof(string), "NCName", ns, "XmlNCName", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddSoapEncodedPrimitive(typeof(string), "NMTOKEN", ns, "XmlNmToken", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
-            AddSoapEncodedPrimitive(typeof(string), "NMTOKENS", ns, "XmlNmTokens", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(string), XmlNameDataTypeName, ns, XmlNameFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(string), NoncolonizedNameDataTypeName, ns, NoncolonizedNameFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(string), XmlNmTokenDataTypeName, ns, XmlNmTokenFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(string), XmlNmTokensDataTypeName, ns, XmlNmTokensFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference);
 
-            AddSoapEncodedPrimitive(typeof(byte[]), "base64Binary", ns, "ByteArrayBase64", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired);
-            AddSoapEncodedPrimitive(typeof(byte[]), "hexBinary", ns, "ByteArrayHex", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.AmbiguousDataType | TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(byte[]), ByteArrayBase64DataTypeName, ns, ByteArrayBase64FormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired);
+            AddSoapEncodedPrimitive(typeof(byte[]), ByteArrayHexDataTypeName, ns, ByteArrayHexFormatterName, new XmlQualifiedName("string", XmlSchema.Namespace), WithoutDirectMappingFlags | TypeFlags.HasCustomFormatter | TypeFlags.Reference | TypeFlags.IgnoreDefault | TypeFlags.XmlEncodingNotRequired);
 
-            AddSoapEncodedPrimitive(typeof(string), "arrayCoordinate", ns, "String", new XmlQualifiedName("string", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue);
-            AddSoapEncodedPrimitive(typeof(byte[]), "base64", ns, "ByteArrayBase64", new XmlQualifiedName("base64Binary", XmlSchema.Namespace), TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.IgnoreDefault | TypeFlags.Reference);
+            AddSoapEncodedPrimitive(typeof(string), "arrayCoordinate", ns, "String", new XmlQualifiedName("string", XmlSchema.Namespace), BaseFlags);
+            AddSoapEncodedPrimitive(typeof(byte[]), "base64", ns, "ByteArrayBase64", new XmlQualifiedName("base64Binary", XmlSchema.Namespace), BaseFlags | TypeFlags.IgnoreDefault | TypeFlags.Reference);
         }
 
         private static void AddPrimitive(

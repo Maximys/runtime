@@ -47,12 +47,12 @@ namespace System.Xml.Serialization.Types
         }
 
         internal TypeDesc(string name, string fullName, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags)
-            : this(name, fullName, (XmlSchemaType?)null, kind, baseTypeDesc, flags, null)
+            : this(name, fullName, null, kind, baseTypeDesc, flags, null)
         { }
 
         internal TypeDesc(
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, bool isXsdType, XmlSchemaType dataType, string formatterName, TypeFlags flags)
-            : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, (TypeDesc?)null, flags, formatterName)
+            : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, null, flags, formatterName)
         {
             _isXsdType = isXsdType;
             _type = type;

@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Xml.Serialization.Configuration;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {
@@ -31,50 +32,47 @@ namespace System.Xml.Serialization
         [return: NotNullIfNotNull(nameof(value))]
         internal static string? FromDefaultValue(object? value, string formatter)
         {
-            if (value == null) return null;
-            switch (value)
+            string? returnValue;
+
+            if (value == null)
             {
-                case DateTime valueDateTime:
-                    {
-                        if (formatter == "DateTime")
-                        {
-                            return FromDateTime(valueDateTime);
-                        }
-                        if (formatter == "Date")
-                        {
-                            return FromDate(valueDateTime);
-                        }
-                        if (formatter == "Time")
-                        {
-                            return FromTime(valueDateTime);
-                        }
-                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(DateTime).FullName));
-                    }
-                case string valueString:
-                    {
-                        if (formatter == "XmlName")
-                        {
-                            return FromXmlName(valueString);
-                        }
-                        if (formatter == "XmlNCName")
-                        {
-                            return FromXmlNCName(valueString);
-                        }
-                        if (formatter == "XmlNmToken")
-                        {
-                            return FromXmlNmToken(valueString);
-                        }
-                        if (formatter == "XmlNmTokens")
-                        {
-                            return FromXmlNmTokens(valueString);
-                        }
-                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(string).FullName));
-                    }
-                default:
-                    {
-                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, value.GetType().FullName));
-                    }
+                returnValue = null;
             }
+            else
+            {
+                switch (value)
+                {
+                    case DateTime valueDateTime:
+                        {
+                            returnValue = formatter switch
+                            {
+                                TypeScope.DateTimeFormatterName => FromDateTime(valueDateTime),
+                                TypeScope.DateFormatterName => FromDate(valueDateTime),
+                                TypeScope.TimeFormatterName => FromTime(valueDateTime),
+                                _ => throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(DateTime).FullName))
+                            };
+                            break;
+                        }
+                    case string valueString:
+                        {
+                            returnValue = formatter switch
+                            {
+                                TypeScope.XmlNameFormatterName => FromXmlName(valueString),
+                                TypeScope.NoncolonizedNameFormatterName => FromXmlNCName(valueString),
+                                TypeScope.XmlNmTokenFormatterName => FromXmlNmToken(valueString),
+                                TypeScope.XmlNmTokensFormatterName => FromXmlNmTokens(valueString),
+                                _ => throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(string).FullName))
+                            };
+                            break;
+                        }
+                    default:
+                        {
+                            throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, value.GetType().FullName));
+                        }
+                }
+            }
+
+            return returnValue;
         }
 
         internal static string FromDate(DateTime value)
@@ -237,31 +235,31 @@ namespace System.Xml.Serialization
         {
             switch (formatter)
             {
-                case "DateTime":
+                case TypeScope.DateTimeFormatterName:
                     {
                         return ToDateTime(value);
                     }
-                case "Date":
+                case TypeScope.DateFormatterName:
                     {
                         return ToDate(value);
                     }
-                case "Time":
+                case TypeScope.TimeFormatterName:
                     {
                         return ToTime(value);
                     }
-                case "XmlName":
+                case TypeScope.XmlNameFormatterName:
                     {
                         return ToXmlName(value);
                     }
-                case "XmlNCName":
+                case TypeScope.NoncolonizedNameFormatterName:
                     {
                         return ToXmlNCName(value);
                     }
-                case "XmlNmToken":
+                case TypeScope.XmlNmTokenFormatterName:
                     {
                         return ToXmlNmToken(value);
                     }
-                case "XmlNmTokens":
+                case TypeScope.XmlNmTokensFormatterName:
                     {
                         return ToXmlNmTokens(value);
                     }
