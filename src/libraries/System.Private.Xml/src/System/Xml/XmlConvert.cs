@@ -747,6 +747,11 @@ namespace System.Xml
             return value.ToString();
         }
 
+        public static string ToString(TimeOnly value, [StringSyntax(StringSyntaxAttribute.TimeOnlyFormat)] string format)
+        {
+            return value.ToString(format, CultureInfo.InvariantCulture);
+        }
+
         public static bool ToBoolean(string s)
         {
             switch (s.AsSpan().Trim(WhitespaceChars))
@@ -1180,6 +1185,21 @@ namespace System.Xml
             }
         }
 
+        private static volatile string[]? s_allTimeFormats;
+
+        private static string[] AllTimeFormats
+        {
+            get
+            {
+                if (s_allTimeFormats == null)
+                {
+                    CreateAllTimeFormats();
+                }
+
+                return s_allTimeFormats!;
+            }
+        }
+
         private static void CreateAllDateOnlyFormats()
         {
             s_allDateOnlyFormats ??= new string[] {
@@ -1215,6 +1235,36 @@ namespace System.Xml
                 "--MM--",                       // month
                 "--MM--Z",
                 "--MM--zzzzzz",
+            };
+        }
+
+        private static void CreateAllTimeFormats()
+        {
+            s_allTimeFormats ??= new string[] {
+                "HH:mm:ss.fffffffzzzzzz",
+                "HH:mm:ss",
+                "HH:mm:ss.f",
+                "HH:mm:ss.ff",
+                "HH:mm:ss.fff",
+                "HH:mm:ss.ffff",
+                "HH:mm:ss.fffff",
+                "HH:mm:ss.ffffff",
+                "HH:mm:ss.fffffff",
+                "HH:mm:ssZ",
+                "HH:mm:ss.fZ",
+                "HH:mm:ss.ffZ",
+                "HH:mm:ss.fffZ",
+                "HH:mm:ss.ffffZ",
+                "HH:mm:ss.fffffZ",
+                "HH:mm:ss.ffffffZ",
+                "HH:mm:ss.fffffffZ",
+                "HH:mm:sszzzzzz",
+                "HH:mm:ss.fzzzzzz",
+                "HH:mm:ss.ffzzzzzz",
+                "HH:mm:ss.fffzzzzzz",
+                "HH:mm:ss.ffffzzzzzz",
+                "HH:mm:ss.fffffzzzzzz",
+                "HH:mm:ss.ffffffzzzzzz",
             };
         }
 
@@ -1303,6 +1353,11 @@ namespace System.Xml
         public static Guid ToGuid(string s)
         {
             return new Guid(s);
+        }
+
+        public static TimeOnly ToTimeOnly(string value)
+        {
+            return TimeOnly.ParseExact(value, AllTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.AllowLeadingWhite | DateTimeStyles.AllowTrailingWhite);
         }
 
         internal static Exception? TryToGuid(string s, out Guid result)

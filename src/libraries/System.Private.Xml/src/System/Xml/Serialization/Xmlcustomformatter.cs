@@ -126,6 +126,11 @@ namespace System.Xml.Serialization
             return XmlConvert.ToString((ushort)value);
         }
 
+        internal static string FromTime(TimeOnly value)
+        {
+            return XmlConvert.ToString(value, "o");
+        }
+
         [return: NotNullIfNotNull(nameof(name))]
         internal static string? FromXmlName(string? name)
         {
@@ -418,6 +423,11 @@ namespace System.Xml.Serialization
         internal static char ToChar(string value)
         {
             return (char)XmlConvert.ToUInt16(value);
+        }
+
+        internal static TimeOnly ToTimeOnly(string value)
+        {
+            return XmlConvert.ToTimeOnly(value);
         }
 
         [return: NotNullIfNotNull(nameof(value))]

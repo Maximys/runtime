@@ -122,6 +122,13 @@ public static partial class XmlSerializerTests
         Assert.StrictEqual(SerializeAndDeserialize(dateOnly, expectedValue), dateOnly);
     }
 
+    [Theory]
+    [MemberData(nameof(TimeOnlyAsRoot_TestData))]
+    public static void TimeOnlyAsRoot(TimeOnly timeOnly, string expectedValue)
+    {
+        Assert.StrictEqual(SerializeAndDeserialize(timeOnly, expectedValue), timeOnly);
+    }
+
     [Fact]
     public static void Xml_DecimalAsRoot()
     {
@@ -3110,5 +3117,11 @@ public static partial class XmlSerializerTests
     {
         yield return new object[] { new DateOnly(1991, 8, 20), @"<?xml version=""1.0""?><dateOnly>1991-08-20</dateOnly>" };
         yield return new object[] { new DateOnly(2013, 1, 2), @"<?xml version=""1.0""?><dateOnly>2013-01-02</dateOnly>" };
+    }
+
+    public static IEnumerable<object[]> TimeOnlyAsRoot_TestData()
+    {
+        yield return new object[] { new TimeOnly(12, 13, 14, 15, 16), @"<?xml version=""1.0""?><timeOnly>12:13:14.0150160</timeOnly>" };
+        yield return new object[] { new TimeOnly(23, 44, 12), @"<?xml version=""1.0""?><timeOnly>23:44:12.0000000</timeOnly>" };
     }
 }

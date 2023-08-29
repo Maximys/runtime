@@ -138,6 +138,11 @@ namespace System.Xml.Serialization
             return XmlCustomFormatter.FromDate(value);
         }
 
+        protected static string FromTime(TimeOnly value)
+        {
+            return XmlCustomFormatter.FromTime(value);
+        }
+
         protected static string FromTime(DateTime value)
         {
             return XmlCustomFormatter.FromTime(value);

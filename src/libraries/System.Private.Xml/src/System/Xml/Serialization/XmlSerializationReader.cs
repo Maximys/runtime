@@ -1112,6 +1112,11 @@ namespace System.Xml.Serialization
             return XmlCustomFormatter.ToEnum(value, h, typeName, true);
         }
 
+        protected static TimeOnly ToTimeOnly(string value)
+        {
+            return XmlCustomFormatter.ToTimeOnly(value);
+        }
+
         [return: NotNullIfNotNull(nameof(value))]
         protected static string? ToXmlName(string? value)
         {

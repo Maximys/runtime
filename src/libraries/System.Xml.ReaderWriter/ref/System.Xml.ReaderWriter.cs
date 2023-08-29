@@ -228,6 +228,7 @@ namespace System.Xml
         public static decimal ToDecimal(string s) { throw null; }
         public static double ToDouble(string s) { throw null; }
         public static System.Guid ToGuid(string s) { throw null; }
+        public static System.TimeOnly ToTimeOnly(string value) { throw null; }
         public static short ToInt16(string s) { throw null; }
         public static int ToInt32(string s) { throw null; }
         public static long ToInt64(string s) { throw null; }
@@ -260,6 +261,7 @@ namespace System.Xml
         public static string ToString(uint value) { throw null; }
         [System.CLSCompliantAttribute(false)]
         public static string ToString(ulong value) { throw null; }
+        public static string ToString(System.TimeOnly value, [System.Diagnostics.CodeAnalysis.StringSyntaxAttribute("TimeOnlyFormat")] string format) { throw null; }
         public static System.TimeSpan ToTimeSpan(string s) { throw null; }
         [System.CLSCompliantAttribute(false)]
         public static ushort ToUInt16(string s) { throw null; }

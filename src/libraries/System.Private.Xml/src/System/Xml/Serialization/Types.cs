@@ -464,6 +464,8 @@ namespace System.Xml.Serialization
     {
         internal const string DateOnlyDataTypeName = "dateOnly";
         internal const string DateOnlyFormatterName = "DateOnly";
+        internal const string TimeOnlyDataTypeName = "timeOnly";
+        internal const string TimeOnlyFormatterName = "TimeOnly";
 
         private readonly Hashtable _typeDescs = new Hashtable();
         private readonly Hashtable _arrayTypeDescs = new Hashtable();
@@ -510,6 +512,7 @@ namespace System.Xml.Serialization
             AddPrimitive(typeof(DateOnly), DateOnlyDataTypeName, DateOnlyFormatterName, TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
             AddPrimitive(typeof(DateTime), "dateTime", "DateTime", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
             AddPrimitive(typeof(XmlQualifiedName), "QName", "XmlQualifiedName", TypeFlags.CanBeAttributeValue | TypeFlags.HasCustomFormatter | TypeFlags.HasIsEmpty | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired | TypeFlags.Reference);
+            AddPrimitive(typeof(TimeOnly), TimeOnlyDataTypeName, TimeOnlyFormatterName, TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.HasCustomFormatter | TypeFlags.XmlEncodingNotRequired);
             AddPrimitive(typeof(byte), "unsignedByte", "Byte", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
             AddPrimitive(typeof(sbyte), "byte", "SByte", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);
             AddPrimitive(typeof(ushort), "unsignedShort", "UInt16", TypeFlags.CanBeAttributeValue | TypeFlags.CanBeElementValue | TypeFlags.XmlEncodingNotRequired);

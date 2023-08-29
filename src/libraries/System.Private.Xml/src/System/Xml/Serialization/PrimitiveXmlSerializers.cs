@@ -251,6 +251,20 @@ namespace System.Xml.Serialization
             WriteNullableQualifiedNameLiteral(@"QName", @"", ((global::System.Xml.XmlQualifiedName)o));
         }
 
+        internal void Write_timeOnly(TimeOnly? timeOnly)
+        {
+            WriteStartDocument();
+            if (timeOnly == null)
+            {
+                WriteEmptyTag(TypeScope.TimeOnlyDataTypeName, @"");
+                return;
+            }
+            else
+            {
+                WriteElementStringRaw(TypeScope.TimeOnlyDataTypeName, @"", FromTime(timeOnly.Value));
+            }
+        }
+
         [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
         protected override void InitCallbacks()
         {
@@ -790,6 +804,30 @@ namespace System.Xml.Serialization
             return (object?)o;
         }
 
+        internal TimeOnly? Read_timeOnly()
+        {
+            TimeOnly? returnValue;
+
+            Reader.MoveToContent();
+            if (Reader.NodeType == XmlNodeType.Element)
+            {
+                if ((Reader.LocalName == _id22_timeOnly && Reader.NamespaceURI == _id2_Item))
+                {
+                    returnValue = ToTimeOnly(Reader.ReadElementString());
+                }
+                else
+                {
+                    throw CreateUnknownNodeException();
+                }
+            }
+            else
+            {
+                UnknownNode(null);
+                returnValue = null;
+            }
+            return returnValue;
+        }
+
         [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
         protected override void InitCallbacks()
         {
@@ -802,6 +840,7 @@ namespace System.Xml.Serialization
         private string _id10_dateTime = null!;
         private string _id20_dateTimeOffset = null!;
         private string _id21_dateOnly = null!;
+        private string _id22_timeOnly = null!;
         private string _id6_long = null!;
         private string _id9_decimal = null!;
         private string _id8_double = null!;
@@ -827,6 +866,7 @@ namespace System.Xml.Serialization
             _id10_dateTime = Reader.NameTable.Add(@"dateTime");
             _id20_dateTimeOffset = Reader.NameTable.Add(@"dateTimeOffset");
             _id21_dateOnly = Reader.NameTable.Add(TypeScope.DateOnlyDataTypeName);
+            _id22_timeOnly = Reader.NameTable.Add(TypeScope.TimeOnlyDataTypeName);
             _id6_long = Reader.NameTable.Add(@"long");
             _id9_decimal = Reader.NameTable.Add(@"decimal");
             _id8_double = Reader.NameTable.Add(@"double");
