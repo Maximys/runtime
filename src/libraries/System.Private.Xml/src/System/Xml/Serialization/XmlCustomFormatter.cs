@@ -1,15 +1,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Xml;
-using System.Globalization;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Collections;
-using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
 using System.Xml.Serialization.Configuration;
 
 namespace System.Xml.Serialization
@@ -37,42 +32,49 @@ namespace System.Xml.Serialization
         internal static string? FromDefaultValue(object? value, string formatter)
         {
             if (value == null) return null;
-            Type type = value.GetType();
-            if (type == typeof(DateTime))
+            switch (value)
             {
-                if (formatter == "DateTime")
-                {
-                    return FromDateTime((DateTime)value);
-                }
-                if (formatter == "Date")
-                {
-                    return FromDate((DateTime)value);
-                }
-                if (formatter == "Time")
-                {
-                    return FromTime((DateTime)value);
-                }
+                case DateTime valueDateTime:
+                    {
+                        if (formatter == "DateTime")
+                        {
+                            return FromDateTime(valueDateTime);
+                        }
+                        if (formatter == "Date")
+                        {
+                            return FromDate(valueDateTime);
+                        }
+                        if (formatter == "Time")
+                        {
+                            return FromTime(valueDateTime);
+                        }
+                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(DateTime).FullName));
+                    }
+                case string valueString:
+                    {
+                        if (formatter == "XmlName")
+                        {
+                            return FromXmlName(valueString);
+                        }
+                        if (formatter == "XmlNCName")
+                        {
+                            return FromXmlNCName(valueString);
+                        }
+                        if (formatter == "XmlNmToken")
+                        {
+                            return FromXmlNmToken(valueString);
+                        }
+                        if (formatter == "XmlNmTokens")
+                        {
+                            return FromXmlNmTokens(valueString);
+                        }
+                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(string).FullName));
+                    }
+                default:
+                    {
+                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, value.GetType().FullName));
+                    }
             }
-            else if (type == typeof(string))
-            {
-                if (formatter == "XmlName")
-                {
-                    return FromXmlName((string)value);
-                }
-                if (formatter == "XmlNCName")
-                {
-                    return FromXmlNCName((string)value);
-                }
-                if (formatter == "XmlNmToken")
-                {
-                    return FromXmlNmToken((string)value);
-                }
-                if (formatter == "XmlNmTokens")
-                {
-                    return FromXmlNmTokens((string)value);
-                }
-            }
-            throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, type.FullName));
         }
 
         internal static string FromDate(DateTime value)
@@ -233,35 +235,41 @@ namespace System.Xml.Serialization
 
         internal static object ToDefaultValue(string value, string formatter)
         {
-            if (formatter == "DateTime")
+            switch (formatter)
             {
-                return ToDateTime(value);
+                case "DateTime":
+                    {
+                        return ToDateTime(value);
+                    }
+                case "Date":
+                    {
+                        return ToDate(value);
+                    }
+                case "Time":
+                    {
+                        return ToTime(value);
+                    }
+                case "XmlName":
+                    {
+                        return ToXmlName(value);
+                    }
+                case "XmlNCName":
+                    {
+                        return ToXmlNCName(value);
+                    }
+                case "XmlNmToken":
+                    {
+                        return ToXmlNmToken(value);
+                    }
+                case "XmlNmTokens":
+                    {
+                        return ToXmlNmTokens(value);
+                    }
+                default:
+                    {
+                        throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultValue, formatter));
+                    }
             }
-            if (formatter == "Date")
-            {
-                return ToDate(value);
-            }
-            if (formatter == "Time")
-            {
-                return ToTime(value);
-            }
-            if (formatter == "XmlName")
-            {
-                return ToXmlName(value);
-            }
-            if (formatter == "XmlNCName")
-            {
-                return ToXmlNCName(value);
-            }
-            if (formatter == "XmlNmToken")
-            {
-                return ToXmlNmToken(value);
-            }
-            if (formatter == "XmlNmTokens")
-            {
-                return ToXmlNmTokens(value);
-            }
-            throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultValue, formatter));
         }
 
         private static readonly string[] s_allDateTimeFormats = new string[] {
