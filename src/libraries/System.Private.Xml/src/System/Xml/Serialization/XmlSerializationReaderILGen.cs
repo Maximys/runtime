@@ -792,7 +792,7 @@ namespace System.Xml.Serialization
                     throw Globals.NotSupported($"Unexpected: {source}");
                 }
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
             {
                 System.Diagnostics.Debug.Assert(source == "Reader.Value" || source == "Reader.ReadElementString()" || source == "vals[i]");
                 if (source == "vals[i]")
@@ -850,9 +850,9 @@ namespace System.Xml.Serialization
                 {
                     // Only these methods below that is non Static and need to ldarg("this") for Call.
                     BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
-                    if ((mapping.TypeDesc.FormatterName == "ByteArrayBase64" && source == "false")
-                        || (mapping.TypeDesc.FormatterName == "ByteArrayHex" && source == "false")
-                        || (mapping.TypeDesc.FormatterName == "XmlQualifiedName"))
+                    if ((mapping.TypeDesc.FormatterName == TypeScope.ByteArrayBase64FormatterName && source == "false")
+                        || (mapping.TypeDesc.FormatterName == TypeScope.ByteArrayHexFormatterName && source == "false")
+                        || (mapping.TypeDesc.FormatterName == TypeScope.XmlQualifiedNameFormatterName))
                     {
                         bindingFlags = CodeGenerator.InstanceBindingFlags;
                         ilg.Ldarg(0);
@@ -2412,7 +2412,7 @@ namespace System.Xml.Serialization
                 }
                 else
                 {
-                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
                     {
                         LocalBuilder tmpLoc = ilg.GetLocal("tmp");
                         MethodInfo XmlSerializationReader_ReadString = typeof(XmlSerializationReader).GetMethod(
@@ -3133,8 +3133,8 @@ namespace System.Xml.Serialization
                         string readFunc;
                         switch (element.Mapping.TypeDesc.FormatterName)
                         {
-                            case "ByteArrayBase64":
-                            case "ByteArrayHex":
+                            case TypeScope.ByteArrayBase64FormatterName:
+                            case TypeScope.ByteArrayHexFormatterName:
                                 readFunc = "false";
                                 break;
                             default:

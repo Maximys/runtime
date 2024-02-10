@@ -2406,7 +2406,7 @@ namespace System.Xml.Serialization
 
         private void WritePrimitiveValue(TypeDesc typeDesc, string source)
         {
-            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == "String")
+            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
             {
                 Writer.Write(source);
             }

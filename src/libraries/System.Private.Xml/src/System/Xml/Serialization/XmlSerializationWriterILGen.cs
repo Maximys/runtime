@@ -148,7 +148,7 @@ namespace System.Xml.Serialization
         [RequiresUnreferencedCode("calls Load")]
         private void WritePrimitiveValue(TypeDesc typeDesc, SourceInfo source, out Type returnType)
         {
-            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == "String")
+            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
             {
                 source.Load(typeDesc.Type!);
                 returnType = typeDesc.Type!;
@@ -177,7 +177,7 @@ namespace System.Xml.Serialization
                 {
                     // Only these methods below that is non Static and need to ldarg("this") for Call.
                     BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
-                    if (typeDesc.FormatterName == "XmlQualifiedName")
+                    if (typeDesc.FormatterName == TypeScope.XmlQualifiedNameFormatterName)
                     {
                         bindingFlags = CodeGenerator.InstanceBindingFlags;
                         ilg.Ldarg(0);
