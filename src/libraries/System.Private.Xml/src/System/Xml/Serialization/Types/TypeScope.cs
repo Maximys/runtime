@@ -64,7 +64,7 @@ namespace System.Xml.Serialization
 
         private static readonly Dictionary<Type, TypeDesc> s_primitiveTypes = new Dictionary<Type, TypeDesc>();
         private static readonly Dictionary<XmlSchemaSimpleType, TypeDesc> s_primitiveDataTypes = new Dictionary<XmlSchemaSimpleType, TypeDesc>();
-        private static readonly NavigationNameTable s_primitiveNames = new NavigationNameTable();
+        private static readonly NavigationNameTable<TypeDesc> s_primitiveNames = new NavigationNameTable<TypeDesc>();
 
         private static readonly string[] s_unsupportedTypes = new string[] {
             DataTypeNames.AnyUri,
@@ -264,7 +264,7 @@ namespace System.Xml.Serialization
 
         internal static TypeDesc? GetTypeDesc(string name, string? ns, TypeFlags flags)
         {
-            TypeDesc? typeDesc = (TypeDesc?)s_primitiveNames[name, ns];
+            TypeDesc? typeDesc = s_primitiveNames[name, ns];
             if (typeDesc != null)
             {
                 if ((typeDesc.Flags & flags) != 0)
