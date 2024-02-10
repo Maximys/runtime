@@ -8,41 +8,38 @@ namespace System.Xml.Serialization.Types
 {
     internal sealed class TypeDesc
     {
-        private readonly string _name;
-        private readonly string _fullName;
         private string? _cSharpName;
-        private TypeDesc? _arrayElementTypeDesc;
         private TypeDesc? _arrayTypeDesc;
         private TypeDesc? _nullableTypeDesc;
-        private readonly TypeKind _kind;
-        private readonly XmlSchemaType? _dataType;
-        private Type? _type;
+
         private TypeDesc? _baseTypeDesc;
-        private TypeFlags _flags;
-        private readonly string? _formatterName;
-        private readonly bool _isXsdType;
         private bool _isMixed;
-        private int _weight;
-        private Exception? _exception;
 
         internal TypeDesc(string name, string fullName, XmlSchemaType? dataType, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags, string? formatterName)
         {
-            _name = name.Replace('+', '.');
-            _fullName = fullName.Replace('+', '.');
-            _kind = kind;
+            Name = name.Replace('+', '.');
+            FullName = fullName.Replace('+', '.');
+            Kind = kind;
             _baseTypeDesc = baseTypeDesc;
-            _flags = flags;
-            _isXsdType = kind == TypeKind.Primitive;
-            if (_isXsdType)
-                _weight = 1;
-            else if (kind == TypeKind.Enum)
-                _weight = 2;
-            else if (_kind == TypeKind.Root)
-                _weight = -1;
-            else
-                _weight = baseTypeDesc == null ? 0 : baseTypeDesc.Weight + 1;
-            _dataType = dataType;
-            _formatterName = formatterName;
+            Flags = flags;
+            IsXsdType = kind == TypeKind.Primitive;
+            switch (Kind)
+            {
+                case TypeKind.Enum:
+                    Weight = 2;
+                    break;
+                case TypeKind.Primitive:
+                    Weight = 1;
+                    break;
+                case TypeKind.Root:
+                    Weight = -1;
+                    break;
+                default:
+                    Weight = baseTypeDesc == null ? 0 : baseTypeDesc.Weight + 1;
+                    break;
+            }
+            DataType = dataType;
+            FormatterName = formatterName;
         }
 
         internal TypeDesc(string name, string fullName, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags)
@@ -53,93 +50,84 @@ namespace System.Xml.Serialization.Types
             Type type, bool isXsdType, XmlSchemaType dataType, string formatterName, TypeFlags flags)
             : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, null, flags, formatterName)
         {
-            _isXsdType = isXsdType;
-            _type = type;
+            IsXsdType = isXsdType;
+            Type = type;
         }
+
         internal TypeDesc(
             Type? type, string name, string fullName, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags, TypeDesc? arrayElementTypeDesc)
             : this(name, fullName, null, kind, baseTypeDesc, flags, null)
         {
-            _arrayElementTypeDesc = arrayElementTypeDesc;
-            _type = type;
+            ArrayElementTypeDesc = arrayElementTypeDesc;
+            Type = type;
         }
 
         public override string ToString()
         {
-            return _fullName;
+            return FullName;
         }
 
-        internal TypeFlags Flags
+        internal TypeDesc? ArrayElementTypeDesc { get; set; }
+
+        internal TypeDesc? BaseTypeDesc
         {
-            get { return _flags; }
+            get { return _baseTypeDesc; }
+            set
+            {
+                _baseTypeDesc = value;
+                Weight = _baseTypeDesc == null ? 0 : _baseTypeDesc.Weight + 1;
+            }
         }
 
-        internal bool IsXsdType
-        {
-            get { return _isXsdType; }
-        }
+        internal int Weight { get; private set; }
+
+        internal TypeFlags Flags { get; private set; }
+
+        internal bool IsXsdType { get; }
 
         internal static bool IsMappedType
         {
             get { return false; }
         }
 
-        internal string Name
-        {
-            get { return _name; }
-        }
+        internal string Name { get; }
 
-        internal string FullName
-        {
-            get { return _fullName; }
-        }
+        internal string FullName { get; }
 
         internal string CSharpName =>
-            _cSharpName ??= _type == null ? CodeIdentifier.GetCSharpName(_fullName) : CodeIdentifier.GetCSharpName(_type);
+            _cSharpName ??= Type == null ? CodeIdentifier.GetCSharpName(FullName) : CodeIdentifier.GetCSharpName(Type);
 
-        internal XmlSchemaType? DataType
-        {
-            get { return _dataType; }
-        }
+        internal XmlSchemaType? DataType { get; }
 
-        internal Type? Type
-        {
-            get { return _type; }
-        }
+        internal Type? Type { get; init; }
 
-        internal string? FormatterName
-        {
-            get { return _formatterName; }
-        }
+        internal string? FormatterName { get; }
 
-        internal TypeKind Kind
-        {
-            get { return _kind; }
-        }
+        internal TypeKind Kind { get; }
 
         internal bool IsValueType
         {
-            get { return (_flags & TypeFlags.Reference) == 0; }
+            get { return (Flags & TypeFlags.Reference) == 0; }
         }
 
         internal bool CanBeAttributeValue
         {
-            get { return (_flags & TypeFlags.CanBeAttributeValue) != 0; }
+            get { return (Flags & TypeFlags.CanBeAttributeValue) != 0; }
         }
 
         internal bool XmlEncodingNotRequired
         {
-            get { return (_flags & TypeFlags.XmlEncodingNotRequired) != 0; }
+            get { return (Flags & TypeFlags.XmlEncodingNotRequired) != 0; }
         }
 
         internal bool CanBeElementValue
         {
-            get { return (_flags & TypeFlags.CanBeElementValue) != 0; }
+            get { return (Flags & TypeFlags.CanBeElementValue) != 0; }
         }
 
         internal bool CanBeTextValue
         {
-            get { return (_flags & TypeFlags.CanBeTextValue) != 0; }
+            get { return (Flags & TypeFlags.CanBeTextValue) != 0; }
         }
 
         internal bool IsMixed
@@ -150,52 +138,52 @@ namespace System.Xml.Serialization.Types
 
         internal bool IsSpecial
         {
-            get { return (_flags & TypeFlags.Special) != 0; }
+            get { return (Flags & TypeFlags.Special) != 0; }
         }
 
         internal bool IsAmbiguousDataType
         {
-            get { return (_flags & TypeFlags.AmbiguousDataType) != 0; }
+            get { return (Flags & TypeFlags.AmbiguousDataType) != 0; }
         }
 
         internal bool HasCustomFormatter
         {
-            get { return (_flags & TypeFlags.HasCustomFormatter) != 0; }
+            get { return (Flags & TypeFlags.HasCustomFormatter) != 0; }
         }
 
         internal bool HasDefaultSupport
         {
-            get { return (_flags & TypeFlags.IgnoreDefault) == 0; }
+            get { return (Flags & TypeFlags.IgnoreDefault) == 0; }
         }
 
         internal bool HasIsEmpty
         {
-            get { return (_flags & TypeFlags.HasIsEmpty) != 0; }
+            get { return (Flags & TypeFlags.HasIsEmpty) != 0; }
         }
 
         internal bool CollapseWhitespace
         {
-            get { return (_flags & TypeFlags.CollapseWhitespace) != 0; }
+            get { return (Flags & TypeFlags.CollapseWhitespace) != 0; }
         }
 
         internal bool HasDefaultConstructor
         {
-            get { return (_flags & TypeFlags.HasDefaultConstructor) != 0; }
+            get { return (Flags & TypeFlags.HasDefaultConstructor) != 0; }
         }
 
         internal bool IsUnsupported
         {
-            get { return (_flags & TypeFlags.Unsupported) != 0; }
+            get { return (Flags & TypeFlags.Unsupported) != 0; }
         }
 
         internal bool IsGenericInterface
         {
-            get { return (_flags & TypeFlags.GenericInterface) != 0; }
+            get { return (Flags & TypeFlags.GenericInterface) != 0; }
         }
 
         internal bool IsPrivateImplementation
         {
-            get { return (_flags & TypeFlags.UsePrivateImplementation) != 0; }
+            get { return (Flags & TypeFlags.UsePrivateImplementation) != 0; }
         }
 
         internal bool CannotNew
@@ -205,62 +193,62 @@ namespace System.Xml.Serialization.Types
 
         internal bool IsAbstract
         {
-            get { return (_flags & TypeFlags.Abstract) != 0; }
+            get { return (Flags & TypeFlags.Abstract) != 0; }
         }
 
         internal bool IsOptionalValue
         {
-            get { return (_flags & TypeFlags.OptionalValue) != 0; }
+            get { return (Flags & TypeFlags.OptionalValue) != 0; }
         }
 
         internal bool UseReflection
         {
-            get { return (_flags & TypeFlags.UseReflection) != 0; }
+            get { return (Flags & TypeFlags.UseReflection) != 0; }
         }
 
         internal bool IsVoid
         {
-            get { return _kind == TypeKind.Void; }
+            get { return Kind == TypeKind.Void; }
         }
 
         internal bool IsClass
         {
-            get { return _kind == TypeKind.Class; }
+            get { return Kind == TypeKind.Class; }
         }
 
         internal bool IsStructLike
         {
-            get { return _kind == TypeKind.Struct || _kind == TypeKind.Class; }
+            get { return Kind == TypeKind.Struct || Kind == TypeKind.Class; }
         }
 
         internal bool IsArrayLike
         {
-            get { return _kind == TypeKind.Array || _kind == TypeKind.Collection || _kind == TypeKind.Enumerable; }
+            get { return Kind == TypeKind.Array || Kind == TypeKind.Collection || Kind == TypeKind.Enumerable; }
         }
 
         internal bool IsCollection
         {
-            get { return _kind == TypeKind.Collection; }
+            get { return Kind == TypeKind.Collection; }
         }
 
         internal bool IsEnumerable
         {
-            get { return _kind == TypeKind.Enumerable; }
+            get { return Kind == TypeKind.Enumerable; }
         }
 
         internal bool IsArray
         {
-            get { return _kind == TypeKind.Array; }
+            get { return Kind == TypeKind.Array; }
         }
 
         internal bool IsPrimitive
         {
-            get { return _kind == TypeKind.Primitive; }
+            get { return Kind == TypeKind.Primitive; }
         }
 
         internal bool IsEnum
         {
-            get { return _kind == TypeKind.Enum; }
+            get { return Kind == TypeKind.Enum; }
         }
 
         internal bool IsNullable
@@ -270,31 +258,28 @@ namespace System.Xml.Serialization.Types
 
         internal bool IsRoot
         {
-            get { return _kind == TypeKind.Root; }
+            get { return Kind == TypeKind.Root; }
         }
 
         internal bool ConstructorInaccessible
         {
-            get { return (_flags & TypeFlags.CtorInaccessible) != 0; }
+            get { return (Flags & TypeFlags.CtorInaccessible) != 0; }
         }
 
-        internal Exception? Exception
-        {
-            get { return _exception; }
-            set { _exception = value; }
-        }
+        internal Exception? Exception { get; set; }
 
         internal TypeDesc GetNullableTypeDesc(
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type)
         {
             if (IsOptionalValue)
-                return this;
-
-            if (_nullableTypeDesc == null)
             {
-                _nullableTypeDesc = new TypeDesc($"NullableOf{_name}", $"System.Nullable`1[{_fullName}]", null, TypeKind.Struct, this, _flags | TypeFlags.OptionalValue, _formatterName);
-                _nullableTypeDesc._type = type;
+                return this;
             }
+
+            _nullableTypeDesc ??= new TypeDesc($"NullableOf{Name}", $"System.Nullable`1[{FullName}]", null, TypeKind.Struct, this, Flags | TypeFlags.OptionalValue, FormatterName)
+            {
+                Type = type
+            };
 
             return _nullableTypeDesc;
         }
@@ -312,40 +297,19 @@ namespace System.Xml.Serialization.Types
                 }
             }
             _baseTypeDesc?.CheckSupported();
-            _arrayElementTypeDesc?.CheckSupported();
+            ArrayElementTypeDesc?.CheckSupported();
         }
 
         internal void CheckNeedConstructor()
         {
             if (!IsValueType && !IsAbstract && !HasDefaultConstructor)
             {
-                _flags |= TypeFlags.Unsupported;
-                _exception = new InvalidOperationException(SR.Format(SR.XmlConstructorInaccessible, FullName));
+                Flags |= TypeFlags.Unsupported;
+                Exception = new InvalidOperationException(SR.Format(SR.XmlConstructorInaccessible, FullName));
             }
         }
 
-        internal TypeDesc? ArrayElementTypeDesc
-        {
-            get { return _arrayElementTypeDesc; }
-            set { _arrayElementTypeDesc = value; }
-        }
-
-        internal int Weight
-        {
-            get { return _weight; }
-        }
-
-        internal TypeDesc CreateArrayTypeDesc() => _arrayTypeDesc ??= new TypeDesc(null, $"{_name}[]", $"{_fullName}[]", TypeKind.Array, null, TypeFlags.Reference | (_flags & TypeFlags.UseReflection), this);
-
-        internal TypeDesc? BaseTypeDesc
-        {
-            get { return _baseTypeDesc; }
-            set
-            {
-                _baseTypeDesc = value;
-                _weight = _baseTypeDesc == null ? 0 : _baseTypeDesc.Weight + 1;
-            }
-        }
+        internal TypeDesc CreateArrayTypeDesc() => _arrayTypeDesc ??= new TypeDesc(null, $"{Name}[]", $"{FullName}[]", TypeKind.Array, null, TypeFlags.Reference | (Flags & TypeFlags.UseReflection), this);
 
         internal bool IsDerivedFrom(TypeDesc baseTypeDesc)
         {
