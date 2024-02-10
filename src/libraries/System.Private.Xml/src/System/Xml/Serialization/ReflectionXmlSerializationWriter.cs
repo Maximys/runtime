@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {

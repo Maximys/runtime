@@ -42,6 +42,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Types\Soap.cs" />
+    <Compile Include="System\Xml\Serialization\Types\Soap12.cs" />
+    <Compile Include="System\Xml\Serialization\Types\TrimmerConstants.cs" />
+    <Compile Include="System\Xml\Serialization\Types\TypeDesc.cs" />
+    <Compile Include="System\Xml\Serialization\Types\TypeFlags.cs" />
+    <Compile Include="System\Xml\Serialization\Types\TypeKind.cs" />
+    <Compile Include="System\Xml\Serialization\Types\TypeScope.cs" />
+    <Compile Include="System\Xml\Serialization\Types\UrtTypes.cs" />
+    <Compile Include="System\Xml\Serialization\Types\Wsdl.cs" />
     <None Include="System\Xml\Core\HtmlEncodedRawTextWriter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>HtmlEncodedRawTextWriter.cs</LastGenOutput>
@@ -464,7 +473,6 @@
     <Compile Include="System\Xml\Serialization\SoapSchemamember.cs" />
     <Compile Include="System\Xml\Serialization\SoapTypeAttribute.cs" />
     <Compile Include="System\Xml\Serialization\SourceInfo.cs" />
-    <Compile Include="System\Xml\Serialization\Types.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyAttributeAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyElementAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyElementAttributes.cs" />
