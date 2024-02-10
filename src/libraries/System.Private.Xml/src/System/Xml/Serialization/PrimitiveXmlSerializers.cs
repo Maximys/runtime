@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {
@@ -13,11 +14,11 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteNullTagLiteral(@"string", @"");
+                WriteNullTagLiteral(DataTypeNames.String, @"");
                 return;
             }
             TopLevelElement();
-            WriteNullableStringLiteral(@"string", @"", ((string)o));
+            WriteNullableStringLiteral(DataTypeNames.String, @"", ((string)o));
         }
 
         internal void Write_int(object? o)
@@ -25,10 +26,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"int", @"");
+                WriteEmptyTag(DataTypeNames.Int32, @"");
                 return;
             }
-            WriteElementStringRaw(@"int", @"", System.Xml.XmlConvert.ToString((int)((int)o)));
+            WriteElementStringRaw(DataTypeNames.Int32, @"", System.Xml.XmlConvert.ToString((int)((int)o)));
         }
 
         internal void Write_boolean(object? o)
@@ -36,10 +37,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"boolean", @"");
+                WriteEmptyTag(DataTypeNames.Boolean, @"");
                 return;
             }
-            WriteElementStringRaw(@"boolean", @"", System.Xml.XmlConvert.ToString((bool)((bool)o)));
+            WriteElementStringRaw(DataTypeNames.Boolean, @"", System.Xml.XmlConvert.ToString((bool)((bool)o)));
         }
 
         internal void Write_short(object? o)
@@ -47,10 +48,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"short", @"");
+                WriteEmptyTag(DataTypeNames.Int16, @"");
                 return;
             }
-            WriteElementStringRaw(@"short", @"", System.Xml.XmlConvert.ToString((short)((short)o)));
+            WriteElementStringRaw(DataTypeNames.Int16, @"", System.Xml.XmlConvert.ToString((short)((short)o)));
         }
 
         internal void Write_long(object? o)
@@ -58,10 +59,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"long", @"");
+                WriteEmptyTag(DataTypeNames.Int64, @"");
                 return;
             }
-            WriteElementStringRaw(@"long", @"", System.Xml.XmlConvert.ToString((long)((long)o)));
+            WriteElementStringRaw(DataTypeNames.Int64, @"", System.Xml.XmlConvert.ToString((long)((long)o)));
         }
 
         internal void Write_float(object? o)
@@ -69,10 +70,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"float", @"");
+                WriteEmptyTag(DataTypeNames.Single, @"");
                 return;
             }
-            WriteElementStringRaw(@"float", @"", System.Xml.XmlConvert.ToString((float)((float)o)));
+            WriteElementStringRaw(DataTypeNames.Single, @"", System.Xml.XmlConvert.ToString((float)((float)o)));
         }
 
         internal void Write_double(object? o)
@@ -80,10 +81,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"double", @"");
+                WriteEmptyTag(DataTypeNames.Double, @"");
                 return;
             }
-            WriteElementStringRaw(@"double", @"", System.Xml.XmlConvert.ToString((double)((double)o)));
+            WriteElementStringRaw(DataTypeNames.Double, @"", System.Xml.XmlConvert.ToString((double)((double)o)));
         }
 
         internal void Write_decimal(object? o)
@@ -91,12 +92,12 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"decimal", @"");
+                WriteEmptyTag(DataTypeNames.Decimal, @"");
                 return;
             }
             // Preventing inlining optimization which is causing issue for XmlConvert.ToString(Decimal)
             decimal d = (decimal)o;
-            WriteElementStringRaw(@"decimal", @"", System.Xml.XmlConvert.ToString(d));
+            WriteElementStringRaw(DataTypeNames.Decimal, @"", System.Xml.XmlConvert.ToString(d));
         }
 
         internal void Write_dateTime(object? o)
@@ -104,10 +105,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"dateTime", @"");
+                WriteEmptyTag(DataTypeNames.DateTime, @"");
                 return;
             }
-            WriteElementStringRaw(@"dateTime", @"", FromDateTime(((System.DateTime)o)));
+            WriteElementStringRaw(DataTypeNames.DateTime, @"", FromDateTime(((System.DateTime)o)));
         }
 
         internal void Write_dateTimeOffset(object? o)
@@ -115,11 +116,11 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"dateTimeOffset", @"");
+                WriteEmptyTag(DataTypeNames.DateTimeOffset, @"");
                 return;
             }
             DateTimeOffset dto = (DateTimeOffset)o;
-            WriteElementStringRaw(@"dateTimeOffset", @"", System.Xml.XmlConvert.ToString(dto));
+            WriteElementStringRaw(DataTypeNames.DateTimeOffset, @"", System.Xml.XmlConvert.ToString(dto));
         }
 
         internal void Write_unsignedByte(object? o)
@@ -127,10 +128,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"unsignedByte", @"");
+                WriteEmptyTag(DataTypeNames.Byte, @"");
                 return;
             }
-            WriteElementStringRaw(@"unsignedByte", @"", System.Xml.XmlConvert.ToString((byte)((byte)o)));
+            WriteElementStringRaw(DataTypeNames.Byte, @"", System.Xml.XmlConvert.ToString((byte)((byte)o)));
         }
 
         internal void Write_byte(object? o)
@@ -138,10 +139,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"byte", @"");
+                WriteEmptyTag(DataTypeNames.SByte, @"");
                 return;
             }
-            WriteElementStringRaw(@"byte", @"", System.Xml.XmlConvert.ToString((sbyte)((sbyte)o)));
+            WriteElementStringRaw(DataTypeNames.SByte, @"", System.Xml.XmlConvert.ToString((sbyte)((sbyte)o)));
         }
 
         internal void Write_unsignedShort(object? o)
@@ -149,10 +150,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"unsignedShort", @"");
+                WriteEmptyTag(DataTypeNames.UInt16, @"");
                 return;
             }
-            WriteElementStringRaw(@"unsignedShort", @"", System.Xml.XmlConvert.ToString((ushort)((ushort)o)));
+            WriteElementStringRaw(DataTypeNames.UInt16, @"", System.Xml.XmlConvert.ToString((ushort)((ushort)o)));
         }
 
         internal void Write_unsignedInt(object? o)
@@ -160,10 +161,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"unsignedInt", @"");
+                WriteEmptyTag(DataTypeNames.UInt32, @"");
                 return;
             }
-            WriteElementStringRaw(@"unsignedInt", @"", System.Xml.XmlConvert.ToString((uint)((uint)o)));
+            WriteElementStringRaw(DataTypeNames.UInt32, @"", System.Xml.XmlConvert.ToString((uint)((uint)o)));
         }
 
         internal void Write_unsignedLong(object? o)
@@ -171,10 +172,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"unsignedLong", @"");
+                WriteEmptyTag(DataTypeNames.UInt64, @"");
                 return;
             }
-            WriteElementStringRaw(@"unsignedLong", @"", System.Xml.XmlConvert.ToString((ulong)((ulong)o)));
+            WriteElementStringRaw(DataTypeNames.UInt64, @"", System.Xml.XmlConvert.ToString((ulong)((ulong)o)));
         }
 
         internal void Write_base64Binary(object? o)
@@ -182,11 +183,11 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteNullTagLiteral(@"base64Binary", @"");
+                WriteNullTagLiteral(DataTypeNames.ByteArrayBase64, @"");
                 return;
             }
             TopLevelElement();
-            WriteNullableStringLiteralRaw(@"base64Binary", @"", FromByteArrayBase64(((byte[])o)));
+            WriteNullableStringLiteralRaw(DataTypeNames.ByteArrayBase64, @"", FromByteArrayBase64(((byte[])o)));
         }
 
         internal void Write_guid(object? o)
@@ -194,12 +195,12 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"guid", @"");
+                WriteEmptyTag(DataTypeNames.Guid, @"");
                 return;
             }
             // Preventing inlining optimization which is causing issue for XmlConvert.ToString(Guid)
             Guid guid = (Guid)o;
-            WriteElementStringRaw(@"guid", @"", System.Xml.XmlConvert.ToString(guid));
+            WriteElementStringRaw(DataTypeNames.Guid, @"", System.Xml.XmlConvert.ToString(guid));
         }
 
         internal void Write_TimeSpan(object? o)
@@ -207,11 +208,11 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"TimeSpan", @"");
+                WriteEmptyTag(DataTypeNames.TimeSpan, @"");
                 return;
             }
             TimeSpan timeSpan = (TimeSpan)o;
-            WriteElementStringRaw(@"TimeSpan", @"", System.Xml.XmlConvert.ToString(timeSpan));
+            WriteElementStringRaw(DataTypeNames.TimeSpan, @"", System.Xml.XmlConvert.ToString(timeSpan));
         }
 
         internal void Write_char(object? o)
@@ -219,10 +220,10 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteEmptyTag(@"char", @"");
+                WriteEmptyTag(DataTypeNames.Char, @"");
                 return;
             }
-            WriteElementString(@"char", @"", FromChar(((char)o)));
+            WriteElementString(DataTypeNames.Char, @"", FromChar(((char)o)));
         }
 
         internal void Write_QName(object? o)
@@ -230,11 +231,11 @@ namespace System.Xml.Serialization
             WriteStartDocument();
             if (o == null)
             {
-                WriteNullTagLiteral(@"QName", @"");
+                WriteNullTagLiteral(DataTypeNames.XmlQualifiedName, @"");
                 return;
             }
             TopLevelElement();
-            WriteNullableQualifiedNameLiteral(@"QName", @"", ((global::System.Xml.XmlQualifiedName)o));
+            WriteNullableQualifiedNameLiteral(DataTypeNames.XmlQualifiedName, @"", ((global::System.Xml.XmlQualifiedName)o));
         }
 
         [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
@@ -782,27 +783,27 @@ namespace System.Xml.Serialization
 
         protected override void InitIDs()
         {
-            _id4_boolean = Reader.NameTable.Add(@"boolean");
-            _id14_unsignedInt = Reader.NameTable.Add(@"unsignedInt");
-            _id15_unsignedLong = Reader.NameTable.Add(@"unsignedLong");
-            _id7_float = Reader.NameTable.Add(@"float");
-            _id10_dateTime = Reader.NameTable.Add(@"dateTime");
-            _id20_dateTimeOffset = Reader.NameTable.Add(@"dateTimeOffset");
-            _id6_long = Reader.NameTable.Add(@"long");
-            _id9_decimal = Reader.NameTable.Add(@"decimal");
-            _id8_double = Reader.NameTable.Add(@"double");
-            _id17_guid = Reader.NameTable.Add(@"guid");
-            _id19_TimeSpan = Reader.NameTable.Add(@"TimeSpan");
+            _id4_boolean = Reader.NameTable.Add(DataTypeNames.Boolean);
+            _id14_unsignedInt = Reader.NameTable.Add(DataTypeNames.UInt32);
+            _id15_unsignedLong = Reader.NameTable.Add(DataTypeNames.UInt64);
+            _id7_float = Reader.NameTable.Add(DataTypeNames.Single);
+            _id10_dateTime = Reader.NameTable.Add(DataTypeNames.DateTime);
+            _id20_dateTimeOffset = Reader.NameTable.Add(DataTypeNames.DateTimeOffset);
+            _id6_long = Reader.NameTable.Add(DataTypeNames.Int64);
+            _id9_decimal = Reader.NameTable.Add(DataTypeNames.Decimal);
+            _id8_double = Reader.NameTable.Add(DataTypeNames.Double);
+            _id17_guid = Reader.NameTable.Add(DataTypeNames.Guid);
+            _id19_TimeSpan = Reader.NameTable.Add(DataTypeNames.TimeSpan);
             _id2_Item = Reader.NameTable.Add(@"");
-            _id13_unsignedShort = Reader.NameTable.Add(@"unsignedShort");
-            _id18_char = Reader.NameTable.Add(@"char");
-            _id3_int = Reader.NameTable.Add(@"int");
-            _id12_byte = Reader.NameTable.Add(@"byte");
-            _id16_base64Binary = Reader.NameTable.Add(@"base64Binary");
-            _id11_unsignedByte = Reader.NameTable.Add(@"unsignedByte");
-            _id5_short = Reader.NameTable.Add(@"short");
-            _id1_string = Reader.NameTable.Add(@"string");
-            _id1_QName = Reader.NameTable.Add(@"QName");
+            _id13_unsignedShort = Reader.NameTable.Add(DataTypeNames.UInt16);
+            _id18_char = Reader.NameTable.Add(DataTypeNames.Char);
+            _id3_int = Reader.NameTable.Add(DataTypeNames.Int32);
+            _id12_byte = Reader.NameTable.Add(DataTypeNames.SByte);
+            _id16_base64Binary = Reader.NameTable.Add(DataTypeNames.ByteArrayBase64);
+            _id11_unsignedByte = Reader.NameTable.Add(DataTypeNames.Byte);
+            _id5_short = Reader.NameTable.Add(DataTypeNames.Int16);
+            _id1_string = Reader.NameTable.Add(DataTypeNames.String);
+            _id1_QName = Reader.NameTable.Add(DataTypeNames.XmlQualifiedName);
         }
     }
 }

@@ -188,58 +188,58 @@ namespace System.Xml.Serialization
             _r.NameTable.Add(XmlSchema.Namespace);
             _r.NameTable.Add(UrtTypes.Namespace);
 
-            _stringID = _r.NameTable.Add("string");
-            _intID = _r.NameTable.Add("int");
-            _booleanID = _r.NameTable.Add("boolean");
-            _shortID = _r.NameTable.Add("short");
-            _longID = _r.NameTable.Add("long");
-            _floatID = _r.NameTable.Add("float");
-            _doubleID = _r.NameTable.Add("double");
-            _decimalID = _r.NameTable.Add("decimal");
-            _dateTimeID = _r.NameTable.Add("dateTime");
-            _qnameID = _r.NameTable.Add("QName");
-            _dateID = _r.NameTable.Add("date");
-            _timeID = _r.NameTable.Add("time");
-            _hexBinaryID = _r.NameTable.Add("hexBinary");
-            _base64BinaryID = _r.NameTable.Add("base64Binary");
-            _unsignedByteID = _r.NameTable.Add("unsignedByte");
-            _byteID = _r.NameTable.Add("byte");
-            _unsignedShortID = _r.NameTable.Add("unsignedShort");
-            _unsignedIntID = _r.NameTable.Add("unsignedInt");
-            _unsignedLongID = _r.NameTable.Add("unsignedLong");
-            _oldDecimalID = _r.NameTable.Add("decimal");
-            _oldTimeInstantID = _r.NameTable.Add("timeInstant");
-            _charID = _r.NameTable.Add("char");
-            _guidID = _r.NameTable.Add("guid");
-            _timeSpanID = _r.NameTable.Add("TimeSpan");
-            _dateTimeOffsetID = _r.NameTable.Add("dateTimeOffset");
-            _base64ID = _r.NameTable.Add("base64");
+            _stringID = _r.NameTable.Add(DataTypeNames.String);
+            _intID = _r.NameTable.Add(DataTypeNames.Int32);
+            _booleanID = _r.NameTable.Add(DataTypeNames.Boolean);
+            _shortID = _r.NameTable.Add(DataTypeNames.Int16);
+            _longID = _r.NameTable.Add(DataTypeNames.Int64);
+            _floatID = _r.NameTable.Add(DataTypeNames.Single);
+            _doubleID = _r.NameTable.Add(DataTypeNames.Double);
+            _decimalID = _r.NameTable.Add(DataTypeNames.Decimal);
+            _dateTimeID = _r.NameTable.Add(DataTypeNames.DateTime);
+            _qnameID = _r.NameTable.Add(DataTypeNames.XmlQualifiedName);
+            _dateID = _r.NameTable.Add(DataTypeNames.Date);
+            _timeID = _r.NameTable.Add(DataTypeNames.Time);
+            _hexBinaryID = _r.NameTable.Add(DataTypeNames.ByteArrayHex);
+            _base64BinaryID = _r.NameTable.Add(DataTypeNames.ByteArrayBase64);
+            _unsignedByteID = _r.NameTable.Add(DataTypeNames.Byte);
+            _byteID = _r.NameTable.Add(DataTypeNames.SByte);
+            _unsignedShortID = _r.NameTable.Add(DataTypeNames.UInt16);
+            _unsignedIntID = _r.NameTable.Add(DataTypeNames.UInt32);
+            _unsignedLongID = _r.NameTable.Add(DataTypeNames.UInt64);
+            _oldDecimalID = _r.NameTable.Add(DataTypeNames.Decimal);
+            _oldTimeInstantID = _r.NameTable.Add(DataTypeNames.OldTimeInstant);
+            _charID = _r.NameTable.Add(DataTypeNames.Char);
+            _guidID = _r.NameTable.Add(DataTypeNames.Guid);
+            _timeSpanID = _r.NameTable.Add(DataTypeNames.TimeSpan);
+            _dateTimeOffsetID = _r.NameTable.Add(DataTypeNames.DateTimeOffset);
+            _base64ID = _r.NameTable.Add(DataTypeNames.Base64);
 
-            _anyURIID = _r.NameTable.Add("anyURI");
-            _durationID = _r.NameTable.Add("duration");
-            _ENTITYID = _r.NameTable.Add("ENTITY");
-            _ENTITIESID = _r.NameTable.Add("ENTITIES");
-            _gDayID = _r.NameTable.Add("gDay");
-            _gMonthID = _r.NameTable.Add("gMonth");
-            _gMonthDayID = _r.NameTable.Add("gMonthDay");
-            _gYearID = _r.NameTable.Add("gYear");
-            _gYearMonthID = _r.NameTable.Add("gYearMonth");
-            _IDID = _r.NameTable.Add("ID");
-            _IDREFID = _r.NameTable.Add("IDREF");
-            _IDREFSID = _r.NameTable.Add("IDREFS");
-            _integerID = _r.NameTable.Add("integer");
-            _languageID = _r.NameTable.Add("language");
-            _nameID = _r.NameTable.Add("Name");
-            _NCNameID = _r.NameTable.Add("NCName");
-            _NMTOKENID = _r.NameTable.Add("NMTOKEN");
-            _NMTOKENSID = _r.NameTable.Add("NMTOKENS");
-            _negativeIntegerID = _r.NameTable.Add("negativeInteger");
-            _nonNegativeIntegerID = _r.NameTable.Add("nonNegativeInteger");
-            _nonPositiveIntegerID = _r.NameTable.Add("nonPositiveInteger");
-            _normalizedStringID = _r.NameTable.Add("normalizedString");
-            _NOTATIONID = _r.NameTable.Add("NOTATION");
-            _positiveIntegerID = _r.NameTable.Add("positiveInteger");
-            _tokenID = _r.NameTable.Add("token");
+            _anyURIID = _r.NameTable.Add(DataTypeNames.AnyUri);
+            _durationID = _r.NameTable.Add(DataTypeNames.Duration);
+            _ENTITYID = _r.NameTable.Add(DataTypeNames.Entity);
+            _ENTITIESID = _r.NameTable.Add(DataTypeNames.Entities);
+            _gDayID = _r.NameTable.Add(DataTypeNames.GDay);
+            _gMonthID = _r.NameTable.Add(DataTypeNames.GMonth);
+            _gMonthDayID = _r.NameTable.Add(DataTypeNames.GMonthDay);
+            _gYearID = _r.NameTable.Add(DataTypeNames.GYear);
+            _gYearMonthID = _r.NameTable.Add(DataTypeNames.GYearMonth);
+            _IDID = _r.NameTable.Add(DataTypeNames.Id);
+            _IDREFID = _r.NameTable.Add(DataTypeNames.IdRef);
+            _IDREFSID = _r.NameTable.Add(DataTypeNames.IdRefs);
+            _integerID = _r.NameTable.Add(DataTypeNames.Integer);
+            _languageID = _r.NameTable.Add(DataTypeNames.Language);
+            _nameID = _r.NameTable.Add(DataTypeNames.XmlName);
+            _NCNameID = _r.NameTable.Add(DataTypeNames.NoncolonizedName);
+            _NMTOKENID = _r.NameTable.Add(DataTypeNames.XmlNmToken);
+            _NMTOKENSID = _r.NameTable.Add(DataTypeNames.XmlNmTokens);
+            _negativeIntegerID = _r.NameTable.Add(DataTypeNames.NegativeInteger);
+            _nonNegativeIntegerID = _r.NameTable.Add(DataTypeNames.NonNegativeInteger);
+            _nonPositiveIntegerID = _r.NameTable.Add(DataTypeNames.NonPositiveInteger);
+            _normalizedStringID = _r.NameTable.Add(DataTypeNames.NormalizedString);
+            _NOTATIONID = _r.NameTable.Add(DataTypeNames.Notation);
+            _positiveIntegerID = _r.NameTable.Add(DataTypeNames.PositiveInteger);
+            _tokenID = _r.NameTable.Add(DataTypeNames.Token);
         }
 
         /// <devdoc>
@@ -2837,7 +2837,7 @@ namespace System.Xml.Serialization
             {
                 Writer.Write(source);
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
             {
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -4099,7 +4099,7 @@ namespace System.Xml.Serialization
                 }
                 else
                 {
-                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
                     {
                         Writer.Write("tmp = ReadString(tmp, ");
                         if (text.Mapping.TypeDesc!.CollapseWhitespace)
@@ -4710,8 +4710,8 @@ namespace System.Xml.Serialization
                         string readFunc;
                         switch (element.Mapping.TypeDesc.FormatterName)
                         {
-                            case "ByteArrayBase64":
-                            case "ByteArrayHex":
+                            case TypeScope.ByteArrayBase64FormatterName:
+                            case TypeScope.ByteArrayHexFormatterName:
                                 readFunc = "false";
                                 break;
                             default:

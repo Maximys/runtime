@@ -707,7 +707,7 @@ namespace System.Xml.Serialization
                     }
                     else
                     {
-                        if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                        if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
                         {
                             value = ReadString(null, text.Mapping.TypeDesc.CollapseWhitespace);
                         }
@@ -888,11 +888,11 @@ namespace System.Xml.Serialization
                     }
                     else
                     {
-                        if (element.Mapping.TypeDesc.FormatterName == "ByteArrayBase64")
+                        if (element.Mapping.TypeDesc.FormatterName == TypeScope.ByteArrayBase64FormatterName)
                         {
                             value = ToByteArrayBase64(false);
                         }
-                        else if (element.Mapping.TypeDesc.FormatterName == "ByteArrayHex")
+                        else if (element.Mapping.TypeDesc.FormatterName == TypeScope.ByteArrayHexFormatterName)
                         {
                             value = ToByteArrayHex(false);
                         }
@@ -1173,7 +1173,7 @@ namespace System.Xml.Serialization
             {
                 return readFunc(funcState);
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
             {
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -1191,22 +1191,22 @@ namespace System.Xml.Serialization
                     string value = readFunc(funcState);
                     object retObj = mapping.TypeDesc.FormatterName switch
                     {
-                        "Boolean" => XmlConvert.ToBoolean(value),
-                        "Int32" => XmlConvert.ToInt32(value),
-                        "Int16" => XmlConvert.ToInt16(value),
-                        "Int64" => XmlConvert.ToInt64(value),
-                        "Single" => XmlConvert.ToSingle(value),
-                        "Double" => XmlConvert.ToDouble(value),
-                        "Decimal" => XmlConvert.ToDecimal(value),
-                        "Byte" => XmlConvert.ToByte(value),
-                        "SByte" => XmlConvert.ToSByte(value),
-                        "UInt16" => XmlConvert.ToUInt16(value),
-                        "UInt32" => XmlConvert.ToUInt32(value),
-                        "UInt64" => XmlConvert.ToUInt64(value),
-                        "Guid" => XmlConvert.ToGuid(value),
-                        "Char" => XmlConvert.ToChar(value),
-                        "TimeSpan" => XmlConvert.ToTimeSpan(value),
-                        "DateTimeOffset" => XmlConvert.ToDateTimeOffset(value),
+                        TypeScope.BooleanFormatterName => XmlConvert.ToBoolean(value),
+                        TypeScope.Int32FormatterName => XmlConvert.ToInt32(value),
+                        TypeScope.Int16FormatterName => XmlConvert.ToInt16(value),
+                        TypeScope.Int64FormatterName => XmlConvert.ToInt64(value),
+                        TypeScope.SingleFormatterName => XmlConvert.ToSingle(value),
+                        TypeScope.DoubleFormatterName => XmlConvert.ToDouble(value),
+                        TypeScope.DecimalFormatterName => XmlConvert.ToDecimal(value),
+                        TypeScope.ByteFormatterName => XmlConvert.ToByte(value),
+                        TypeScope.SByteFormatterName => XmlConvert.ToSByte(value),
+                        TypeScope.UInt16FormatterName => XmlConvert.ToUInt16(value),
+                        TypeScope.UInt32FormatterName => XmlConvert.ToUInt32(value),
+                        TypeScope.UInt64FormatterName => XmlConvert.ToUInt64(value),
+                        TypeScope.GuidFormatterName => XmlConvert.ToGuid(value),
+                        TypeScope.CharFormatterName => XmlConvert.ToChar(value),
+                        TypeScope.TimeSpanFormatterName => XmlConvert.ToTimeSpan(value),
+                        TypeScope.DateTimeOffsetFormatterName => XmlConvert.ToDateTimeOffset(value),
                         _ => throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown FormatterName: {mapping.TypeDesc.FormatterName}")),
                     };
                     return retObj;
