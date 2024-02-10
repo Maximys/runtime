@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.Navigation;
+using System.Xml.Serialization.Mappings.TypeMappings;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization

@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.TypeMappings;
 
 namespace System.Xml.Serialization.Mappings.Accessors
 {
