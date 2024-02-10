@@ -47,6 +47,7 @@
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\Accessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\AttributeAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\ChoiceIdentifierAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\Comparers\AccessorComparer.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\ElementAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\TextAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\XmlnsAccessor.cs" />
