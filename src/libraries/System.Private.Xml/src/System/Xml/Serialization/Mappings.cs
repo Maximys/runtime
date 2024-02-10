@@ -2,16 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
-using System.Xml.Serialization.Mappings.AccessorMappings;
-using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.TypeMappings;
-using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {
@@ -61,36 +56,6 @@ namespace System.Xml.Serialization
         {
             get { return _value; }
             set { _value = value; }
-        }
-    }
-
-    internal sealed class MemberMappingComparer : IComparer<MemberMapping>
-    {
-        public int Compare(MemberMapping? m1, MemberMapping? m2)
-        {
-            Debug.Assert(m1 != null);
-            Debug.Assert(m2 != null);
-            bool m1Text = m1.IsText;
-            if (m1Text)
-            {
-                if (m2.IsText)
-                    return 0;
-                return 1;
-            }
-            else if (m2.IsText)
-                return -1;
-
-            if (m1.SequenceId < 0 && m2.SequenceId < 0)
-                return 0;
-            if (m1.SequenceId < 0)
-                return 1;
-            if (m2.SequenceId < 0)
-                return -1;
-            if (m1.SequenceId < m2.SequenceId)
-                return -1;
-            if (m1.SequenceId > m2.SequenceId)
-                return 1;
-            return 0;
         }
     }
 
