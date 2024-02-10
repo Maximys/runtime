@@ -3,16 +3,10 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-#if DEBUG
-using System.Diagnostics;
-#endif
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reflection;
 using System.Xml.Schema;
-using System.Xml.Serialization.Configuration;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {

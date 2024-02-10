@@ -13,6 +13,7 @@ using System.Runtime.Loader;
 using System.Security;
 using System.Text;
 using System.Threading;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {

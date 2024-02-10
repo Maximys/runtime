@@ -2,15 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
-using System.ComponentModel;
-using System.Configuration;
-#if DEBUG
-using System.Diagnostics;
-#endif
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Xml.Schema;
-using System.Xml.Serialization.Configuration;
+using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
 {
