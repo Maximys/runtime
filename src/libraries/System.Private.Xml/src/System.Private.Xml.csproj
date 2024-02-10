@@ -52,6 +52,7 @@
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\ElementAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\TextAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\XmlnsAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\ConstantMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\INavigationNameScope.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameKey.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameTable.cs" />
@@ -478,7 +479,7 @@
     <Compile Include="System\Xml\Serialization\indentedWriter.cs" />
     <Compile Include="System\Xml\Serialization\IXmlSerializable.cs" />
     <Compile Include="System\Xml\Serialization\IXmlTextParser.cs" />
-    <Compile Include="System\Xml\Serialization\Mappings.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Mapping.cs" />
     <Compile Include="System\Xml\Serialization\Models.cs" />
     <Compile Include="System\Xml\Serialization\ReflectionXmlSerializationReader.cs" />
     <Compile Include="System\Xml\Serialization\ReflectionXmlSerializationWriter.cs" />
