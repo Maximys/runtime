@@ -42,6 +42,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\AccessorMapping.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\MemberMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\Accessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\AttributeAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\ChoiceIdentifierAccessor.cs" />
