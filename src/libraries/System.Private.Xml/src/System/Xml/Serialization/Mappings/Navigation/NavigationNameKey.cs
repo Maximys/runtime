@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace System.Xml.Serialization.Mappings.Navigation
 {
-    internal sealed class NavigationNameKey
+    internal sealed class NavigationNameKey : IEquatable<NavigationNameKey>
     {
         private readonly string? _ns;
         private readonly string? _name;
@@ -18,9 +18,20 @@ namespace System.Xml.Serialization.Mappings.Navigation
 
         public override bool Equals([NotNullWhen(true)] object? other)
         {
-            if (!(other is NavigationNameKey)) return false;
-            NavigationNameKey key = (NavigationNameKey)other;
-            return _name == key._name && _ns == key._ns;
+            if (other is NavigationNameKey navigationNameKey)
+            {
+                return Equals(navigationNameKey);
+            }
+            return false;
+        }
+
+        public bool Equals([NotNullWhen(true)] NavigationNameKey? other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            return _name == other._name && _ns == other._ns;
         }
 
         public override int GetHashCode()
