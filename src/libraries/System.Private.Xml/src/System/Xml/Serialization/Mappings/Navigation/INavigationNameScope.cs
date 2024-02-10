@@ -3,8 +3,8 @@
 
 namespace System.Xml.Serialization.Mappings.Navigation
 {
-    internal interface INavigationNameScope
+    internal interface INavigationNameScope<T>
     {
-        object? this[string? name, string? ns] { get; set; }
+        T? this[string? name, string? ns] { get; set; }
     }
 }

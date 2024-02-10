@@ -20,8 +20,8 @@ namespace System.Xml.Serialization
     {
         private readonly TypeScope _typeScope;
         private readonly SoapAttributeOverrides _attributeOverrides;
-        private readonly NavigationNameTable _types = new NavigationNameTable();      // xmltypename + xmlns -> Mapping
-        private readonly NavigationNameTable _nullables = new NavigationNameTable();  // xmltypename + xmlns -> NullableMapping
+        private readonly NavigationNameTable<TypeMapping> _types = new NavigationNameTable<TypeMapping>();
+        private readonly NavigationNameTable<NullableMapping> _nullables = new NavigationNameTable<NullableMapping>();
         private StructMapping? _root;
         private readonly string _defaultNs;
         private readonly ModelScope _modelScope;
@@ -249,10 +249,17 @@ namespace System.Xml.Serialization
 
         private TypeMapping? GetTypeMapping(string typeName, string? ns, TypeDesc typeDesc)
         {
-            TypeMapping? mapping = (TypeMapping?)_types[typeName, ns];
-            if (mapping == null) return null;
+            TypeMapping? mapping = _types[typeName, ns];
+            if (mapping == null)
+            {
+                return null;
+            }
+
             if (mapping.TypeDesc != typeDesc)
+            {
                 throw new InvalidOperationException(SR.Format(SR.XmlTypesDuplicate, typeDesc.FullName, mapping.TypeDesc!.FullName, typeName, ns));
+            }
+
             return mapping;
         }
 
@@ -260,7 +267,7 @@ namespace System.Xml.Serialization
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type)
         {
             TypeDesc typeDesc = baseMapping.TypeDesc!.GetNullableTypeDesc(type);
-            TypeMapping? existingMapping = (TypeMapping?)_nullables[baseMapping.TypeName!, baseMapping.Namespace];
+            TypeMapping? existingMapping = _nullables[baseMapping.TypeName!, baseMapping.Namespace];
             NullableMapping mapping;
             if (existingMapping != null)
             {
@@ -508,7 +515,7 @@ namespace System.Xml.Serialization
             string uniqueName = $"ArrayOf{itemTypeName}";
             string ns = useDefaultNs ? _defaultNs : itemTypeNamespace;
             int i = 1;
-            TypeMapping? existingMapping = (TypeMapping?)_types[uniqueName, ns];
+            TypeMapping? existingMapping = _types[uniqueName, ns];
             while (existingMapping != null)
             {
                 if (existingMapping is ArrayMapping arrayMapping)
@@ -520,7 +527,7 @@ namespace System.Xml.Serialization
                 }
                 // need to re-name the mapping
                 uniqueName = itemTypeName + i.ToString(CultureInfo.InvariantCulture);
-                existingMapping = (TypeMapping?)_types[uniqueName, ns];
+                existingMapping = _types[uniqueName, ns];
                 i++;
             }
             mapping.Namespace = ns;

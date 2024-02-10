@@ -19,8 +19,6 @@ namespace System.Xml.Serialization
         private TypeScope? _scope;
         private ImportContext _context;
         private bool _rootImported;
-        private NavigationNameTable? _typesInUse;
-        private NavigationNameTable? _groupsInUse;
 
         [RequiresUnreferencedCode("calls SetCache")]
         [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]
@@ -63,9 +61,9 @@ namespace System.Xml.Serialization
 
         internal TypeScope Scope => _scope ??= new TypeScope();
 
-        internal NavigationNameTable GroupsInUse => _groupsInUse ??= new NavigationNameTable();
+        internal NavigationNameTable<XmlQualifiedName> GroupsInUse { get; } = new NavigationNameTable<XmlQualifiedName>();
 
-        internal NavigationNameTable TypesInUse => _typesInUse ??= new NavigationNameTable();
+        internal NavigationNameTable<XmlQualifiedName> TypesInUse { get; } = new NavigationNameTable<XmlQualifiedName>();
 
         internal CodeGenerationOptions Options
         {
@@ -88,10 +86,15 @@ namespace System.Xml.Serialization
                         // if baseTypeCanBeIndirect is true, we apply the supplied baseType to the top of the
                         // inheritance chain, not necessarily directly to the imported type.
                         while (typeDescToChange.BaseTypeDesc != null && typeDescToChange.BaseTypeDesc != baseTypeDesc)
+                        {
                             typeDescToChange = typeDescToChange.BaseTypeDesc;
+                        }
                     }
+
                     if (typeDescToChange.BaseTypeDesc != null && typeDescToChange.BaseTypeDesc != baseTypeDesc)
+                    {
                         throw new InvalidOperationException(SR.Format(SR.XmlInvalidBaseType, structMapping.TypeDesc!.FullName, baseType.FullName, typeDescToChange.BaseTypeDesc.FullName));
+                    }
                     typeDescToChange.BaseTypeDesc = baseTypeDesc;
                 }
             }
@@ -136,18 +139,22 @@ namespace System.Xml.Serialization
         [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]
         internal abstract void ImportDerivedTypes(XmlQualifiedName baseName);
 
-        internal static void AddReference(XmlQualifiedName name, NavigationNameTable references, string error)
+        internal static void AddReference(XmlQualifiedName name, NavigationNameTable<XmlQualifiedName> references, string error)
         {
             if (name.Namespace == XmlSchema.Namespace)
+            {
                 return;
+            }
+
             if (references[name] != null)
             {
                 throw new InvalidOperationException(string.Format(error, name.Name, name.Namespace));
             }
+
             references[name] = name;
         }
 
-        internal static void RemoveReference(XmlQualifiedName name, NavigationNameTable references)
+        internal static void RemoveReference(XmlQualifiedName name, NavigationNameTable<XmlQualifiedName> references)
         {
             references[name] = null;
         }
