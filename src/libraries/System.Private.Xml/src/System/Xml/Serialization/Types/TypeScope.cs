@@ -57,14 +57,12 @@ namespace System.Xml.Serialization
         private const TypeFlags WithoutDirectMappingFlags = TypeFlags.AmbiguousDataType
             | BaseFlags;
 
+        private readonly Dictionary<Type, TypeDesc> _typeDescs = new Dictionary<Type, TypeDesc>();
+        private readonly Dictionary<Type, TypeDesc> _arrayTypeDescs = new Dictionary<Type, TypeDesc>();
+        private readonly List<TypeMapping> _typeMappings = new List<TypeMapping>();
 
-
-        private readonly Hashtable _typeDescs = new Hashtable();
-        private readonly Hashtable _arrayTypeDescs = new Hashtable();
-        private readonly ArrayList _typeMappings = new ArrayList();
-
-        private static readonly Hashtable s_primitiveTypes = new Hashtable();
-        private static readonly Hashtable s_primitiveDataTypes = new Hashtable();
+        private static readonly Dictionary<Type, TypeDesc> s_primitiveTypes = new Dictionary<Type, TypeDesc>();
+        private static readonly Dictionary<XmlSchemaSimpleType, TypeDesc> s_primitiveDataTypes = new Dictionary<XmlSchemaSimpleType, TypeDesc>();
         private static readonly NameTable s_primitiveNames = new NameTable();
 
         private static readonly string[] s_unsupportedTypes = new string[] {
@@ -231,8 +229,7 @@ namespace System.Xml.Serialization
             XmlSchemaSimpleType dataType = new XmlSchemaSimpleType();
             dataType.Name = dataTypeName;
             TypeDesc typeDesc = new TypeDesc(type, true, dataType, formatterName, flags);
-            if (s_primitiveTypes[type] == null)
-                s_primitiveTypes.Add(type, typeDesc);
+            s_primitiveTypes.TryAdd(type, typeDesc);
             s_primitiveDataTypes.Add(dataType, typeDesc);
             s_primitiveNames.Add(dataTypeName, XmlSchema.Namespace, typeDesc);
         }
@@ -249,8 +246,7 @@ namespace System.Xml.Serialization
             }
             dataType.Content = restriction;
             TypeDesc typeDesc = new TypeDesc(type, false, dataType, formatterName, flags);
-            if (s_primitiveTypes[type] == null)
-                s_primitiveTypes.Add(type, typeDesc);
+            s_primitiveTypes.TryAdd(type, typeDesc);
             s_primitiveDataTypes.Add(dataType, typeDesc);
             s_primitiveNames.Add(dataTypeName, ns, typeDesc);
         }
@@ -280,7 +276,10 @@ namespace System.Xml.Serialization
 
         internal static TypeDesc? GetTypeDesc(XmlSchemaSimpleType dataType)
         {
-            return (TypeDesc?)s_primitiveDataTypes[dataType];
+            TypeDesc? returnValue;
+
+            s_primitiveDataTypes.TryGetValue(dataType, out returnValue);
+            return returnValue;
         }
 
         [RequiresUnreferencedCode("calls GetTypeDesc")]
@@ -298,35 +297,47 @@ namespace System.Xml.Serialization
         [RequiresUnreferencedCode("calls ImportTypeDesc")]
         internal TypeDesc GetTypeDesc(Type type, MemberInfo? source, bool directReference, bool throwOnError)
         {
+            TypeDesc? returnValue;
+
             if (type.ContainsGenericParameters)
             {
                 throw new InvalidOperationException(SR.Format(SR.XmlUnsupportedOpenGenericType, type));
             }
 
-            TypeDesc typeDesc =
-                (TypeDesc?)s_primitiveTypes[type] ??
-                (TypeDesc?)_typeDescs[type] ??
-                ImportTypeDesc(type, source, directReference);
+            if (!s_primitiveTypes.TryGetValue(type, out returnValue))
+            {
+                if (!_typeDescs.TryGetValue(type, out returnValue))
+                {
+                    returnValue = ImportTypeDesc(type, source, directReference);
+                }
+            }
 
             if (throwOnError)
-                typeDesc.CheckSupported();
+            {
+                returnValue.CheckSupported();
+            }
 
-            return typeDesc;
+            return returnValue;
         }
 
         [RequiresUnreferencedCode("calls ImportTypeDesc")]
         internal TypeDesc GetArrayTypeDesc(Type type)
         {
-            TypeDesc? typeDesc = (TypeDesc?)_arrayTypeDescs[type];
-            if (typeDesc == null)
+            TypeDesc? returnValue;
+
+            if (!_arrayTypeDescs.TryGetValue(type, out returnValue))
             {
-                typeDesc = GetTypeDesc(type);
+                TypeDesc typeDesc = GetTypeDesc(type);
                 if (!typeDesc.IsArrayLike)
+                {
                     typeDesc = ImportTypeDesc(type, null, false);
+                }
                 typeDesc.CheckSupported();
                 _arrayTypeDescs.Add(type, typeDesc);
+                returnValue = typeDesc;
             }
-            return typeDesc;
+
+            return returnValue;
         }
 
         internal TypeMapping? GetTypeMappingFromTypeDesc(TypeDesc typeDesc)
@@ -342,11 +353,15 @@ namespace System.Xml.Serialization
         internal Type? GetTypeFromTypeDesc(TypeDesc typeDesc)
         {
             if (typeDesc.Type != null)
+            {
                 return typeDesc.Type;
-            foreach (DictionaryEntry de in _typeDescs)
+            }
+            foreach (KeyValuePair<Type, TypeDesc> de in _typeDescs)
             {
                 if (de.Value == typeDesc)
-                    return de.Key as Type;
+                {
+                    return de.Key;
+                }
             }
             return null;
         }
@@ -1019,6 +1034,6 @@ namespace System.Xml.Serialization
         {
             get { return _typeMappings; }
         }
-        internal static Hashtable PrimtiveTypes { get { return s_primitiveTypes; } }
+        internal static Dictionary<Type, TypeDesc> PrimitiveTypes { get { return s_primitiveTypes; } }
     }
 }
