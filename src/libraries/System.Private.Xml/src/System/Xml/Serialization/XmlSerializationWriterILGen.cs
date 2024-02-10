@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.TypeMappings;
