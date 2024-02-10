@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
 using System.Xml.Serialization.Mappings.Accessors;
-using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Mappings.TypeMappings;
 using System.Xml.Serialization.Types;
 
@@ -34,35 +33,6 @@ namespace System.Xml.Serialization
         {
             get { return _isSoap; }
             set { _isSoap = value; }
-        }
-    }
-
-    internal class PrimitiveMapping : TypeMapping
-    {
-        private bool _isList;
-
-        internal override bool IsList
-        {
-            get { return _isList; }
-            set { _isList = value; }
-        }
-    }
-
-    internal sealed class EnumMapping : PrimitiveMapping
-    {
-        private ConstantMapping[]? _constants;
-        private bool _isFlags;
-
-        internal bool IsFlags
-        {
-            get { return _isFlags; }
-            set { _isFlags = value; }
-        }
-
-        internal ConstantMapping[]? Constants
-        {
-            get { return _constants; }
-            set { _constants = value; }
         }
     }
 
