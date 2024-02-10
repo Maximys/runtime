@@ -8,7 +8,7 @@ using System.Xml.Serialization.Mappings.Navigation;
 
 namespace System.Xml.Serialization.Mappings.TypeMappings
 {
-    internal sealed class StructMapping : TypeMapping, INavigationNameScope
+    internal sealed class StructMapping : TypeMapping, INavigationNameScope<ElementAccessor>
     {
         private StructMapping? _baseMapping;
         private StructMapping? _derivedMappings;
@@ -17,8 +17,6 @@ namespace System.Xml.Serialization.Mappings.TypeMappings
         private bool _hasSimpleContent;
         private bool _openModel;
         private bool _isSequence;
-        private NavigationNameTable? _elements;
-        private NavigationNameTable? _attributes;
         private CodeIdentifiers? _scope;
 
         [DisallowNull]
@@ -57,20 +55,20 @@ namespace System.Xml.Serialization.Mappings.TypeMappings
             get { return _baseMapping != null && Members != null; }
         }
 
-        internal NavigationNameTable LocalElements => _elements ??= new NavigationNameTable();
-        internal NavigationNameTable LocalAttributes => _attributes ??= new NavigationNameTable();
-        object? INavigationNameScope.this[string? name, string? ns]
+        internal NavigationNameTable<ElementAccessor> LocalElements { get; } = new NavigationNameTable<ElementAccessor>();
+        internal NavigationNameTable<AttributeAccessor> LocalAttributes { get; } = new NavigationNameTable<AttributeAccessor>();
+        ElementAccessor? INavigationNameScope<ElementAccessor>.this[string? name, string? ns]
         {
             get
             {
-                object? named = LocalElements[name, ns];
+                ElementAccessor? named = LocalElements[name, ns];
                 if (named != null)
                 {
                     return named;
                 }
                 if (_baseMapping != null)
                 {
-                    return ((INavigationNameScope)_baseMapping)[name, ns];
+                    return ((INavigationNameScope<ElementAccessor>)_baseMapping)[name, ns];
                 }
                 return null;
             }
