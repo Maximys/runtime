@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
