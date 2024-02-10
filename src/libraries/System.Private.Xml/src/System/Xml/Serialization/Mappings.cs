@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -461,7 +462,7 @@ namespace System.Xml.Serialization
         }
     }
 
-    internal sealed class StructMapping : TypeMapping, INameScope
+    internal sealed class StructMapping : TypeMapping, INavigationNameScope
     {
         private MemberMapping[]? _members;
         private StructMapping? _baseMapping;
@@ -471,8 +472,8 @@ namespace System.Xml.Serialization
         private bool _hasSimpleContent;
         private bool _openModel;
         private bool _isSequence;
-        private NameTable? _elements;
-        private NameTable? _attributes;
+        private NavigationNameTable? _elements;
+        private NavigationNameTable? _attributes;
         private CodeIdentifiers? _scope;
 
         [DisallowNull]
@@ -511,17 +512,21 @@ namespace System.Xml.Serialization
             get { return _baseMapping != null && Members != null; }
         }
 
-        internal NameTable LocalElements => _elements ??= new NameTable();
-        internal NameTable LocalAttributes => _attributes ??= new NameTable();
-        object? INameScope.this[string? name, string? ns]
+        internal NavigationNameTable LocalElements => _elements ??= new NavigationNameTable();
+        internal NavigationNameTable LocalAttributes => _attributes ??= new NavigationNameTable();
+        object? INavigationNameScope.this[string? name, string? ns]
         {
             get
             {
                 object? named = LocalElements[name, ns];
                 if (named != null)
+                {
                     return named;
+                }
                 if (_baseMapping != null)
-                    return ((INameScope)_baseMapping)[name, ns];
+                {
+                    return ((INavigationNameScope)_baseMapping)[name, ns];
+                }
                 return null;
             }
             set

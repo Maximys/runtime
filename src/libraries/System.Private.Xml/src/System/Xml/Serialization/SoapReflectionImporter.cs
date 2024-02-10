@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -14,8 +15,8 @@ namespace System.Xml.Serialization
     {
         private readonly TypeScope _typeScope;
         private readonly SoapAttributeOverrides _attributeOverrides;
-        private readonly NameTable _types = new NameTable();      // xmltypename + xmlns -> Mapping
-        private readonly NameTable _nullables = new NameTable();  // xmltypename + xmlns -> NullableMapping
+        private readonly NavigationNameTable _types = new NavigationNameTable();      // xmltypename + xmlns -> Mapping
+        private readonly NavigationNameTable _nullables = new NavigationNameTable();  // xmltypename + xmlns -> NullableMapping
         private StructMapping? _root;
         private readonly string _defaultNs;
         private readonly ModelScope _modelScope;

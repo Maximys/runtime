@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -63,7 +64,7 @@ namespace System.Xml.Serialization
 
         private static readonly Dictionary<Type, TypeDesc> s_primitiveTypes = new Dictionary<Type, TypeDesc>();
         private static readonly Dictionary<XmlSchemaSimpleType, TypeDesc> s_primitiveDataTypes = new Dictionary<XmlSchemaSimpleType, TypeDesc>();
-        private static readonly NameTable s_primitiveNames = new NameTable();
+        private static readonly NavigationNameTable s_primitiveNames = new NavigationNameTable();
 
         private static readonly string[] s_unsupportedTypes = new string[] {
             DataTypeNames.AnyUri,
