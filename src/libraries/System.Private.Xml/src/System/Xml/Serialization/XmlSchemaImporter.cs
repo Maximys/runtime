@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -456,7 +457,7 @@ namespace System.Xml.Serialization
             CodeIdentifiers memberScope = new CodeIdentifiers();
             memberScope.UseCamelCasing = true;
             bool needExplicitOrder = false;
-            MemberMapping[] members = ImportTypeMembers(type, typeNs, identifier, memberScope, new CodeIdentifiers(), new NameTable(), ref needExplicitOrder, false, false);
+            MemberMapping[] members = ImportTypeMembers(type, typeNs, identifier, memberScope, new CodeIdentifiers(), new NavigationNameTable(), ref needExplicitOrder, false, false);
             MembersMapping mappings = new MembersMapping();
             mappings.HasWrapperElement = true;
             mappings.TypeDesc = Scope.GetTypeDesc(typeof(object[]));
@@ -606,7 +607,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls FindType")]
-        private MemberMapping[] ImportTypeMembers(XmlSchemaType type, string? typeNs, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INameScope elementsScope, ref bool needExplicitOrder, bool order, bool allowUnboundedElements)
+        private MemberMapping[] ImportTypeMembers(XmlSchemaType type, string? typeNs, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INavigationNameScope elementsScope, ref bool needExplicitOrder, bool order, bool allowUnboundedElements)
         {
             TypeItems items = GetTypeItems(type);
             bool mixed = IsMixed(type);
@@ -722,7 +723,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls ImportChoiceGroup")]
-        private void ImportGroup(XmlSchemaGroupBase group, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INameScope elementsScope, string? ns, bool mixed, ref bool needExplicitOrder, bool allowDuplicates, bool groupRepeats, bool allowUnboundedElements)
+        private void ImportGroup(XmlSchemaGroupBase group, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INavigationNameScope elementsScope, string? ns, bool mixed, ref bool needExplicitOrder, bool allowDuplicates, bool groupRepeats, bool allowUnboundedElements)
         {
             if (group is XmlSchemaChoice)
                 ImportChoiceGroup((XmlSchemaChoice)group, identifier, members, membersScope, elementsScope, ns, groupRepeats, ref needExplicitOrder, allowDuplicates);
@@ -736,9 +737,9 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls GetTypeDesc")]
-        private MemberMapping ImportChoiceGroup(XmlSchemaGroupBase group, string identifier, CodeIdentifiers? members, CodeIdentifiers? membersScope, INameScope? elementsScope, string? ns, bool groupRepeats, ref bool needExplicitOrder, bool allowDuplicates)
+        private MemberMapping ImportChoiceGroup(XmlSchemaGroupBase group, string identifier, CodeIdentifiers? members, CodeIdentifiers? membersScope, INavigationNameScope? elementsScope, string? ns, bool groupRepeats, ref bool needExplicitOrder, bool allowDuplicates)
         {
-            NameTable choiceElements = new NameTable();
+            NavigationNameTable choiceElements = new NavigationNameTable();
             if (GatherGroupChoices(group, choiceElements, identifier, ns, ref needExplicitOrder, allowDuplicates))
                 groupRepeats = true;
             MemberMapping member = new MemberMapping();
@@ -873,13 +874,13 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls GatherGroupChoices")]
-        private bool GatherGroupChoices(XmlSchemaGroup group, NameTable choiceElements, string identifier, string? ns, ref bool needExplicitOrder, bool allowDuplicates)
+        private bool GatherGroupChoices(XmlSchemaGroup group, NavigationNameTable choiceElements, string identifier, string? ns, ref bool needExplicitOrder, bool allowDuplicates)
         {
             return GatherGroupChoices(group.Particle, choiceElements, identifier, ns, ref needExplicitOrder, allowDuplicates);
         }
 
         [RequiresUnreferencedCode("Calls ImportAny")]
-        private bool GatherGroupChoices(XmlSchemaParticle? particle, NameTable choiceElements, string identifier, string? ns, ref bool needExplicitOrder, bool allowDuplicates)
+        private bool GatherGroupChoices(XmlSchemaParticle? particle, NavigationNameTable choiceElements, string identifier, string? ns, ref bool needExplicitOrder, bool allowDuplicates)
         {
             if (particle is XmlSchemaGroupRef refGroup)
             {
@@ -947,7 +948,7 @@ namespace System.Xml.Serialization
             return false;
         }
 
-        private static void AddScopeElement(INameScope? scope, ElementAccessor element, ref bool duplicateElements, bool allowDuplicates)
+        private static void AddScopeElement(INavigationNameScope? scope, ElementAccessor element, ref bool duplicateElements, bool allowDuplicates)
         {
             if (scope == null)
                 return;
@@ -971,7 +972,7 @@ namespace System.Xml.Serialization
             }
         }
 
-        private static void AddScopeElements(INameScope? scope, ElementAccessor[] elements, ref bool duplicateElements, bool allowDuplicates)
+        private static void AddScopeElements(INavigationNameScope? scope, ElementAccessor[] elements, ref bool duplicateElements, bool allowDuplicates)
         {
             for (int i = 0; i < elements.Length; i++)
             {
@@ -980,7 +981,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls ImportChoiceGroup")]
-        private void ImportGroupMembers(XmlSchemaParticle? particle, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INameScope elementsScope, string? ns, bool groupRepeats, ref bool mixed, ref bool needExplicitOrder, bool allowDuplicates, bool allowUnboundedElements)
+        private void ImportGroupMembers(XmlSchemaParticle? particle, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INavigationNameScope elementsScope, string? ns, bool groupRepeats, ref bool mixed, ref bool needExplicitOrder, bool allowDuplicates, bool allowUnboundedElements)
         {
             if (particle is XmlSchemaGroupRef refGroup)
             {
@@ -1127,7 +1128,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls GetTypeDesc")]
-        private MemberMapping ImportAnyMember(XmlSchemaAny any, CodeIdentifiers members, CodeIdentifiers membersScope, INameScope elementsScope, string? ns, ref bool mixed, ref bool needExplicitOrder, bool allowDuplicates)
+        private MemberMapping ImportAnyMember(XmlSchemaAny any, CodeIdentifiers members, CodeIdentifiers membersScope, INavigationNameScope elementsScope, string? ns, ref bool mixed, ref bool needExplicitOrder, bool allowDuplicates)
         {
             ElementAccessor[] accessors = ImportAny(any, !mixed, ns);
             AddScopeElements(elementsScope, accessors, ref needExplicitOrder, allowDuplicates);
@@ -1362,7 +1363,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("calls ImportSubstitutionGroupMember")]
-        private void ImportElementMember(XmlSchemaElement element, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INameScope elementsScope, string? ns, bool repeats, ref bool needExplicitOrder, bool allowDuplicates, bool allowUnboundedElements)
+        private void ImportElementMember(XmlSchemaElement element, string identifier, CodeIdentifiers members, CodeIdentifiers membersScope, INavigationNameScope elementsScope, string? ns, bool repeats, ref bool needExplicitOrder, bool allowDuplicates, bool allowUnboundedElements)
         {
             repeats |= element.IsMultipleOccurrence;
             XmlSchemaElement? headElement = GetTopLevelElement(element);
