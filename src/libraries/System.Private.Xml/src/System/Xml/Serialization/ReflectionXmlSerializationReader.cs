@@ -2,14 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Xml.Schema;
+using System.Xml.Serialization.Types;
 
 // UnconditionalSuppressMessage that specify a Target need to be at the assembly or module level for now. Also,
 // they won't consider Target unless you also specify Scope to be either "member" or "type"
