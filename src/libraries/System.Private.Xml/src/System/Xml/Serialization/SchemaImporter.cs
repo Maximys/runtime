@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -16,8 +17,8 @@ namespace System.Xml.Serialization
         private TypeScope? _scope;
         private ImportContext _context;
         private bool _rootImported;
-        private NameTable? _typesInUse;
-        private NameTable? _groupsInUse;
+        private NavigationNameTable? _typesInUse;
+        private NavigationNameTable? _groupsInUse;
 
         [RequiresUnreferencedCode("calls SetCache")]
         internal SchemaImporter(XmlSchemas schemas, CodeGenerationOptions options, ImportContext context)
@@ -59,9 +60,9 @@ namespace System.Xml.Serialization
 
         internal TypeScope Scope => _scope ??= new TypeScope();
 
-        internal NameTable GroupsInUse => _groupsInUse ??= new NameTable();
+        internal NavigationNameTable GroupsInUse => _groupsInUse ??= new NavigationNameTable();
 
-        internal NameTable TypesInUse => _typesInUse ??= new NameTable();
+        internal NavigationNameTable TypesInUse => _typesInUse ??= new NavigationNameTable();
 
         internal CodeGenerationOptions Options
         {
@@ -130,7 +131,7 @@ namespace System.Xml.Serialization
         [RequiresUnreferencedCode("calls ImportType")]
         internal abstract void ImportDerivedTypes(XmlQualifiedName baseName);
 
-        internal static void AddReference(XmlQualifiedName name, NameTable references, string error)
+        internal static void AddReference(XmlQualifiedName name, NavigationNameTable references, string error)
         {
             if (name.Namespace == XmlSchema.Namespace)
                 return;
@@ -141,7 +142,7 @@ namespace System.Xml.Serialization
             references[name] = name;
         }
 
-        internal static void RemoveReference(XmlQualifiedName name, NameTable references)
+        internal static void RemoveReference(XmlQualifiedName name, NavigationNameTable references)
         {
             references[name] = null;
         }
