@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization

@@ -11,6 +11,7 @@ using System.Reflection.Emit;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
