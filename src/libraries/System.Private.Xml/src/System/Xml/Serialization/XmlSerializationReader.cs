@@ -2826,7 +2826,7 @@ namespace System.Xml.Serialization
             {
                 Writer.Write(source);
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
             {
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -4088,7 +4088,7 @@ namespace System.Xml.Serialization
                 }
                 else
                 {
-                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
                     {
                         Writer.Write("tmp = ReadString(tmp, ");
                         if (text.Mapping.TypeDesc!.CollapseWhitespace)
@@ -4699,8 +4699,8 @@ namespace System.Xml.Serialization
                         string readFunc;
                         switch (element.Mapping.TypeDesc.FormatterName)
                         {
-                            case "ByteArrayBase64":
-                            case "ByteArrayHex":
+                            case TypeScope.ByteArrayBase64FormatterName:
+                            case TypeScope.ByteArrayHexFormatterName:
                                 readFunc = "false";
                                 break;
                             default:

@@ -1,12 +1,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using System.Xml;
 using System.Xml.Serialization.Configuration;
 
 namespace System.Xml.Serialization
@@ -16,14 +14,6 @@ namespace System.Xml.Serialization
     ///   primitive type values to and from their XML string representations.</summary>
     internal static class XmlCustomFormatter
     {
-        private const string DateTimeFormatter = "DateTime";
-        private const string DateFormatter = "Date";
-        private const string TimeFormatter = "Time";
-        private const string XmlNameFormatter = "XmlName";
-        private const string XmlNCNameFormatter = "XmlNCName";
-        private const string XmlNmTokenFormatter = "XmlNmToken";
-        private const string XmlNmTokensFormatter = "XmlNmTokens";
-
         private static DateTimeSerializationSection.DateTimeSerializationMode s_mode;
 
         private static DateTimeSerializationSection.DateTimeSerializationMode Mode
@@ -55,25 +45,23 @@ namespace System.Xml.Serialization
                     {
                         returnValue = formatter switch
                         {
-                            DateTimeFormatter => FromDateTime(valueDateTime),
-                            DateFormatter => FromDate(valueDateTime),
-                            TimeFormatter => FromTime(valueDateTime),
+                            TypeScope.DateTimeFormatterName => FromDateTime(valueDateTime),
+                            TypeScope.DateFormatterName => FromDate(valueDateTime),
+                            TypeScope.TimeFormatterName => FromTime(valueDateTime),
                             _ => throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(DateTime).FullName))
                         };
-
                         break;
                     }
                     case string valueString:
                     {
                         returnValue = formatter switch
                         {
-                            XmlNameFormatter => FromXmlName(valueString),
-                            XmlNCNameFormatter => FromXmlNCName(valueString),
-                            XmlNmTokenFormatter => FromXmlNmToken(valueString),
-                            XmlNmTokensFormatter => FromXmlNmTokens(valueString),
+                            TypeScope.XmlNameFormatterName => FromXmlName(valueString),
+                            TypeScope.NoncolonizedNameFormatterName => FromXmlNCName(valueString),
+                            TypeScope.XmlNmTokenFormatterName => FromXmlNmToken(valueString),
+                            TypeScope.XmlNmTokensFormatterName => FromXmlNmTokens(valueString),
                             _ => throw new XmlException(SR.Format(SR.XmlUnsupportedDefaultType, typeof(string).FullName))
                         };
-
                         break;
                     }
                     default:
@@ -238,37 +226,37 @@ namespace System.Xml.Serialization
 
             switch (formatter)
             {
-                case DateTimeFormatter:
+                case TypeScope.DateTimeFormatterName:
                 {
                     returnValue = ToDateTime(value);
                     break;
                 }
-                case DateFormatter:
+                case TypeScope.DateFormatterName:
                 {
                     returnValue = ToDate(value);
                     break;
                 }
-                case TimeFormatter:
+                case TypeScope.TimeFormatterName:
                 {
                     returnValue = ToTime(value);
                     break;
                 }
-                case XmlNameFormatter:
+                case TypeScope.XmlNameFormatterName:
                 {
                     returnValue = ToXmlName(value);
                     break;
                 }
-                case XmlNCNameFormatter:
+                case TypeScope.NoncolonizedNameFormatterName:
                 {
                     returnValue = ToXmlNCName(value);
                     break;
                 }
-                case XmlNmTokenFormatter:
+                case TypeScope.XmlNmTokenFormatterName:
                 {
                     returnValue = ToXmlNmToken(value);
                     break;
                 }
-                case XmlNmTokensFormatter:
+                case TypeScope.XmlNmTokensFormatterName:
                 {
                     returnValue = ToXmlNmTokens(value);
                     break;
