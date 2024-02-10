@@ -198,49 +198,132 @@ namespace System.Xml.Serialization
 
             switch (Type.GetTypeCode(type))
             {
-                case TypeCode.String: typeName = "string"; break;
-                case TypeCode.Int32: typeName = "int"; break;
-                case TypeCode.Boolean: typeName = "boolean"; break;
-                case TypeCode.Int16: typeName = "short"; break;
-                case TypeCode.Int64: typeName = "long"; break;
-                case TypeCode.Single: typeName = "float"; break;
-                case TypeCode.Double: typeName = "double"; break;
-                case TypeCode.Decimal: typeName = "decimal"; break;
-                case TypeCode.DateTime: typeName = "dateTime"; break;
-                case TypeCode.Byte: typeName = "unsignedByte"; break;
-                case TypeCode.SByte: typeName = "byte"; break;
-                case TypeCode.UInt16: typeName = "unsignedShort"; break;
-                case TypeCode.UInt32: typeName = "unsignedInt"; break;
-                case TypeCode.UInt64: typeName = "unsignedLong"; break;
+                case TypeCode.String:
+                {
+                    typeName = DataTypeNames.String;
+                    break;
+                }
+                case TypeCode.Int32:
+                {
+                    typeName = DataTypeNames.Int32;
+                    break;
+                }
+                case TypeCode.Boolean:
+                {
+                    typeName = DataTypeNames.Boolean;
+                    break;
+                }
+                case TypeCode.Int16:
+                {
+                    typeName = DataTypeNames.Int16;
+                    break;
+                }
+                case TypeCode.Int64:
+                {
+                    typeName = DataTypeNames.Int64;
+                    break;
+                }
+                case TypeCode.Single:
+                {
+                    typeName = DataTypeNames.Single;
+                    break;
+                }
+                case TypeCode.Double:
+                {
+                    typeName = DataTypeNames.Double;
+                    break;
+                }
+                case TypeCode.Decimal:
+                {
+                    typeName = DataTypeNames.Decimal;
+                    break;
+                }
+                case TypeCode.DateTime:
+                {
+                    typeName = DataTypeNames.DateTime;
+                    break;
+                }
+                case TypeCode.Byte:
+                {
+                    typeName = DataTypeNames.Byte;
+                    break;
+                }
+                case TypeCode.SByte:
+                {
+                    typeName = DataTypeNames.SByte;
+                    break;
+                }
+                case TypeCode.UInt16:
+                {
+                    typeName = DataTypeNames.UInt16;
+                    break;
+                }
+                case TypeCode.UInt32:
+                {
+                    typeName = DataTypeNames.UInt32;
+                    break;
+                }
+                case TypeCode.UInt64:
+                {
+                    typeName = DataTypeNames.UInt64;
+                    break;
+                }
                 case TypeCode.Char:
-                    typeName = "char";
+                {
+                    typeName = DataTypeNames.Char;
                     typeNs = UrtTypes.Namespace;
                     break;
+                }
                 default:
-                    if (type == typeof(XmlQualifiedName)) typeName = "QName";
-                    else if (type == typeof(byte[])) typeName = "base64Binary";
-                    else if (type == typeof(Guid))
+                {
+                    if (type == typeof(XmlQualifiedName))
                     {
-                        typeName = "guid";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (type == typeof(TimeSpan))
-                    {
-                        typeName = "TimeSpan";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (type == typeof(DateTimeOffset))
-                    {
-                        typeName = "dateTimeOffset";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (type == typeof(XmlNode[]))
-                    {
-                        typeName = Soap.UrType;
+                        typeName = DataTypeNames.XmlQualifiedName;
                     }
                     else
-                        return null;
+                    {
+                        if (type == typeof(byte[]))
+                        {
+                            typeName = DataTypeNames.ByteArrayBase64;
+                        }
+                        else
+                        {
+                            if (type == typeof(Guid))
+                            {
+                                typeName = DataTypeNames.Guid;
+                                typeNs = UrtTypes.Namespace;
+                            }
+                            else
+                            {
+                                if (type == typeof(TimeSpan))
+                                {
+                                    typeName = DataTypeNames.TimeSpan;
+                                    typeNs = UrtTypes.Namespace;
+                                }
+                                else
+                                {
+                                    if (type == typeof(DateTimeOffset))
+                                    {
+                                        typeName = DataTypeNames.DateTimeOffset;
+                                        typeNs = UrtTypes.Namespace;
+                                    }
+                                    else
+                                    {
+                                        if (type == typeof(XmlNode[]))
+                                        {
+                                            typeName = Soap.UrType;
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     break;
+                }
             }
             return new XmlQualifiedName(typeName, typeNs);
         }
@@ -262,128 +345,154 @@ namespace System.Xml.Serialization
             {
                 case TypeCode.String:
                     value = (string)o;
-                    type = "string";
+                    type = DataTypeNames.String;
                     writeRaw = false;
                     break;
                 case TypeCode.Int32:
                     tryFormatResult = XmlConvert.TryFormat((int)o, _primitivesBuffer, out charsWritten);
-                    type = "int";
+                    type = DataTypeNames.Int32;
                     break;
                 case TypeCode.Boolean:
                     tryFormatResult = XmlConvert.TryFormat((bool)o, _primitivesBuffer, out charsWritten);
-                    type = "boolean";
+                    type = DataTypeNames.Boolean;
                     break;
                 case TypeCode.Int16:
                     tryFormatResult = XmlConvert.TryFormat((short)o, _primitivesBuffer, out charsWritten);
-                    type = "short";
+                    type = DataTypeNames.Int16;
                     break;
                 case TypeCode.Int64:
                     tryFormatResult = XmlConvert.TryFormat((long)o, _primitivesBuffer, out charsWritten);
-                    type = "long";
+                    type = DataTypeNames.Int64;
                     break;
                 case TypeCode.Single:
                     tryFormatResult = XmlConvert.TryFormat((float)o, _primitivesBuffer, out charsWritten);
-                    type = "float";
+                    type = DataTypeNames.Single;
                     break;
                 case TypeCode.Double:
                     tryFormatResult = XmlConvert.TryFormat((double)o, _primitivesBuffer, out charsWritten);
-                    type = "double";
+                    type = DataTypeNames.Double;
                     break;
                 case TypeCode.Decimal:
                     tryFormatResult = XmlConvert.TryFormat((decimal)o, _primitivesBuffer, out charsWritten);
-                    type = "decimal";
+                    type = DataTypeNames.Decimal;
                     break;
                 case TypeCode.DateTime:
                     tryFormatResult = TryFormatDateTime((DateTime)o, _primitivesBuffer, out charsWritten);
-                    type = "dateTime";
+                    type = DataTypeNames.DateTime;
                     break;
                 case TypeCode.Char:
                     tryFormatResult = XmlConvert.TryFormat((ushort)(char)o, _primitivesBuffer, out charsWritten);
-                    type = "char";
+                    type = DataTypeNames.Char;
                     typeNs = UrtTypes.Namespace;
                     break;
                 case TypeCode.Byte:
                     tryFormatResult = XmlConvert.TryFormat((byte)o, _primitivesBuffer, out charsWritten);
-                    type = "unsignedByte";
+                    type = DataTypeNames.Byte;
                     break;
                 case TypeCode.SByte:
                     tryFormatResult = XmlConvert.TryFormat((sbyte)o, _primitivesBuffer, out charsWritten);
-                    type = "byte";
+                    type = DataTypeNames.SByte;
                     break;
                 case TypeCode.UInt16:
                     tryFormatResult = XmlConvert.TryFormat((ushort)o, _primitivesBuffer, out charsWritten);
-                    type = "unsignedShort";
+                    type = DataTypeNames.UInt16;
                     break;
                 case TypeCode.UInt32:
                     tryFormatResult = XmlConvert.TryFormat((uint)o, _primitivesBuffer, out charsWritten);
-                    type = "unsignedInt";
+                    type = DataTypeNames.UInt32;
                     break;
                 case TypeCode.UInt64:
                     tryFormatResult = XmlConvert.TryFormat((ulong)o, _primitivesBuffer, out charsWritten);
-                    type = "unsignedLong";
+                    type = DataTypeNames.UInt64;
                     break;
 
                 default:
                     if (t == typeof(XmlQualifiedName))
                     {
-                        type = "QName";
+                        type = DataTypeNames.XmlQualifiedName;
                         // need to write start element ahead of time to establish context
                         // for ns definitions by FromXmlQualifiedName
                         wroteStartElement = true;
                         if (name == null)
-                            _w.WriteStartElement(type, typeNs);
-                        else
-                            _w.WriteStartElement(name, ns);
-                        value = FromXmlQualifiedName((XmlQualifiedName)o, false);
-                    }
-                    else if (t == typeof(byte[]))
-                    {
-                        value = string.Empty;
-                        writeDirect = true;
-                        type = "base64Binary";
-                    }
-                    else if (t == typeof(Guid))
-                    {
-                        tryFormatResult = XmlConvert.TryFormat((Guid)o, _primitivesBuffer, out charsWritten);
-                        type = "guid";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (t == typeof(TimeSpan))
-                    {
-                        tryFormatResult = XmlConvert.TryFormat((TimeSpan)o, _primitivesBuffer, out charsWritten);
-                        type = "TimeSpan";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (t == typeof(DateTimeOffset))
-                    {
-                        tryFormatResult = XmlConvert.TryFormat((DateTimeOffset)o, _primitivesBuffer, out charsWritten);
-                        type = "dateTimeOffset";
-                        typeNs = UrtTypes.Namespace;
-                    }
-                    else if (typeof(XmlNode[]).IsAssignableFrom(t))
-                    {
-                        if (name == null)
-                            _w.WriteStartElement(Soap.UrType, XmlSchema.Namespace);
-                        else
-                            _w.WriteStartElement(name, ns);
-
-                        XmlNode[] xmlNodes = (XmlNode[])o;
-                        for (int i = 0; i < xmlNodes.Length; i++)
                         {
-                            if (xmlNodes[i] == null)
-                                continue;
-                            xmlNodes[i].WriteTo(_w);
+                            _w.WriteStartElement(type, typeNs);
                         }
-                        _w.WriteEndElement();
-                        return;
+                        else
+                        {
+                            _w.WriteStartElement(name, ns);
+                        }
+                        value = FromXmlQualifiedName((XmlQualifiedName)o, false);
                     }
                     else
                     {
-                        throw CreateUnknownTypeException(t);
+                        if (t == typeof(byte[]))
+                        {
+                            value = string.Empty;
+                            writeDirect = true;
+                            type = DataTypeNames.ByteArrayBase64;
+                        }
+                        else
+                        {
+                            if (t == typeof(Guid))
+                            {
+                                tryFormatResult = XmlConvert.TryFormat((Guid)o, _primitivesBuffer, out charsWritten);
+                                type = DataTypeNames.Guid;
+                                typeNs = UrtTypes.Namespace;
+                            }
+                            else
+                            {
+                                if (t == typeof(TimeSpan))
+                                {
+                                    tryFormatResult = XmlConvert.TryFormat((TimeSpan)o, _primitivesBuffer, out charsWritten);
+                                    type = DataTypeNames.TimeSpan;
+                                    typeNs = UrtTypes.Namespace;
+                                }
+                                else
+                                {
+                                    if (t == typeof(DateTimeOffset))
+                                    {
+                                        tryFormatResult = XmlConvert.TryFormat((DateTimeOffset)o, _primitivesBuffer, out charsWritten);
+                                        type = DataTypeNames.DateTimeOffset;
+                                        typeNs = UrtTypes.Namespace;
+                                    }
+                                    else
+                                    {
+                                        if (typeof(XmlNode[]).IsAssignableFrom(t))
+                                        {
+                                            if (name == null)
+                                            {
+                                                _w.WriteStartElement(Soap.UrType, XmlSchema.Namespace);
+                                            }
+                                            else
+                                            {
+                                                _w.WriteStartElement(name, ns);
+                                            }
+
+                                            XmlNode[] xmlNodes = (XmlNode[])o;
+                                            for (int i = 0; i < xmlNodes.Length; i++)
+                                            {
+                                                if (xmlNodes[i] == null)
+                                                {
+                                                    continue;
+                                                }
+                                                xmlNodes[i].WriteTo(_w);
+                                            }
+                                            _w.WriteEndElement();
+                                            return;
+                                        }
+                                        else
+                                        {
+                                            throw CreateUnknownTypeException(t);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     break;
             }
+
             if (!wroteStartElement)
             {
                 if (name == null)
@@ -2408,7 +2517,7 @@ namespace System.Xml.Serialization
 
         private void WritePrimitiveValue(TypeDesc typeDesc, string source)
         {
-            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == "String")
+            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
             {
                 Writer.Write(source);
             }

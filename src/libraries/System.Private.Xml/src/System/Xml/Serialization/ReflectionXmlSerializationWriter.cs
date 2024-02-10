@@ -1065,7 +1065,7 @@ namespace System.Xml.Serialization
 
         private bool WritePrimitiveValue(TypeDesc typeDesc, object? o, out string? stringValue)
         {
-            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.FormatterName == "String")
+            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
             {
                 stringValue = (string?)o;
                 return true;
@@ -1077,26 +1077,26 @@ namespace System.Xml.Serialization
                     stringValue = ConvertPrimitiveToString(o!, typeDesc);
                     return true;
                 }
-                else if (o is byte[] && typeDesc.FormatterName == "ByteArrayHex")
+                else if (o is byte[] byteArray && typeDesc.FormatterName == TypeScope.ByteArrayHexFormatterName)
                 {
-                    stringValue = FromByteArrayHex((byte[])o);
+                    stringValue = FromByteArrayHex(byteArray);
                     return true;
                 }
-                else if (o is DateTime)
+                else if (o is DateTime dateTime)
                 {
-                    if (typeDesc.FormatterName == "DateTime")
+                    if (typeDesc.FormatterName == TypeScope.DateTimeFormatterName)
                     {
-                        stringValue = FromDateTime((DateTime)o);
+                        stringValue = FromDateTime(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == "Date")
+                    else if (typeDesc.FormatterName == TypeScope.DateFormatterName)
                     {
-                        stringValue = FromDate((DateTime)o);
+                        stringValue = FromDate(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == "Time")
+                    else if (typeDesc.FormatterName == TypeScope.TimeFormatterName)
                     {
-                        stringValue = FromTime((DateTime)o);
+                        stringValue = FromTime(dateTime);
                         return true;
                     }
                     else
@@ -1109,21 +1109,21 @@ namespace System.Xml.Serialization
                     stringValue = FromXmlQualifiedName((XmlQualifiedName?)o);
                     return true;
                 }
-                else if (o is string)
+                else if (o is string str)
                 {
                     switch (typeDesc.FormatterName)
                     {
-                        case "XmlName":
-                            stringValue = FromXmlName((string)o);
+                        case TypeScope.XmlNameFormatterName:
+                            stringValue = FromXmlName(str);
                             break;
-                        case "XmlNCName":
-                            stringValue = FromXmlNCName((string)o);
+                        case TypeScope.NoncolonizedNameFormatterName:
+                            stringValue = FromXmlNCName(str);
                             break;
-                        case "XmlNmToken":
-                            stringValue = FromXmlNmToken((string)o);
+                        case TypeScope.XmlNmTokenFormatterName:
+                            stringValue = FromXmlNmToken(str);
                             break;
-                        case "XmlNmTokens":
-                            stringValue = FromXmlNmTokens((string)o);
+                        case TypeScope.XmlNmTokensFormatterName:
+                            stringValue = FromXmlNmTokens(str);
                             break;
                         default:
                             stringValue = null;
@@ -1132,9 +1132,9 @@ namespace System.Xml.Serialization
 
                     return true;
                 }
-                else if (o is char && typeDesc.FormatterName == "Char")
+                else if (o is char ch && typeDesc.FormatterName == TypeScope.CharFormatterName)
                 {
-                    stringValue = FromChar((char)o);
+                    stringValue = FromChar(ch);
                     return true;
                 }
                 else if (o is byte[])
@@ -1155,23 +1155,23 @@ namespace System.Xml.Serialization
         {
             string stringValue = typeDesc.FormatterName switch
             {
-                "Boolean" => XmlConvert.ToString((bool)o),
-                "Int32" => XmlConvert.ToString((int)o),
-                "Int16" => XmlConvert.ToString((short)o),
-                "Int64" => XmlConvert.ToString((long)o),
-                "Single" => XmlConvert.ToString((float)o),
-                "Double" => XmlConvert.ToString((double)o),
-                "Decimal" => XmlConvert.ToString((decimal)o),
-                "Byte" => XmlConvert.ToString((byte)o),
-                "SByte" => XmlConvert.ToString((sbyte)o),
-                "UInt16" => XmlConvert.ToString((ushort)o),
-                "UInt32" => XmlConvert.ToString((uint)o),
-                "UInt64" => XmlConvert.ToString((ulong)o),
+                TypeScope.BooleanFormatterName => XmlConvert.ToString((bool)o),
+                TypeScope.Int32FormatterName => XmlConvert.ToString((int)o),
+                TypeScope.Int16FormatterName => XmlConvert.ToString((short)o),
+                TypeScope.Int64FormatterName => XmlConvert.ToString((long)o),
+                TypeScope.SingleFormatterName => XmlConvert.ToString((float)o),
+                TypeScope.DoubleFormatterName => XmlConvert.ToString((double)o),
+                TypeScope.DecimalFormatterName => XmlConvert.ToString((decimal)o),
+                TypeScope.ByteFormatterName => XmlConvert.ToString((byte)o),
+                TypeScope.SByteFormatterName => XmlConvert.ToString((sbyte)o),
+                TypeScope.UInt16FormatterName => XmlConvert.ToString((ushort)o),
+                TypeScope.UInt32FormatterName => XmlConvert.ToString((uint)o),
+                TypeScope.UInt64FormatterName => XmlConvert.ToString((ulong)o),
                 // Types without direct mapping (ambiguous)
-                "Guid" => XmlConvert.ToString((Guid)o),
-                "Char" => XmlConvert.ToString((char)o),
-                "TimeSpan" => XmlConvert.ToString((TimeSpan)o),
-                "DateTimeOffset" => XmlConvert.ToString((DateTimeOffset)o),
+                TypeScope.GuidFormatterName => XmlConvert.ToString((Guid)o),
+                TypeScope.CharFormatterName => XmlConvert.ToString((char)o),
+                TypeScope.TimeSpanFormatterName => XmlConvert.ToString((TimeSpan)o),
+                TypeScope.DateTimeOffsetFormatterName => XmlConvert.ToString((DateTimeOffset)o),
                 _ => o.ToString()!,
             };
             return stringValue;

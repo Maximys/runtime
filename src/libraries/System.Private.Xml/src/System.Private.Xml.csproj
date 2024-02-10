@@ -42,6 +42,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Types\DataTypeNames.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap12.cs" />
     <Compile Include="System\Xml\Serialization\Types\TrimmerConstants.cs" />

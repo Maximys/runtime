@@ -914,7 +914,7 @@ namespace System.Xml.Serialization
                 }
 #endif
 
-                if (pm.TypeDesc.FormatterName == "String")
+                if (pm.TypeDesc.FormatterName == TypeScope.StringFormatterName)
                     return (string)value;
 
                 Type formatter = typeof(XmlConvert);
