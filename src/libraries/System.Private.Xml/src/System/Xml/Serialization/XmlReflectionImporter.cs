@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.AccessorMappings.Comparers;
 using System.Xml.Serialization.Mappings.Accessors;
