@@ -3,6 +3,7 @@
 
 using System.Text;
 using System.Xml.Serialization.Mappings.Accessors;
+using System.Xml.Serialization.Mappings.TypeMappings;
 
 namespace System.Xml.Serialization
 {

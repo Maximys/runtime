@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Xml.Serialization.Mappings.Accessors;
+using System.Xml.Serialization.Mappings.TypeMappings;
 
 namespace System.Xml.Serialization
 {
