@@ -60,6 +60,8 @@
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\NullableMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\PrimitiveMappings\EnumMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\PrimitiveMappings\PrimitiveMapping.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\SpecialMappings\SerializableMapping.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\SpecialMappings\SpecialMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\StructMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\TypeMapping.cs" />
     <Compile Include="System\Xml\Serialization\Types\DataTypeNames.cs" />
