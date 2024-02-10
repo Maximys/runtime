@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization

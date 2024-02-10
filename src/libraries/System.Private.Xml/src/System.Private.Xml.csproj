@@ -42,6 +42,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\Accessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\AttributeAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\ChoiceIdentifierAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\ElementAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\TextAccessor.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Accessors\XmlnsAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\INavigationNameScope.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameKey.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameTable.cs" />
