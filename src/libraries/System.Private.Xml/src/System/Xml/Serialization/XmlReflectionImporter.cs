@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization.Mappings.AccessorMappings;
+using System.Xml.Serialization.Mappings.AccessorMappings.Comparers;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Mappings.TypeMappings;
