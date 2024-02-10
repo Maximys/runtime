@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Mappings.TypeMappings;
 using System.Xml.Serialization.Types;
