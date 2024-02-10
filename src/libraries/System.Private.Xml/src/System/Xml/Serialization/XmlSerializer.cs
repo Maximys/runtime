@@ -538,7 +538,7 @@ namespace System.Xml.Serialization
         {
             if (_primitiveType != null)
             {
-                TypeDesc typeDesc = (TypeDesc)TypeScope.PrimtiveTypes[_primitiveType]!;
+                TypeDesc typeDesc = TypeScope.PrimitiveTypes[_primitiveType];
                 return xmlReader.IsStartElement(typeDesc.DataType!.Name!, string.Empty);
             }
             else if (ShouldUseReflectionBasedSerialization(_mapping) || _isReflectionBasedSerializer)
@@ -836,15 +836,23 @@ namespace System.Xml.Serialization
         private static XmlTypeMapping? GetKnownMapping(Type type, string? ns)
         {
             if (ns != null && ns != string.Empty)
+            {
                 return null;
-            TypeDesc? typeDesc = (TypeDesc?)TypeScope.PrimtiveTypes[type];
-            if (typeDesc == null)
+            }
+
+            TypeDesc? typeDesc;
+            if (TypeScope.PrimitiveTypes.TryGetValue(type, out typeDesc))
+            {
+                ElementAccessor element = new ElementAccessor();
+                element.Name = typeDesc.DataType!.Name;
+                XmlTypeMapping mapping = new XmlTypeMapping(null, element);
+                mapping.SetKeyInternal(XmlMapping.GenerateKey(type, null, null));
+                return mapping;
+            }
+            else
+            {
                 return null;
-            ElementAccessor element = new ElementAccessor();
-            element.Name = typeDesc.DataType!.Name;
-            XmlTypeMapping mapping = new XmlTypeMapping(null, element);
-            mapping.SetKeyInternal(XmlMapping.GenerateKey(type, null, null));
-            return mapping;
+            }
         }
 
         private void SerializePrimitive(XmlWriter xmlWriter, object? o, XmlSerializerNamespaces? namespaces)
