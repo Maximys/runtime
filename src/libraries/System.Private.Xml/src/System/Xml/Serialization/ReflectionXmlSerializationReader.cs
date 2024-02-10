@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.TypeMappings;
+using System.Xml.Serialization.Mappings.TypeMappings.PrimitiveMappings;
 using System.Xml.Serialization.Types;
 
 // UnconditionalSuppressMessage that specify a Target need to be at the assembly or module level for now. Also,
