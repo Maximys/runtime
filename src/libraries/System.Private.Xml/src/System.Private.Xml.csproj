@@ -42,6 +42,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Mappings\Navigation\INavigationNameScope.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameKey.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameTable.cs" />
     <Compile Include="System\Xml\Serialization\Types\DataTypeNames.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap12.cs" />
@@ -458,7 +461,6 @@
     <Compile Include="System\Xml\Serialization\IXmlTextParser.cs" />
     <Compile Include="System\Xml\Serialization\Mappings.cs" />
     <Compile Include="System\Xml\Serialization\Models.cs" />
-    <Compile Include="System\Xml\Serialization\NameTable.cs" />
     <Compile Include="System\Xml\Serialization\ReflectionXmlSerializationReader.cs" />
     <Compile Include="System\Xml\Serialization\ReflectionXmlSerializationWriter.cs" />
     <Compile Include="System\Xml\Serialization\SchemaImporter.cs" />

@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Schema;
+using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -20,13 +21,13 @@ namespace System.Xml.Serialization
         private readonly TypeScope _typeScope;
         private readonly XmlAttributeOverrides _attributeOverrides;
         private readonly XmlAttributes _defaultAttributes = new XmlAttributes();
-        private readonly NameTable _types = new NameTable();      // xmltypename + xmlns -> Mapping
-        private readonly NameTable _nullables = new NameTable();  // xmltypename + xmlns -> NullableMapping
-        private readonly NameTable _elements = new NameTable();   // xmlelementname + xmlns -> ElementAccessor
-        private NameTable? _xsdAttributes;   // xmlattributetname + xmlns -> AttributeAccessor
+        private readonly NavigationNameTable _types = new NavigationNameTable();      // xmltypename + xmlns -> Mapping
+        private readonly NavigationNameTable _nullables = new NavigationNameTable();  // xmltypename + xmlns -> NullableMapping
+        private readonly NavigationNameTable _elements = new NavigationNameTable();   // xmlelementname + xmlns -> ElementAccessor
+        private NavigationNameTable? _xsdAttributes;   // xmlattributetname + xmlns -> AttributeAccessor
         private Hashtable? _specials;   // type -> SpecialMapping
         private readonly Hashtable _anonymous = new Hashtable();   // type -> AnonymousMapping
-        private NameTable? _serializables;  // type name --> new SerializableMapping
+        private NavigationNameTable? _serializables;  // type name --> new SerializableMapping
         private StructMapping? _root;
         private readonly string _defaultNs;
         private readonly ModelScope _modelScope;
@@ -303,7 +304,7 @@ namespace System.Xml.Serialization
             return (ElementAccessor)ReconcileAccessor(accessor, _elements);
         }
 
-        private Accessor ReconcileAccessor(Accessor accessor, NameTable accessors)
+        private Accessor ReconcileAccessor(Accessor accessor, NavigationNameTable accessors)
         {
             if (accessor.Any && accessor.Name.Length == 0)
                 return accessor;
@@ -526,7 +527,7 @@ namespace System.Xml.Serialization
                     XmlQualifiedName? qname = serializableMapping.XsiType;
                     if (qname != null && !qname.IsEmpty)
                     {
-                        _serializables ??= new NameTable();
+                        _serializables ??= new NavigationNameTable();
                         SerializableMapping? existingMapping = (SerializableMapping?)_serializables[qname];
                         if (existingMapping != null)
                         {
@@ -703,7 +704,7 @@ namespace System.Xml.Serialization
             return _root;
         }
 
-        private TypeMapping? GetTypeMapping(string? typeName, string? ns, TypeDesc typeDesc, NameTable typeLib, Type? type)
+        private TypeMapping? GetTypeMapping(string? typeName, string? ns, TypeDesc typeDesc, NavigationNameTable typeLib, Type? type)
         {
             TypeMapping? mapping;
             if (string.IsNullOrEmpty(typeName))
@@ -1243,8 +1244,8 @@ namespace System.Xml.Serialization
             MembersMapping members = new MembersMapping();
             members.TypeDesc = _typeScope.GetTypeDesc(typeof(object[]));
             MemberMapping[] mappings = new MemberMapping[xmlReflectionMembers.Length];
-            NameTable elements = new NameTable();
-            NameTable attributes = new NameTable();
+            NavigationNameTable elements = new NavigationNameTable();
+            NavigationNameTable attributes = new NavigationNameTable();
             TextAccessor? textAccessor = null;
             bool isSequence = false;
 
@@ -1496,7 +1497,7 @@ namespace System.Xml.Serialization
         [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]
         private void CreateArrayElementsFromAttributes(ArrayMapping arrayMapping, XmlArrayItemAttributes attributes, Type arrayElementType, string? arrayElementNs, RecursionLimiter limiter)
         {
-            NameTable arrayItemElements = new NameTable();   // xmlelementname + xmlns -> ElementAccessor
+            NavigationNameTable arrayItemElements = new NavigationNameTable();   // xmlelementname + xmlns -> ElementAccessor
 
             for (int i = 0; attributes != null && i < attributes.Count; i++)
             {
@@ -1533,7 +1534,7 @@ namespace System.Xml.Serialization
             Type accessorType = model.FieldType;
             string accessorName = model.Name;
             ArrayList elementList = new ArrayList();
-            NameTable elements = new NameTable();
+            NavigationNameTable elements = new NavigationNameTable();
             accessor.TypeDesc = _typeScope.GetTypeDesc(accessorType);
             XmlAttributeFlags flags = a.XmlFlags;
             accessor.Ignore = a.XmlIgnore;
@@ -1606,7 +1607,7 @@ namespace System.Xml.Serialization
                     attribute.Any = (a.XmlAnyAttribute != null);
                     if (attribute.Form == XmlSchemaForm.Qualified && attribute.Namespace != ns)
                     {
-                        _xsdAttributes ??= new NameTable();
+                        _xsdAttributes ??= new NavigationNameTable();
                         attribute = (AttributeAccessor)ReconcileAccessor(attribute, _xsdAttributes);
                     }
                     accessor.Attribute = attribute;
@@ -1671,7 +1672,7 @@ namespace System.Xml.Serialization
                         AddUniqueAccessor(elements, element);
                         elementList.Add(element);
                     }
-                    NameTable anys = new NameTable();
+                    NavigationNameTable anys = new NavigationNameTable();
                     for (int i = 0; i < a.XmlAnyElements.Count; i++)
                     {
                         XmlAnyElementAttribute xmlAnyElement = a.XmlAnyElements[i]!;
@@ -1784,7 +1785,7 @@ namespace System.Xml.Serialization
                         attribute.Any = a.XmlAnyAttribute != null;
                         if (attribute.Form == XmlSchemaForm.Qualified && attribute.Namespace != ns)
                         {
-                            _xsdAttributes ??= new NameTable();
+                            _xsdAttributes ??= new NavigationNameTable();
                             attribute = (AttributeAccessor)ReconcileAccessor(attribute, _xsdAttributes);
                         }
                         accessor.Attribute = attribute;
@@ -1912,7 +1913,7 @@ namespace System.Xml.Serialization
                         AddUniqueAccessor(elements, element);
                         elementList.Add(element);
                     }
-                    NameTable anys = new NameTable();
+                    NavigationNameTable anys = new NavigationNameTable();
                     for (int i = 0; i < a.XmlAnyElements.Count; i++)
                     {
                         XmlAnyElementAttribute xmlAnyElement = a.XmlAnyElements[i]!;
@@ -2097,7 +2098,7 @@ namespace System.Xml.Serialization
             XmlArrayItemAttributes items = a.XmlArrayItems;
             if (items != null && items.Count >= 2)
             {
-                NameTable arrayTypes = new NameTable();
+                NavigationNameTable arrayTypes = new NavigationNameTable();
 
                 for (int i = 0; i < items.Count; i++)
                 {
@@ -2118,7 +2119,7 @@ namespace System.Xml.Serialization
 
         private static void CheckChoiceIdentifierMapping(EnumMapping choiceMapping)
         {
-            NameTable ids = new NameTable();
+            NavigationNameTable ids = new NavigationNameTable();
             for (int i = 0; i < choiceMapping.Constants!.Length; i++)
             {
                 string choiceId = choiceMapping.Constants[i].XmlName;
@@ -2176,7 +2177,7 @@ namespace System.Xml.Serialization
             return xmlElement;
         }
 
-        private static void AddUniqueAccessor(INameScope scope, Accessor accessor)
+        private static void AddUniqueAccessor(INavigationNameScope scope, Accessor accessor)
         {
             Accessor? existing = (Accessor?)scope[accessor.Name, accessor.Namespace];
             if (existing != null)
@@ -2200,7 +2201,7 @@ namespace System.Xml.Serialization
             }
         }
 
-        private static void AddUniqueAccessor(MemberMapping member, INameScope elements, INameScope attributes, bool isSequence)
+        private static void AddUniqueAccessor(MemberMapping member, INavigationNameScope elements, INavigationNameScope attributes, bool isSequence)
         {
             if (member.Attribute != null)
             {
