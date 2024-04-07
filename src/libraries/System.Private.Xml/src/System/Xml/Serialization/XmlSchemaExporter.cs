@@ -920,8 +920,10 @@ namespace System.Xml.Serialization
                 }
 #endif
 
-                if (pm.TypeDesc.FormatterName == TypeScope.StringFormatterName)
+                if (pm.TypeDesc.Formatter!.Name == TypeScope.StringFormatterName)
+                {
                     return (string)value;
+                }
 
                 Type formatter = typeof(XmlConvert);
                 System.Reflection.MethodInfo? format = formatter.GetMethod("ToString", new Type[] { pm.TypeDesc.Type! });
@@ -930,7 +932,7 @@ namespace System.Xml.Serialization
             }
             else
             {
-                string defaultValue = XmlCustomFormatter.FromDefaultValue(value, pm.TypeDesc.FormatterName!);
+                string defaultValue = XmlCustomFormatter.FromDefaultValue(value, pm.TypeDesc.Formatter!.Name);
                 if (defaultValue == null)
                     throw new InvalidOperationException(SR.Format(SR.XmlInvalidDefaultValue, value, pm.TypeDesc.Name));
                 return defaultValue;
