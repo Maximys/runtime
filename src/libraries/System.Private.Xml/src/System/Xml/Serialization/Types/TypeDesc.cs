@@ -15,7 +15,14 @@ namespace System.Xml.Serialization.Types
         private TypeDesc? _baseTypeDesc;
         private bool _isMixed;
 
-        internal TypeDesc(string name, string fullName, XmlSchemaType? dataType, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags, string? formatterName)
+        internal TypeDesc(
+            string name,
+            string fullName,
+            XmlSchemaType? dataType,
+            TypeKind kind,
+            TypeDesc? baseTypeDesc,
+            TypeFlags flags,
+            Formatter? formatter)
         {
             Name = name.Replace('+', '.');
             FullName = fullName.Replace('+', '.');
@@ -39,7 +46,7 @@ namespace System.Xml.Serialization.Types
                     break;
             }
             DataType = dataType;
-            FormatterName = formatterName;
+            Formatter = formatter;
         }
 
         internal TypeDesc(string name, string fullName, TypeKind kind, TypeDesc? baseTypeDesc, TypeFlags flags)
@@ -47,8 +54,12 @@ namespace System.Xml.Serialization.Types
         { }
 
         internal TypeDesc(
-            Type type, bool isXsdType, XmlSchemaType dataType, string formatterName, TypeFlags flags)
-            : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, null, flags, formatterName)
+            Type type,
+            bool isXsdType,
+            XmlSchemaType dataType,
+            Formatter? formatter,
+            TypeFlags flags)
+            : this(type!.Name, type.FullName!, dataType, TypeKind.Primitive, null, flags, formatter)
         {
             IsXsdType = isXsdType;
             Type = type;
@@ -101,7 +112,7 @@ namespace System.Xml.Serialization.Types
 
         internal Type? Type { get; init; }
 
-        internal string? FormatterName { get; }
+        internal Formatter? Formatter { get; }
 
         internal TypeKind Kind { get; }
 
@@ -276,7 +287,7 @@ namespace System.Xml.Serialization.Types
                 return this;
             }
 
-            _nullableTypeDesc ??= new TypeDesc($"NullableOf{Name}", $"System.Nullable`1[{FullName}]", null, TypeKind.Struct, this, Flags | TypeFlags.OptionalValue, FormatterName)
+            _nullableTypeDesc ??= new TypeDesc($"NullableOf{Name}", $"System.Nullable`1[{FullName}]", null, TypeKind.Struct, this, Flags | TypeFlags.OptionalValue, Formatter)
             {
                 Type = type
             };

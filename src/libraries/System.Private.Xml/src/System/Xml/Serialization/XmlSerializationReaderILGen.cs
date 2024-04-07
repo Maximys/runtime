@@ -790,7 +790,7 @@ namespace System.Xml.Serialization
                     throw Globals.NotSupported($"Unexpected: {source}");
                 }
             }
-            else if (mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
+            else if (mapping.TypeDesc!.Formatter!.Name == TypeScope.StringFormatterName)
             {
                 System.Diagnostics.Debug.Assert(source == "Reader.Value" || source == "Reader.ReadElementString()" || source == "vals[i]");
                 if (source == "vals[i]")
@@ -848,16 +848,16 @@ namespace System.Xml.Serialization
                 {
                     // Only these methods below that is non Static and need to ldarg("this") for Call.
                     BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
-                    if ((mapping.TypeDesc.FormatterName == TypeScope.ByteArrayBase64FormatterName && source == "false")
-                        || (mapping.TypeDesc.FormatterName == TypeScope.ByteArrayHexFormatterName && source == "false")
-                        || (mapping.TypeDesc.FormatterName == TypeScope.XmlQualifiedNameFormatterName))
+                    if ((mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayBase64FormatterName && source == "false")
+                        || (mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayHexFormatterName && source == "false")
+                        || (mapping.TypeDesc.Formatter!.Name == TypeScope.XmlQualifiedNameFormatterName))
                     {
                         bindingFlags = CodeGenerator.InstanceBindingFlags;
                         ilg.Ldarg(0);
                     }
 
                     ToXXX = typeof(XmlSerializationReader).GetMethod(
-                        $"To{mapping.TypeDesc.FormatterName}",
+                        $"To{mapping.TypeDesc.Formatter!.Name}",
                         bindingFlags,
                         new Type[] { argType }
                         )!;
@@ -865,7 +865,7 @@ namespace System.Xml.Serialization
                 else
                 {
                     ToXXX = typeof(XmlConvert).GetMethod(
-                        $"To{mapping.TypeDesc.FormatterName}",
+                        $"To{mapping.TypeDesc.Formatter!.Name}",
                         CodeGenerator.StaticBindingFlags,
                         new Type[] { argType }
                         )!;
@@ -2394,7 +2394,7 @@ namespace System.Xml.Serialization
                 }
                 else
                 {
-                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == TypeScope.StringFormatterName)
+                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.Formatter?.Name == TypeScope.StringFormatterName)
                     {
                         LocalBuilder tmpLoc = ilg.GetLocal("tmp");
                         MethodInfo XmlSerializationReader_ReadString = typeof(XmlSerializationReader).GetMethod(
@@ -3105,7 +3105,7 @@ namespace System.Xml.Serialization
                     else
                     {
                         string readFunc;
-                        switch (element.Mapping.TypeDesc.FormatterName)
+                        switch (element.Mapping.TypeDesc.Formatter?.Name)
                         {
                             case TypeScope.ByteArrayBase64FormatterName:
                             case TypeScope.ByteArrayHexFormatterName:
