@@ -717,7 +717,7 @@ namespace System.Xml.Serialization
                     }
                     else
                     {
-                        if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                        if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.Formatter?.Name == "String")
                         {
                             value = ReadString(null, text.Mapping.TypeDesc.CollapseWhitespace);
                         }
@@ -900,11 +900,11 @@ namespace System.Xml.Serialization
                     }
                     else
                     {
-                        if (element.Mapping.TypeDesc.FormatterName == "ByteArrayBase64")
+                        if (element.Mapping.TypeDesc.Formatter?.Name == "ByteArrayBase64")
                         {
                             value = ToByteArrayBase64(false);
                         }
-                        else if (element.Mapping.TypeDesc.FormatterName == "ByteArrayHex")
+                        else if (element.Mapping.TypeDesc.Formatter?.Name == "ByteArrayHex")
                         {
                             value = ToByteArrayHex(false);
                         }
@@ -1191,7 +1191,7 @@ namespace System.Xml.Serialization
             {
                 return readFunc(funcState);
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.Formatter!.Name == "String")
             {
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -1207,7 +1207,7 @@ namespace System.Xml.Serialization
                 if (!mapping.TypeDesc.HasCustomFormatter)
                 {
                     string value = readFunc(funcState);
-                    object retObj = mapping.TypeDesc.FormatterName switch
+                    object retObj = mapping.TypeDesc.Formatter.Name switch
                     {
                         "Boolean" => XmlConvert.ToBoolean(value),
                         "Int32" => XmlConvert.ToInt32(value),
@@ -1225,17 +1225,17 @@ namespace System.Xml.Serialization
                         "Char" => XmlConvert.ToChar(value),
                         "TimeSpan" => XmlConvert.ToTimeSpan(value),
                         "DateTimeOffset" => XmlConvert.ToDateTimeOffset(value),
-                        _ => throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown FormatterName: {mapping.TypeDesc.FormatterName}")),
+                        _ => throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown Name of Formatter: {mapping.TypeDesc.Formatter.Name}")),
                     };
                     return retObj;
                 }
                 else
                 {
-                    string methodName = $"To{mapping.TypeDesc.FormatterName}";
+                    string methodName = $"To{mapping.TypeDesc.Formatter.Name}";
                     MethodInfo? method = typeof(XmlSerializationReader).GetMethod(methodName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, new Type[] { typeof(string) });
                     if (method == null)
                     {
-                        throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown FormatterName: {mapping.TypeDesc.FormatterName}"));
+                        throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown Name of Formatter: {mapping.TypeDesc.Formatter.Name}"));
                     }
 
                     return method.Invoke(this, new object[] { readFunc(funcState) })!;

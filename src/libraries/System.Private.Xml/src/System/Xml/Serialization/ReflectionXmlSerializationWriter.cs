@@ -1085,7 +1085,7 @@ namespace System.Xml.Serialization
 
         private bool WritePrimitiveValue(TypeDesc typeDesc, object? o, out string? stringValue)
         {
-            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
+            if (typeDesc == ReflectionXmlSerializationReader.StringTypeDesc || typeDesc.Formatter!.Name == TypeScope.StringFormatterName)
             {
                 stringValue = (string?)o;
                 return true;
@@ -1097,24 +1097,24 @@ namespace System.Xml.Serialization
                     stringValue = ConvertPrimitiveToString(o!, typeDesc);
                     return true;
                 }
-                else if (o is byte[] byteArray && typeDesc.FormatterName == "ByteArrayHex")
+                else if (o is byte[] byteArray && typeDesc.Formatter.Name == "ByteArrayHex")
                 {
                     stringValue = FromByteArrayHex(byteArray);
                     return true;
                 }
                 else if (o is DateTime dateTime)
                 {
-                    if (typeDesc.FormatterName == TypeScope.DateTimeFormatterName)
+                    if (typeDesc.Formatter.Name == TypeScope.DateTimeFormatterName)
                     {
                         stringValue = FromDateTime(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == TypeScope.DateFormatterName)
+                    else if (typeDesc.Formatter.Name == TypeScope.DateFormatterName)
                     {
                         stringValue = FromDate(dateTime);
                         return true;
                     }
-                    else if (typeDesc.FormatterName == TypeScope.TimeFormatterName)
+                    else if (typeDesc.Formatter.Name == TypeScope.TimeFormatterName)
                     {
                         stringValue = FromTime(dateTime);
                         return true;
@@ -1131,7 +1131,7 @@ namespace System.Xml.Serialization
                 }
                 else if (o is string str)
                 {
-                    switch (typeDesc.FormatterName)
+                    switch (typeDesc.Formatter.Name)
                     {
                         case TypeScope.XmlNameFormatterName:
                             stringValue = FromXmlName(str);
@@ -1152,7 +1152,7 @@ namespace System.Xml.Serialization
 
                     return true;
                 }
-                else if (o is char ch && typeDesc.FormatterName == TypeScope.CharFormatterName)
+                else if (o is char ch && typeDesc.Formatter.Name == TypeScope.CharFormatterName)
                 {
                     stringValue = FromChar(ch);
                     return true;
@@ -1173,7 +1173,7 @@ namespace System.Xml.Serialization
 
         private static string ConvertPrimitiveToString(object o, TypeDesc typeDesc)
         {
-            string stringValue = typeDesc.FormatterName switch
+            string stringValue = typeDesc.Formatter!.Name switch
             {
                 "Boolean" => XmlConvert.ToString((bool)o),
                 "Int32" => XmlConvert.ToString((int)o),

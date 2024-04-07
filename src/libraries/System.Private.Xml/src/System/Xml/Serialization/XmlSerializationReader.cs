@@ -2832,7 +2832,7 @@ namespace System.Xml.Serialization
             {
                 Writer.Write(source);
             }
-            else if (mapping.TypeDesc!.FormatterName == "String")
+            else if (mapping.TypeDesc!.Formatter!.Name == "String")
             {
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -2853,7 +2853,7 @@ namespace System.Xml.Serialization
                     Writer.Write(".");
                 }
                 Writer.Write("To");
-                Writer.Write(mapping.TypeDesc.FormatterName);
+                Writer.Write(mapping.TypeDesc.Formatter!.Name);
                 Writer.Write("(");
                 Writer.Write(source);
                 Writer.Write(")");
@@ -4094,7 +4094,7 @@ namespace System.Xml.Serialization
                 }
                 else
                 {
-                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.FormatterName == "String")
+                    if (text.Mapping!.TypeDesc == StringTypeDesc || text.Mapping.TypeDesc!.Formatter!.Name == "String")
                     {
                         Writer.Write("tmp = ReadString(tmp, ");
                         if (text.Mapping.TypeDesc!.CollapseWhitespace)
@@ -4703,7 +4703,7 @@ namespace System.Xml.Serialization
                     else
                     {
                         string readFunc;
-                        switch (element.Mapping.TypeDesc.FormatterName)
+                        switch (element.Mapping.TypeDesc.Formatter!.Name)
                         {
                             case "ByteArrayBase64":
                             case "ByteArrayHex":
