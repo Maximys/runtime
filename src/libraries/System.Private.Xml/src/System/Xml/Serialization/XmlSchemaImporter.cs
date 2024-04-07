@@ -1773,7 +1773,7 @@ namespace System.Xml.Serialization
                     // validate the enumeration value
                     if (sourceTypeDesc != null && sourceTypeDesc.HasCustomFormatter)
                     {
-                        XmlCustomFormatter.ToDefaultValue(enumeration.Value!, sourceTypeDesc.FormatterName!);
+                        XmlCustomFormatter.ToDefaultValue(enumeration.Value!, sourceTypeDesc.Formatter!.Name);
                     }
                     ConstantMapping constant = new ConstantMapping();
                     string constantName = CodeIdentifier.MakeValid(enumeration.Value!);

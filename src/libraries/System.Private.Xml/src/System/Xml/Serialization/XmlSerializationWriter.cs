@@ -2523,7 +2523,7 @@ namespace System.Xml.Serialization
 
         private void WritePrimitiveValue(TypeDesc typeDesc, string source)
         {
-            if (typeDesc == StringTypeDesc || typeDesc.FormatterName == TypeScope.StringFormatterName)
+            if (typeDesc == StringTypeDesc || typeDesc.Formatter!.Name == TypeScope.StringFormatterName)
             {
                 Writer.Write(source);
             }
@@ -2541,7 +2541,7 @@ namespace System.Xml.Serialization
                 else
                 {
                     Writer.Write("From");
-                    Writer.Write(typeDesc.FormatterName);
+                    Writer.Write(typeDesc.Formatter!.Name);
                     Writer.Write("(");
                     Writer.Write(source);
                     Writer.Write(")");

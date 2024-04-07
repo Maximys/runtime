@@ -66,6 +66,7 @@
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\StructMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\TypeMappings\TypeMapping.cs" />
     <Compile Include="System\Xml\Serialization\Types\DataTypeNames.cs" />
+    <Compile Include="System\Xml\Serialization\Types\Formatter.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap.cs" />
     <Compile Include="System\Xml\Serialization\Types\Soap12.cs" />
     <Compile Include="System\Xml\Serialization\Types\TrimmerConstants.cs" />
