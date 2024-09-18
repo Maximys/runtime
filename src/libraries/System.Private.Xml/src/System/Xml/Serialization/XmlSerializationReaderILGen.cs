@@ -23,6 +23,16 @@ namespace System.Xml.Serialization
 {
     internal sealed partial class XmlSerializationReaderILGen : XmlSerializationILGen
     {
+        /// <summary>
+        /// Iterator name for <see cref="SourceType.Array"/>.
+        /// </summary>
+        private const string ArraySourceTypeIteratorName = "i";
+
+        /// <summary>
+        /// Value name for <see cref="SourceType.Array"/>.
+        /// </summary>
+        private const string ArraySourceTypeValueName = "vals";
+
         private readonly Dictionary<string, string> _idNames = new Dictionary<string, string>();
         // Mapping name->id_XXXNN field
         private readonly Dictionary<string, FieldBuilder> _idNameFields = new Dictionary<string, FieldBuilder>();
@@ -176,6 +186,15 @@ namespace System.Xml.Serialization
             {
                 get { return _choiceArraySource; }
             }
+        }
+
+        private enum SourceType
+        {
+            Array,
+            Boolean,
+            ReadElementString,
+            ReadString,
+            Value,
         }
 
         [RequiresUnreferencedCode("Creates XmlSerializationILGen")]
@@ -688,11 +707,11 @@ namespace System.Xml.Serialization
             string.Create(CultureInfo.InvariantCulture, $"id{++_nextIdNumber}_{CodeIdentifier.MakeValidInternal(name)}");
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void PrepareCallOfIntermediateLanguage(string source)
+        private void PrepareCallOfIntermediateLanguage(SourceType source)
         {
             switch (source)
             {
-                case "Reader.ReadElementString()":
+                case SourceType.ReadElementString:
                 {
                     MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
                         "get_Reader",
@@ -709,7 +728,7 @@ namespace System.Xml.Serialization
                     ilg.Call(XmlReader_ReadXXXString);
                     break;
                 }
-                case "Reader.ReadString()":
+                case SourceType.ReadString:
                 {
                     MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
                         "get_Reader",
@@ -726,7 +745,7 @@ namespace System.Xml.Serialization
                     ilg.Call(XmlReader_ReadXXXString);
                     break;
                 }
-                case "Reader.Value":
+                case SourceType.Value:
                 {
                     MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
                         "get_Reader",
@@ -743,14 +762,14 @@ namespace System.Xml.Serialization
                     ilg.Call(XmlReader_get_Value);
                     break;
                 }
-                case "vals[i]":
+                case SourceType.Array:
                 {
-                    LocalBuilder locVals = ilg.GetLocal("vals");
-                    LocalBuilder locI = ilg.GetLocal("i");
+                    LocalBuilder locVals = ilg.GetLocal(ArraySourceTypeValueName);
+                    LocalBuilder locI = ilg.GetLocal(ArraySourceTypeIteratorName);
                     ilg.LoadArrayElement(locVals, locI);
                     break;
                 }
-                case "false":
+                case SourceType.Boolean:
                 {
                     ilg.Ldc(false);
                     break;
@@ -763,10 +782,8 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void WritePrimitive(TypeMapping mapping, string source)
+        private void WritePrimitive(TypeMapping mapping, SourceType source)
         {
-            System.Diagnostics.Debug.Assert(source == "Reader.ReadElementString()" || source == "Reader.ReadString()"
-                || source == "false" || source == "Reader.Value" || source == "vals[i]");
             if (mapping is EnumMapping)
             {
                 WritePrimitiveEnum(mapping, source);
@@ -786,16 +803,16 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void WritePrimitiveDefault(TypeMapping mapping, string source)
+        private void WritePrimitiveDefault(TypeMapping mapping, SourceType source)
         {
-            Type argType = source == "false" ? typeof(bool) : typeof(string);
+            Type argType = source == SourceType.Boolean ? typeof(bool) : typeof(string);
             MethodInfo ToXXX;
             if (mapping.TypeDesc!.HasCustomFormatter)
             {
                 // Only these methods below that is non Static and need to ldarg("this") for Call.
                 BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
-                if ((mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayBase64FormatterName && source == "false")
-                    || (mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayHexFormatterName && source == "false")
+                if ((mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayBase64FormatterName && source == SourceType.Boolean)
+                    || (mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayHexFormatterName && source == SourceType.Boolean)
                     || (mapping.TypeDesc.Formatter!.Name == TypeScope.XmlQualifiedNameFormatterName))
                 {
                     bindingFlags = CodeGenerator.InstanceBindingFlags;
@@ -823,7 +840,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void WritePrimitiveEnum(TypeMapping mapping, string source)
+        private void WritePrimitiveEnum(TypeMapping mapping, SourceType source)
         {
             string? enumMethodName = ReferenceMapping(mapping);
             if (enumMethodName == null)
@@ -846,17 +863,16 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void WritePrimitiveStringFormatter(TypeMapping mapping, string source)
+        private void WritePrimitiveStringFormatter(TypeMapping mapping, SourceType source)
         {
-            System.Diagnostics.Debug.Assert(source == "Reader.Value" || source == "Reader.ReadElementString()" || source == "vals[i]");
-            if (source == "vals[i]")
+            if (source == SourceType.Array)
             {
                 if (mapping.TypeDesc!.CollapseWhitespace)
                 {
                     ilg.Ldarg(0);
                 }
-                LocalBuilder locVals = ilg.GetLocal("vals");
-                LocalBuilder locI = ilg.GetLocal("i");
+                LocalBuilder locVals = ilg.GetLocal(ArraySourceTypeValueName);
+                LocalBuilder locI = ilg.GetLocal(ArraySourceTypeIteratorName);
                 ilg.LoadArrayElement(locVals, locI);
                 if (mapping.TypeDesc.CollapseWhitespace)
                 {
@@ -878,7 +894,7 @@ namespace System.Xml.Serialization
                     Type.EmptyTypes
                 )!;
                 MethodInfo XmlReader_method = typeof(XmlReader).GetMethod(
-                    source == "Reader.Value" ? "get_Value" : nameof(XmlReader.ReadElementContentAsString),
+                    source == SourceType.Value ? "get_Value" : nameof(XmlReader.ReadElementContentAsString),
                     CodeGenerator.InstanceBindingFlags,
                     Type.EmptyTypes
                 )!;
@@ -902,7 +918,7 @@ namespace System.Xml.Serialization
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
-        private void WritePrimitiveStringTypeDesc(string source)
+        private void WritePrimitiveStringTypeDesc(SourceType source)
         {
             PrepareCallOfIntermediateLanguage(source);
         }
@@ -2074,7 +2090,7 @@ namespace System.Xml.Serialization
                 if (attribute.IsList)
                 {
                     LocalBuilder locListValues = ilg.DeclareOrGetLocal(typeof(string), "listValues");
-                    LocalBuilder locVals = ilg.DeclareOrGetLocal(typeof(string[]), "vals");
+                    LocalBuilder locVals = ilg.DeclareOrGetLocal(typeof(string[]), ArraySourceTypeValueName);
                     MethodInfo String_Split = typeof(string).GetMethod(
                         "Split",
                         CodeGenerator.InstanceBindingFlags,
@@ -2098,20 +2114,20 @@ namespace System.Xml.Serialization
                     ilg.Load(null);
                     ilg.Call(String_Split);
                     ilg.Stloc(locVals);
-                    LocalBuilder localI = ilg.DeclareOrGetLocal(typeof(int), "i");
+                    LocalBuilder localI = ilg.DeclareOrGetLocal(typeof(int), ArraySourceTypeIteratorName);
                     ilg.For(localI, 0, locVals);
 
                     string attributeSource = GetArraySource(member.Mapping.TypeDesc!, member.ArrayName);
 
                     WriteSourceBegin(attributeSource);
-                    WritePrimitive(attribute.Mapping!, "vals[i]");
+                    WritePrimitive(attribute.Mapping!, SourceType.Array);
                     WriteSourceEnd(attributeSource, member.Mapping.TypeDesc!.ArrayElementTypeDesc!.Type!);
                     ilg.EndFor();
                 }
                 else
                 {
                     WriteSourceBegin(member.ArraySource);
-                    WritePrimitive(attribute.Mapping!, attribute.IsList ? "vals[i]" : "Reader.Value");
+                    WritePrimitive(attribute.Mapping!, attribute.IsList ? SourceType.Array : SourceType.Value);
                     WriteSourceEnd(member.ArraySource, member.Mapping.TypeDesc!.IsArrayLike ? member.Mapping.TypeDesc.ArrayElementTypeDesc!.Type! : member.Mapping.TypeDesc.Type!);
                 }
             }
@@ -2420,7 +2436,7 @@ namespace System.Xml.Serialization
                     else
                     {
                         WriteSourceBegin(member.ArraySource);
-                        WritePrimitive(text.Mapping, "Reader.ReadString()");
+                        WritePrimitive(text.Mapping, SourceType.ReadString);
                     }
                 }
                 WriteSourceEnd(member.ArraySource, text.Mapping.TypeDesc.Type!);
@@ -3099,7 +3115,7 @@ namespace System.Xml.Serialization
                     WriteSourceEnd(source, element.Mapping.TypeDesc.Type);
                     ilg.Else();
                     WriteSourceBegin(source);
-                    WritePrimitive(element.Mapping, "Reader.ReadElementString()");
+                    WritePrimitive(element.Mapping, SourceType.ReadElementString);
                     WriteSourceEnd(source, element.Mapping.TypeDesc.Type);
                     ilg.EndIf();
                 }
@@ -3118,15 +3134,15 @@ namespace System.Xml.Serialization
                     }
                     else
                     {
-                        string readFunc;
+                        SourceType readFunc;
                         switch (element.Mapping.TypeDesc.Formatter?.Name)
                         {
                             case TypeScope.ByteArrayBase64FormatterName:
                             case TypeScope.ByteArrayHexFormatterName:
-                                readFunc = "false";
+                                readFunc = SourceType.Boolean;
                                 break;
                             default:
-                                readFunc = "Reader.ReadElementString()";
+                                readFunc = SourceType.ReadElementString;
                                 break;
                         }
                         WritePrimitive(element.Mapping, readFunc);
