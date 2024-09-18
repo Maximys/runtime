@@ -688,6 +688,81 @@ namespace System.Xml.Serialization
             string.Create(CultureInfo.InvariantCulture, $"id{++_nextIdNumber}_{CodeIdentifier.MakeValidInternal(name)}");
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
+        private void PrepareCallOfIntermediateLanguage(string source)
+        {
+            switch (source)
+            {
+                case "Reader.ReadElementString()":
+                {
+                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
+                        "get_Reader",
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
+                        nameof(XmlReader.ReadElementContentAsString),
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    ilg.Ldarg(0);
+                    ilg.Call(XmlSerializationReader_get_Reader);
+                    ilg.Call(XmlReader_ReadXXXString);
+                    break;
+                }
+                case "Reader.ReadString()":
+                {
+                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
+                        "get_Reader",
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
+                        nameof(XmlReader.ReadContentAsString),
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    ilg.Ldarg(0);
+                    ilg.Call(XmlSerializationReader_get_Reader);
+                    ilg.Call(XmlReader_ReadXXXString);
+                    break;
+                }
+                case "Reader.Value":
+                {
+                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
+                        "get_Reader",
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    MethodInfo XmlReader_get_Value = typeof(XmlReader).GetMethod(
+                        "get_Value",
+                        CodeGenerator.InstanceBindingFlags,
+                        Type.EmptyTypes
+                    )!;
+                    ilg.Ldarg(0);
+                    ilg.Call(XmlSerializationReader_get_Reader);
+                    ilg.Call(XmlReader_get_Value);
+                    break;
+                }
+                case "vals[i]":
+                {
+                    LocalBuilder locVals = ilg.GetLocal("vals");
+                    LocalBuilder locI = ilg.GetLocal("i");
+                    ilg.LoadArrayElement(locVals, locI);
+                    break;
+                }
+                case "false":
+                {
+                    ilg.Ldc(false);
+                    break;
+                }
+                default:
+                {
+                    throw Globals.NotSupported($"Unexpected: {source}");
+                }
+            }
+        }
+
+        [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
         private void WritePrimitive(TypeMapping mapping, string source)
         {
             System.Diagnostics.Debug.Assert(source == "Reader.ReadElementString()" || source == "Reader.ReadString()"
@@ -742,76 +817,7 @@ namespace System.Xml.Serialization
                 )!;
             }
 
-            switch (source)
-            {
-                case "Reader.ReadElementString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadElementContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.ReadString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.Value":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_get_Value = typeof(XmlReader).GetMethod(
-                        "get_Value",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_get_Value);
-                    break;
-                }
-                case "vals[i]":
-                {
-                    LocalBuilder locVals = ilg.GetLocal("vals");
-                    LocalBuilder locI = ilg.GetLocal("i");
-                    ilg.LoadArrayElement(locVals, locI);
-                    break;
-                }
-                case "false":
-                {
-                    ilg.Ldc(false);
-                    break;
-                }
-                default:
-                {
-                    throw Globals.NotSupported($"Unexpected: {source}");
-                }
-            }
+            PrepareCallOfIntermediateLanguage(source);
 
             ilg.Call(ToXXX);
         }
@@ -834,76 +840,7 @@ namespace System.Xml.Serialization
             );
             ilg.Ldarg(0);
 
-            switch (source)
-            {
-                case "Reader.ReadElementString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadElementContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.ReadString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.Value":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_get_Value = typeof(XmlReader).GetMethod(
-                        "get_Value",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_get_Value);
-                    break;
-                }
-                case "vals[i]":
-                {
-                    LocalBuilder locVals = ilg.GetLocal("vals");
-                    LocalBuilder locI = ilg.GetLocal("i");
-                    ilg.LoadArrayElement(locVals, locI);
-                    break;
-                }
-                case "false":
-                {
-                    ilg.Ldc(false);
-                    break;
-                }
-                default:
-                {
-                    throw Globals.NotSupported($"Unexpected: {source}");
-                }
-            }
+            PrepareCallOfIntermediateLanguage(source);
 
             ilg.Call(methodBuilder);
         }
@@ -967,71 +904,7 @@ namespace System.Xml.Serialization
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
         private void WritePrimitiveStringTypeDesc(string source)
         {
-            switch(source)
-            {
-                case "Reader.ReadElementString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadElementContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.ReadString()":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    MethodInfo XmlReader_ReadXXXString = typeof(XmlReader).GetMethod(
-                        nameof(XmlReader.ReadContentAsString),
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_ReadXXXString);
-                    break;
-                }
-                case "Reader.Value":
-                {
-                    MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
-                        "get_Reader",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                     )!;
-                    MethodInfo XmlReader_get_Value = typeof(XmlReader).GetMethod(
-                        "get_Value",
-                        CodeGenerator.InstanceBindingFlags,
-                        Type.EmptyTypes
-                    )!;
-                    ilg.Ldarg(0);
-                    ilg.Call(XmlSerializationReader_get_Reader);
-                    ilg.Call(XmlReader_get_Value);
-                    break;
-                }
-                case "vals[i]":
-                {
-                    LocalBuilder locVals = ilg.GetLocal("vals");
-                    LocalBuilder locI = ilg.GetLocal("i");
-                    ilg.LoadArrayElement(locVals, locI);
-                    break;
-                }
-                default:
-                {
-                    throw Globals.NotSupported($"Unexpected: {source}");
-                }
-            }
+            PrepareCallOfIntermediateLanguage(source);
         }
 
         private string? MakeUnique(EnumMapping mapping, string name)
