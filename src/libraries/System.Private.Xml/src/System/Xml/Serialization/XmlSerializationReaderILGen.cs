@@ -794,11 +794,14 @@ namespace System.Xml.Serialization
                     ilg.LoadArrayElement(locVals, locI);
                     break;
                 }
-                default:
+                case "false":
                 {
-                    System.Diagnostics.Debug.Assert(source == "false");
                     ilg.Ldc(false);
                     break;
+                }
+                default:
+                {
+                    throw Globals.NotSupported($"Unexpected: {source}");
                 }
             }
 
