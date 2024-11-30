@@ -54,6 +54,7 @@
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\ReflectionAwareCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationWriterCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\Enums\Cmp.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\ReflectionAwareILGen.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\AccessorMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\Comparers\MemberMappingComparer.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\MemberMapping.cs" />
