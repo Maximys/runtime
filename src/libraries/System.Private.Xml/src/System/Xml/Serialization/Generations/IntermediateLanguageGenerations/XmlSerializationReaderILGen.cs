@@ -12,6 +12,7 @@ using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
 using System.Xml.Serialization.Generations.CodeGenerations;
+using System.Xml.Serialization.Generations.Enums;
 using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Accessors;
