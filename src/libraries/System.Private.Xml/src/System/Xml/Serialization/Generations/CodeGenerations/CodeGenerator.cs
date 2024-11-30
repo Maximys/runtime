@@ -625,26 +625,53 @@ namespace System.Xml.Serialization.Generations.CodeGenerations
             }
         }
 
-        internal void Load(object? obj)
+        internal void Load<T>(T? obj)
         {
-            if (obj == null)
-                _ilGen!.Emit(OpCodes.Ldnull);
-            else if (obj is ArgBuilder)
-                Ldarg((ArgBuilder)obj);
-            else if (obj is LocalBuilder)
-                Ldloc((LocalBuilder)obj);
-            else
-                Ldc(obj);
+            switch (obj)
+            {
+                case ArgBuilder argBuilder:
+                {
+                    Ldarg(argBuilder);
+                    break;
+                }
+                case LocalBuilder localBuilder:
+                {
+                    Ldloc(localBuilder);
+                    break;
+                }
+                case null:
+                {
+                    _ilGen!.Emit(OpCodes.Ldnull);
+                    break;
+                }
+                default:
+                {
+                    Ldc(obj);
+                    break;
+                }
+            }
         }
 
-        internal void LoadAddress(object obj)
+        internal void LoadAddress<T>(T obj)
         {
-            if (obj is ArgBuilder)
-                LdargAddress((ArgBuilder)obj);
-            else if (obj is LocalBuilder)
-                LdlocAddress((LocalBuilder)obj);
-            else
-                Load(obj);
+            switch (obj)
+            {
+                case ArgBuilder argBuilder:
+                {
+                    LdargAddress(argBuilder);
+                    break;
+                }
+                case LocalBuilder localBuilder:
+                {
+                    LdlocAddress(localBuilder);
+                    break;
+                }
+                default:
+                {
+                    Load(obj);
+                    break;
+                }
+            }
         }
 
 
@@ -763,107 +790,138 @@ namespace System.Xml.Serialization.Generations.CodeGenerations
 
         internal void Ldc(object o)
         {
-            Type valueType = o.GetType();
-            if (o is Type)
+            switch (o)
             {
-                Ldtoken((Type)o);
-                Call(typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Static | BindingFlags.Public, new Type[] { typeof(RuntimeTypeHandle) })!);
-            }
-            else if (valueType.IsEnum)
-            {
-                Ldc(Convert.ChangeType(o, Enum.GetUnderlyingType(valueType), null));
-            }
-            else
-            {
-                switch (Type.GetTypeCode(valueType))
+                case bool booleanValue:
                 {
-                    case TypeCode.Boolean:
-                        Ldc((bool)o);
-                        break;
-                    case TypeCode.Char:
-                        Debug.Fail("Char is not a valid schema primitive and should be treated as int in DataContract");
-                        throw new NotSupportedException(SR.XmlInvalidCharSchemaPrimitive);
-                    case TypeCode.SByte:
-                    case TypeCode.Byte:
-                    case TypeCode.Int16:
-                    case TypeCode.UInt16:
-                        Ldc(Convert.ToInt32(o, CultureInfo.InvariantCulture));
-                        break;
-                    case TypeCode.Int32:
-                        Ldc((int)o);
-                        break;
-                    case TypeCode.UInt32:
-                        Ldc((int)(uint)o);
-                        break;
-                    case TypeCode.UInt64:
-                        Ldc((long)(ulong)o);
-                        break;
-                    case TypeCode.Int64:
-                        Ldc((long)o);
-                        break;
-                    case TypeCode.Single:
-                        Ldc((float)o);
-                        break;
-                    case TypeCode.Double:
-                        Ldc((double)o);
-                        break;
-                    case TypeCode.String:
-                        Ldstr((string)o);
-                        break;
-                    case TypeCode.Decimal:
-                        ConstructorInfo Decimal_ctor = typeof(decimal).GetConstructor(
-                             InstanceBindingFlags,
-                             new Type[] { typeof(int), typeof(int), typeof(int), typeof(bool), typeof(byte) }
-                             )!;
-                        int[] bits = decimal.GetBits((decimal)o);
-                        Ldc(bits[0]); // digit
-                        Ldc(bits[1]); // digit
-                        Ldc(bits[2]); // digit
-                        Ldc((bits[3] & 0x80000000) == 0x80000000); // sign
-                        Ldc((byte)(bits[3] >> 16 & 0xFF)); // decimal location
-                        New(Decimal_ctor);
-                        break;
-                    case TypeCode.DateTime:
-                        ConstructorInfo DateTime_ctor = typeof(DateTime).GetConstructor(
-                            InstanceBindingFlags,
-                            new Type[] { typeof(long) }
-                            )!;
-                        Ldc(((DateTime)o).Ticks); // ticks
-                        New(DateTime_ctor);
-                        break;
-                    case TypeCode.Object:
-                    case TypeCode.Empty:
-                    case TypeCode.DBNull:
-                    default:
-                        if (valueType == typeof(TimeSpan))
-                        {
-                            ConstructorInfo TimeSpan_ctor = typeof(TimeSpan).GetConstructor(
-                            InstanceBindingFlags,
-                            null,
-                            new Type[] { typeof(long) },
-                            null
-                            )!;
-                            Ldc(((TimeSpan)o).Ticks); // ticks
-                            New(TimeSpan_ctor);
-                            break;
-                        }
-                        else if (valueType == typeof(DateTimeOffset))
-                        {
-                            ConstructorInfo DateTimeOffset_ctor = typeof(DateTimeOffset).GetConstructor(
-                            InstanceBindingFlags,
-                            null,
-                            new Type[] { typeof(long), typeof(TimeSpan) },
-                            null
-                            )!;
-                            Ldc(((DateTimeOffset)o).Ticks); // ticks
-                            Ldc(((DateTimeOffset)o).Offset); // offset
-                            New(DateTimeOffset_ctor);
-                            break;
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(SR.Format(SR.UnknownConstantType, valueType.AssemblyQualifiedName));
-                        }
+                    Ldc(booleanValue);
+                    break;
+                }
+                case char:
+                {
+                    Debug.Fail("Char is not a valid schema primitive and should be treated as int in DataContract");
+                    throw new NotSupportedException(SR.XmlInvalidCharSchemaPrimitive);
+                }
+                case sbyte sbyteValue:
+                {
+                    Ldc(sbyteValue);
+                    break;
+                }
+                case byte byteValue:
+                {
+                    Ldc(byteValue);
+                    break;
+                }
+                case short shortValue:
+                {
+                    Ldc(shortValue);
+                    break;
+                }
+                case ushort ushortValue:
+                {
+                    Ldc(ushortValue);
+                    break;
+                }
+                case int intValue:
+                {
+                    Ldc(intValue);
+                    break;
+                }
+                case uint uintValue:
+                {
+                    Ldc((int)uintValue);
+                    break;
+                }
+                case ulong ulongValue:
+                {
+                    Ldc((long)ulongValue);
+                    break;
+                }
+                case long longValue:
+                {
+                    Ldc(longValue);
+                    break;
+                }
+                case float floatValue:
+                {
+                    Ldc(floatValue);
+                    break;
+                }
+                case double doubleValue:
+                {
+                    Ldc(doubleValue);
+                    break;
+                }
+                case string stringValue:
+                {
+                    Ldstr(stringValue);
+                    break;
+                }
+                case decimal decimalValue:
+                {
+                    ConstructorInfo Decimal_ctor = typeof(decimal).GetConstructor(
+                         InstanceBindingFlags,
+                         new Type[] { typeof(int), typeof(int), typeof(int), typeof(bool), typeof(byte) }
+                         )!;
+                    int[] bits = decimal.GetBits(decimalValue);
+                    Ldc(bits[0]); // digit
+                    Ldc(bits[1]); // digit
+                    Ldc(bits[2]); // digit
+                    Ldc((bits[3] & 0x80000000) == 0x80000000); // sign
+                    Ldc((byte)(bits[3] >> 16 & 0xFF)); // decimal location
+                    New(Decimal_ctor);
+                    break;
+                }
+                case DateTime dateTimeValue:
+                {
+                    ConstructorInfo DateTime_ctor = typeof(DateTime).GetConstructor(
+                        InstanceBindingFlags,
+                        new Type[] { typeof(long) }
+                        )!;
+                    Ldc(dateTimeValue.Ticks);
+                    New(DateTime_ctor);
+                    break;
+                }
+                case TimeSpan timeSpanValue:
+                {
+                    ConstructorInfo TimeSpan_ctor = typeof(TimeSpan).GetConstructor(
+                        InstanceBindingFlags,
+                        null,
+                        new Type[] { typeof(long) },
+                        null
+                        )!;
+                    Ldc(timeSpanValue.Ticks);
+                    New(TimeSpan_ctor);
+                    break;
+                }
+                case Type type:
+                {
+                    Ldtoken(type);
+                    Call(typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Static | BindingFlags.Public, new Type[] { typeof(RuntimeTypeHandle) })!);
+                    break;
+                }
+                case DateTimeOffset dateTimeOffsetValue:
+                {
+                    ConstructorInfo DateTimeOffset_ctor = typeof(DateTimeOffset).GetConstructor(
+                        InstanceBindingFlags,
+                        null,
+                        new Type[] { typeof(long), typeof(TimeSpan) },
+                        null
+                        )!;
+                    Ldc(dateTimeOffsetValue.Ticks);
+                    Ldc(dateTimeOffsetValue.Offset);
+                    New(DateTimeOffset_ctor);
+                    break;
+                }
+                case { }
+                    when o.GetType().IsEnum:
+                {
+                    Ldc(Convert.ChangeType(o, Enum.GetUnderlyingType(o.GetType()), null));
+                    break;
+                }
+                default:
+                {
+                    throw new NotSupportedException(SR.Format(SR.UnknownConstantType, o!.GetType().AssemblyQualifiedName));
                 }
             }
         }

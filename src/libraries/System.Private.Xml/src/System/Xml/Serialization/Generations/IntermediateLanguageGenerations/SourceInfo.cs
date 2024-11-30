@@ -138,7 +138,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             }
             else if (Source == "null")
             {
-                ILG.Load(null);
+                ILG.Load<object>(null);
             }
             else
             {

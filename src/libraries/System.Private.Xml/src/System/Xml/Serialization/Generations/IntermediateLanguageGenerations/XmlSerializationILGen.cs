@@ -172,7 +172,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 
             ilg.Ldarg(0);
             ilg.LoadMember(fieldBuilder);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             // this 'if' ends in GenerateHashtableGetEnd
             ilg.If(Cmp.EqualTo);
 
@@ -191,7 +191,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
         {
             ilg!.Ldarg(0);
             ilg.LoadMember(fieldBuilder);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.If(Cmp.EqualTo);
             {
                 ilg.Ldarg(0);
@@ -473,7 +473,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     ilg.EndIf();
                 }
             }
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Stloc(ilg.ReturnLocal);
             ilg.Br(ilg.ReturnLabel);
             ilg.MarkLabel(ilg.ReturnLabel);
@@ -551,13 +551,13 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 CodeGenerator.PublicMethodAttributes | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName
                 );
             ilg.Ldarg(0);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.StoreMember(readMethodsField);
             ilg.Ldarg(0);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.StoreMember(writeMethodsField);
             ilg.Ldarg(0);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.StoreMember(typedSerializersField);
             ilg.Ldarg(0);
             ilg.Call(baseCtor);
