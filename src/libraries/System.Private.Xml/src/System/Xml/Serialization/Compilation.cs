@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Xml.Serialization.CodeGenerations;
 using System.Xml.Serialization.Generations.CodeGenerations;
+using System.Xml.Serialization.Generations.CodeGenerations.Exceptions;
 using System.Xml.Serialization.Generations.IntermediateLanguageGenerations;
 using System.Xml.Serialization.Types;
 

@@ -42,10 +42,18 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Generations\Building\ArgBuilder.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\Building\MethodBuilderInfo.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\Exceptions\CodeGeneratorConversionException.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\Scopes\LocalScope.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\States\ForState.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\States\IfState.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\States\WhileState.cs" />
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationReaderCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\DynamicAssemblies.cs" />
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\ReflectionAwareCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationWriterCodeGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\Enums\Cmp.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\AccessorMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\Comparers\MemberMappingComparer.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\MemberMapping.cs" />
