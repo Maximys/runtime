@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.CodeGenerations;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Navigation;
 using System.Xml.Serialization.Mappings.TypeMappings;

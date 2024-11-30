@@ -1,7 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,10 +14,10 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text.RegularExpressions;
-using System.Xml;
+using System.Xml.Serialization;
 using System.Xml.Serialization.Configuration;
 
-namespace System.Xml.Serialization
+namespace System.Xml.Serialization.Generations.CodeGenerations
 {
     internal sealed class CodeGenerator
     {
@@ -86,7 +85,7 @@ namespace System.Xml.Serialization
         private void InitILGeneration(Type[] argTypes, string[] argNames, bool isStatic)
         {
             _methodEndLabel = _ilGen!.DefineLabel();
-            this.retLabel = _ilGen.DefineLabel();
+            retLabel = _ilGen.DefineLabel();
             _blockStack = new Stack<object>();
             _whileStack = new Stack<WhileState>();
             _currentScope = new LocalScope();
@@ -129,7 +128,7 @@ namespace System.Xml.Serialization
         internal ArgBuilder GetArg(string name)
         {
             System.Diagnostics.Debug.Assert(_argList != null && _argList.ContainsKey(name));
-            return (ArgBuilder)_argList[name];
+            return _argList[name];
         }
 
         internal LocalBuilder GetLocal(string name)
@@ -296,11 +295,11 @@ namespace System.Xml.Serialization
                 else
                 {
 #if DEBUG
-                    CodeGenerator.AssertHasInterface(varType, typeof(ICollection));
+                    AssertHasInterface(varType, typeof(ICollection));
 #endif
                     MethodInfo ICollection_get_Count = typeof(ICollection).GetMethod(
                           "get_Count",
-                          CodeGenerator.InstanceBindingFlags,
+                          InstanceBindingFlags,
                           Type.EmptyTypes
                           )!;
                     // ICollection is not a value type, and ICollection::get_Count is a virtual method. So Call() here
@@ -816,7 +815,7 @@ namespace System.Xml.Serialization
                         break;
                     case TypeCode.Decimal:
                         ConstructorInfo Decimal_ctor = typeof(decimal).GetConstructor(
-                             CodeGenerator.InstanceBindingFlags,
+                             InstanceBindingFlags,
                              new Type[] { typeof(int), typeof(int), typeof(int), typeof(bool), typeof(byte) }
                              )!;
                         int[] bits = decimal.GetBits((decimal)o);
@@ -824,12 +823,12 @@ namespace System.Xml.Serialization
                         Ldc(bits[1]); // digit
                         Ldc(bits[2]); // digit
                         Ldc((bits[3] & 0x80000000) == 0x80000000); // sign
-                        Ldc((byte)((bits[3] >> 16) & 0xFF)); // decimal location
+                        Ldc((byte)(bits[3] >> 16 & 0xFF)); // decimal location
                         New(Decimal_ctor);
                         break;
                     case TypeCode.DateTime:
                         ConstructorInfo DateTime_ctor = typeof(DateTime).GetConstructor(
-                            CodeGenerator.InstanceBindingFlags,
+                            InstanceBindingFlags,
                             new Type[] { typeof(long) }
                             )!;
                         Ldc(((DateTime)o).Ticks); // ticks
@@ -842,7 +841,7 @@ namespace System.Xml.Serialization
                         if (valueType == typeof(TimeSpan))
                         {
                             ConstructorInfo TimeSpan_ctor = typeof(TimeSpan).GetConstructor(
-                            CodeGenerator.InstanceBindingFlags,
+                            InstanceBindingFlags,
                             null,
                             new Type[] { typeof(long) },
                             null
@@ -854,7 +853,7 @@ namespace System.Xml.Serialization
                         else if (valueType == typeof(DateTimeOffset))
                         {
                             ConstructorInfo DateTimeOffset_ctor = typeof(DateTimeOffset).GetConstructor(
-                            CodeGenerator.InstanceBindingFlags,
+                            InstanceBindingFlags,
                             null,
                             new Type[] { typeof(long), typeof(TimeSpan) },
                             null
@@ -1430,9 +1429,9 @@ namespace System.Xml.Serialization
         internal Type ArgType;
         internal ArgBuilder(string name, int index, Type argType)
         {
-            this.Name = name;
-            this.Index = index;
-            this.ArgType = argType;
+            Name = name;
+            Index = index;
+            ArgType = argType;
         }
     }
 
@@ -1542,7 +1541,7 @@ namespace System.Xml.Serialization
 
         public bool ContainsKey(string key)
         {
-            return _locals.ContainsKey(key) || (parent != null && parent.ContainsKey(key));
+            return _locals.ContainsKey(key) || parent != null && parent.ContainsKey(key);
         }
 
         public bool TryGetValue(string key, [NotNullWhen(true)] out LocalBuilder? value)
@@ -1605,19 +1604,19 @@ namespace System.Xml.Serialization
         public readonly Type[] ParameterTypes;
         public MethodBuilderInfo(MethodBuilder methodBuilder, Type[] parameterTypes)
         {
-            this.MethodBuilder = methodBuilder;
-            this.ParameterTypes = parameterTypes;
+            MethodBuilder = methodBuilder;
+            ParameterTypes = parameterTypes;
         }
 
         [Conditional("DEBUG")]
         public void Validate(Type? returnType, Type[] parameterTypes, MethodAttributes attributes)
         {
-            Debug.Assert(this.MethodBuilder.ReturnType == returnType);
-            Debug.Assert(this.MethodBuilder.Attributes == attributes);
-            Debug.Assert(this.ParameterTypes.Length == parameterTypes.Length);
+            Debug.Assert(MethodBuilder.ReturnType == returnType);
+            Debug.Assert(MethodBuilder.Attributes == attributes);
+            Debug.Assert(ParameterTypes.Length == parameterTypes.Length);
             for (int i = 0; i < parameterTypes.Length; ++i)
             {
-                Debug.Assert(this.ParameterTypes[i] == parameterTypes[i]);
+                Debug.Assert(ParameterTypes[i] == parameterTypes[i]);
             }
         }
     }

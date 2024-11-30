@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.CodeGenerations;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Types;
 

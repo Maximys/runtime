@@ -11,6 +11,7 @@ using System.Reflection.Emit;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Xml.Schema;
+using System.Xml.Serialization.Generations.CodeGenerations;
 using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Accessors;
@@ -19,7 +20,7 @@ using System.Xml.Serialization.Mappings.TypeMappings.PrimitiveMappings;
 using System.Xml.Serialization.Mappings.TypeMappings.SpecialMappings;
 using System.Xml.Serialization.Types;
 
-namespace System.Xml.Serialization
+namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 {
     [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
     [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]

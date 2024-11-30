@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Xml.Schema;
+using System.Xml.Serialization.Generations.CodeGenerations;
 using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Mappings.AccessorMappings;
 using System.Xml.Serialization.Mappings.Accessors;
@@ -18,7 +19,7 @@ using System.Xml.Serialization.Mappings.TypeMappings.PrimitiveMappings;
 using System.Xml.Serialization.Mappings.TypeMappings.SpecialMappings;
 using System.Xml.Serialization.Types;
 
-namespace System.Xml.Serialization
+namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 {
     [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
     [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]
@@ -31,7 +32,7 @@ namespace System.Xml.Serialization
 
         internal void GenerateBegin()
         {
-            this.typeBuilder = CodeGenerator.CreateTypeBuilder(
+            typeBuilder = CodeGenerator.CreateTypeBuilder(
                 ModuleBuilder,
                 ClassName,
                 TypeAttributes | TypeAttributes.BeforeFieldInit,
@@ -70,9 +71,9 @@ namespace System.Xml.Serialization
         {
             GenerateReferencedMethods();
             GenerateInitCallbacksMethod();
-            this.typeBuilder.DefineDefaultConstructor(
+            typeBuilder.DefineDefaultConstructor(
                 CodeGenerator.PublicMethodAttributes);
-            return this.typeBuilder.CreateType();
+            return typeBuilder.CreateType();
         }
 
         internal string? GenerateElement(XmlMapping xmlMapping)
@@ -91,7 +92,7 @@ namespace System.Xml.Serialization
 
         private void GenerateInitCallbacksMethod()
         {
-            ilg = new CodeGenerator(this.typeBuilder);
+            ilg = new CodeGenerator(typeBuilder);
             ilg.BeginMethod(typeof(void), "InitCallbacks", Type.EmptyTypes, Array.Empty<string>(),
                 CodeGenerator.ProtectedOverrideMethodAttributes);
             ilg.EndMethod();
@@ -117,7 +118,7 @@ namespace System.Xml.Serialization
             argTypes.Add(mapping.TypeDesc.Type!);
 
             MethodInfo XmlSerializationWriter_WriteXXX = typeof(XmlSerializationWriter).GetMethod(
-                 nullable ? ("WriteNullableQualifiedNameLiteral") : "WriteElementQualifiedName",
+                 nullable ? "WriteNullableQualifiedNameLiteral" : "WriteElementQualifiedName",
                  CodeGenerator.InstanceBindingFlags,
                  argTypes.ToArray()
                  )!;
@@ -359,7 +360,7 @@ namespace System.Xml.Serialization
             bool hasWrapperElement = mapping.HasWrapperElement;
             bool writeAccessors = mapping.WriteAccessors;
             string methodName = NextMethodName(element.Name);
-            ilg = new CodeGenerator(this.typeBuilder);
+            ilg = new CodeGenerator(typeBuilder);
             ilg.BeginMethod(
                 typeof(void),
                 methodName,
@@ -394,7 +395,7 @@ namespace System.Xml.Serialization
 
             if (hasWrapperElement)
             {
-                WriteStartElement(element.Name, (element.Form == XmlSchemaForm.Qualified ? element.Namespace : ""), false);
+                WriteStartElement(element.Name, element.Form == XmlSchemaForm.Qualified ? element.Namespace : "", false);
 
                 int xmlnsMember = FindXmlnsIndex(mapping.Members!);
                 if (xmlnsMember >= 0)
@@ -550,7 +551,7 @@ namespace System.Xml.Serialization
             ElementAccessor element = xmlTypeMapping.Accessor;
             TypeMapping mapping = element.Mapping!;
             string methodName = NextMethodName(element.Name);
-            ilg = new CodeGenerator(this.typeBuilder);
+            ilg = new CodeGenerator(typeBuilder);
             ilg.BeginMethod(
                 typeof(void),
                 methodName,
@@ -570,10 +571,10 @@ namespace System.Xml.Serialization
             ilg.If(ilg.GetArg("o"), Cmp.EqualTo, null);
             if (element.IsNullable)
             {
-                WriteLiteralNullTag(element.Name, (element.Form == XmlSchemaForm.Qualified ? element.Namespace : ""));
+                WriteLiteralNullTag(element.Name, element.Form == XmlSchemaForm.Qualified ? element.Namespace : "");
             }
             else
-                WriteEmptyTag(element.Name, (element.Form == XmlSchemaForm.Qualified ? element.Namespace : ""));
+                WriteEmptyTag(element.Name, element.Form == XmlSchemaForm.Qualified ? element.Namespace : "");
             ilg.GotoMethodEnd();
             ilg.EndIf();
 
@@ -607,7 +608,7 @@ namespace System.Xml.Serialization
             List<string> argNames = new List<string>();
             argTypes.Add(mapping.TypeDesc!.Type!);
             argNames.Add("v");
-            ilg = new CodeGenerator(this.typeBuilder);
+            ilg = new CodeGenerator(typeBuilder);
             ilg.BeginMethod(
                 typeof(string),
                 GetMethodBuilder(methodName!),
@@ -917,7 +918,7 @@ namespace System.Xml.Serialization
             string? methodName;
             MethodNames.TryGetValue(mapping, out methodName);
 
-            ilg = new CodeGenerator(this.typeBuilder);
+            ilg = new CodeGenerator(typeBuilder);
             List<Type> argTypes = new List<Type>(5);
             List<string> argNames = new List<string>(5);
             argTypes.Add(typeof(string));
@@ -1045,7 +1046,7 @@ namespace System.Xml.Serialization
                     ilg.Load(null);
                 else
                 {
-                    System.Diagnostics.Debug.Assert(xmlnsSource.StartsWith("o.@", StringComparison.Ordinal));
+                    Debug.Assert(xmlnsSource.StartsWith("o.@", StringComparison.Ordinal));
                     ILGenLoad(xmlnsSource);
                 }
 
@@ -1152,7 +1153,7 @@ namespace System.Xml.Serialization
             // currently we have only one data type (XmlQualifiedName) that we can not write "inline",
             // because we need to output xmlns:qx="..." for each of the qnames
 
-            return (listElementTypeDesc != null && listElementTypeDesc != QnameTypeDesc);
+            return listElementTypeDesc != null && listElementTypeDesc != QnameTypeDesc;
         }
 
         private void WriteMember(SourceInfo source, AttributeAccessor attribute, TypeDesc memberTypeDesc, string parent)
@@ -1365,7 +1366,7 @@ namespace System.Xml.Serialization
             {
                 if (special.TypeDesc!.Kind == TypeKind.Attribute || special.TypeDesc.CanBeAttributeValue)
                 {
-                    System.Diagnostics.Debug.Assert(parent == "o" || parent == "p");
+                    Debug.Assert(parent == "o" || parent == "p");
                     MethodInfo XmlSerializationWriter_WriteXmlAttribute = typeof(XmlSerializationWriter).GetMethod(
                         "WriteXmlAttribute",
                         CodeGenerator.InstanceBindingFlags,
@@ -1524,8 +1525,8 @@ namespace System.Xml.Serialization
                 ilg.Load(null);
                 ilg.If(Cmp.NotEqualTo);
                 ilg.WhileBegin();
-                string arrayNamePlusA = $"{(arrayName).Replace(arrayTypeDesc.Name, "")}a{arrayElementTypeDesc.Name}";
-                string arrayNamePlusI = $"{(arrayName).Replace(arrayTypeDesc.Name, "")}i{arrayElementTypeDesc.Name}";
+                string arrayNamePlusA = $"{arrayName.Replace(arrayTypeDesc.Name, "")}a{arrayElementTypeDesc.Name}";
+                string arrayNamePlusI = $"{arrayName.Replace(arrayTypeDesc.Name, "")}i{arrayElementTypeDesc.Name}";
                 WriteLocalDecl(arrayNamePlusI, "e.Current", arrayElementTypeDesc.Type!);
                 WriteElements(new SourceInfo(arrayNamePlusI, null, null, arrayElementTypeDesc.Type, ilg), $"{choiceName}i", elements, text, choice, arrayNamePlusA, true, true);
 
@@ -1544,9 +1545,9 @@ namespace System.Xml.Serialization
             else
             {
                 // Filter out type specific for index (code match reusing local).
-                string iPlusArrayName = $"i{(arrayName).Replace(arrayTypeDesc.Name, "")}";
-                string arrayNamePlusA = $"{(arrayName).Replace(arrayTypeDesc.Name, "")}a{arrayElementTypeDesc.Name}";
-                string arrayNamePlusI = $"{(arrayName).Replace(arrayTypeDesc.Name, "")}i{arrayElementTypeDesc.Name}";
+                string iPlusArrayName = $"i{arrayName.Replace(arrayTypeDesc.Name, "")}";
+                string arrayNamePlusA = $"{arrayName.Replace(arrayTypeDesc.Name, "")}a{arrayElementTypeDesc.Name}";
+                string arrayNamePlusI = $"{arrayName.Replace(arrayTypeDesc.Name, "")}i{arrayElementTypeDesc.Name}";
                 LocalBuilder localI = ilg.DeclareOrGetLocal(typeof(int), iPlusArrayName);
                 ilg.For(localI, 0, ilg.GetLocal(arrayName));
                 int count = elements.Length + (text == null ? 0 : 1);
@@ -1902,7 +1903,7 @@ namespace System.Xml.Serialization
         private void WriteElement(SourceInfo source, ElementAccessor element, string arrayName, bool writeAccessor)
         {
             string name = writeAccessor ? element.Name : element.Mapping!.TypeName!;
-            string? ns = element.Any && element.Name.Length == 0 ? null : (element.Form == XmlSchemaForm.Qualified ? (writeAccessor ? element.Namespace : element.Mapping!.Namespace) : "");
+            string? ns = element.Any && element.Name.Length == 0 ? null : element.Form == XmlSchemaForm.Qualified ? writeAccessor ? element.Namespace : element.Mapping!.Namespace : "";
             if (element.Mapping is NullableMapping)
             {
                 if (source.Type == element.Mapping.TypeDesc!.Type)
@@ -1987,7 +1988,7 @@ namespace System.Xml.Serialization
                 else
                 {
                     string suffixRaw = primitiveMapping.TypeDesc!.XmlEncodingNotRequired ? "Raw" : "";
-                    WritePrimitive(element.IsNullable ? ("WriteNullableStringLiteral" + suffixRaw) : ("WriteElementString" + suffixRaw),
+                    WritePrimitive(element.IsNullable ? "WriteNullableStringLiteral" + suffixRaw : "WriteElementString" + suffixRaw,
                                    name, ns, GetConvertedDefaultValue(source.Type, element.Default), source, primitiveMapping, false, true, element.IsNullable);
                 }
             }
@@ -2267,7 +2268,7 @@ namespace System.Xml.Serialization
 
                 if (element.Name == choiceName)
                 {
-                    if ((element.Form == XmlSchemaForm.Unqualified && string.IsNullOrEmpty(choiceNs)) || element.Namespace == choiceNs)
+                    if (element.Form == XmlSchemaForm.Unqualified && string.IsNullOrEmpty(choiceNs) || element.Namespace == choiceNs)
                     {
                         enumValue = choiceMapping.Constants[i].Name;
                         eValue = Enum.ToObject(choiceMapping.TypeDesc!.Type!, choiceMapping.Constants[i].Value);
@@ -2553,7 +2554,7 @@ namespace System.Xml.Serialization
         internal static void WriteArrayLocalDecl(string typeName, string variableName, SourceInfo initValue, TypeDesc arrayTypeDesc)
         {
             Debug.Assert(typeName == arrayTypeDesc.CSharpName || typeName == $"{arrayTypeDesc.CSharpName}[]");
-            Type localType = (typeName == arrayTypeDesc.CSharpName) ? arrayTypeDesc.Type! : arrayTypeDesc.Type!.MakeArrayType();
+            Type localType = typeName == arrayTypeDesc.CSharpName ? arrayTypeDesc.Type! : arrayTypeDesc.Type!.MakeArrayType();
             // This may need reused variable to get code compat?
             LocalBuilder local = initValue.ILG.DeclareOrGetLocal(localType, variableName);
             initValue.Load(local.LocalType);

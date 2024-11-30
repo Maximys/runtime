@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreAppCurrent)-windows;$(NetCoreAppCurrent)</TargetFrameworks>
@@ -42,6 +42,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationReaderCodeGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\DynamicAssemblies.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\ReflectionAwareCodeGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationWriterCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\AccessorMapping.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\Comparers\MemberMappingComparer.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\AccessorMappings\MemberMapping.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="System\Xml\Serialization\Types\TypeScope.cs" />
     <Compile Include="System\Xml\Serialization\Types\UrtTypes.cs" />
     <Compile Include="System\Xml\Serialization\Types\Wsdl.cs" />
+    <Compile Include="System\Xml\Serialization\XmlSerializationGeneratedCode.cs" />
     <None Include="System\Xml\Core\HtmlEncodedRawTextWriter.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>HtmlEncodedRawTextWriter.cs</LastGenOutput>
@@ -279,6 +284,12 @@
     <Compile Include="System\Xml\Resolvers\XmlKnownDtds.cs" />
     <Compile Include="System\Xml\Resolvers\XmlPreloadedResolver.cs" />
     <Compile Include="System\Xml\Resolvers\XmlPreloadedResolverAsync.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\CodeGenerator.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\SourceInfo.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationCodeGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationILGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationWriterILGen.cs" />
     <Compile Include="System\Xml\XPath\IXPathNavigable.cs" />
     <Compile Include="System\Xml\XPath\XPathDocument.cs" />
     <Compile Include="System\Xml\XPath\XPathException.cs" />
@@ -470,7 +481,6 @@
     <Compile Include="System\Xml\Schema\Inference\Infer.cs" />
     <Compile Include="System\Xml\Schema\Inference\XmlSchemaInferenceException.cs" />
     <Compile Include="System\Xml\Serialization\CodeGenerationoptions.cs" />
-    <Compile Include="System\Xml\Serialization\CodeGenerator.cs" />
     <Compile Include="System\Xml\Serialization\CodeIdentifier.cs" />
     <Compile Include="System\Xml\Serialization\CodeIdentifiers.cs" />
     <Compile Include="System\Xml\Serialization\Compilation.cs" />
@@ -496,7 +506,6 @@
     <Compile Include="System\Xml\Serialization\SoapReflectionImporter.cs" />
     <Compile Include="System\Xml\Serialization\SoapSchemamember.cs" />
     <Compile Include="System\Xml\Serialization\SoapTypeAttribute.cs" />
-    <Compile Include="System\Xml\Serialization\SourceInfo.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyAttributeAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyElementAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlAnyElementAttributes.cs" />
@@ -524,12 +533,8 @@
     <Compile Include="System\Xml\Serialization\XmlSchemaImporter.cs" />
     <Compile Include="System\Xml\Serialization\XmlSchemaProviderAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlSchemas.cs" />
-    <Compile Include="System\Xml\Serialization\XmlSerializationGeneratedCode.cs" />
-    <Compile Include="System\Xml\Serialization\XmlSerializationILGen.cs" />
     <Compile Include="System\Xml\Serialization\XmlSerializationReader.cs" />
-    <Compile Include="System\Xml\Serialization\XmlSerializationReaderILGen.cs" />
     <Compile Include="System\Xml\Serialization\XmlSerializationWriter.cs" />
-    <Compile Include="System\Xml\Serialization\XmlSerializationWriterILGen.cs" />
     <Compile Include="System\Xml\Serialization\XmlSerializerAssemblyAttribute.cs" />
     <Compile Include="System\Xml\Serialization\XmlSerializer.cs" />
     <Compile Include="System\Xml\Serialization\XmlSerializerFactory.cs" />
