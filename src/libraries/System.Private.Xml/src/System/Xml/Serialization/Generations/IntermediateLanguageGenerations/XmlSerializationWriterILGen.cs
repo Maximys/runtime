@@ -306,7 +306,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             ilg.Ldarg(0);
             ilg.Ldstr(GetCSharpString(name));
             ilg.Ldstr(GetCSharpString(ns));
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Ldc(writePrefixed);
             ilg.Call(XmlSerializationWriter_Method);
         }
@@ -618,7 +618,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 argNames.ToArray(),
                 CodeGenerator.PrivateMethodAttributes);
             LocalBuilder sLoc = ilg.DeclareLocal(typeof(string), "s");
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Stloc(sLoc);
             ConstantMapping[] constants = mapping.Constants!;
 
@@ -1045,7 +1045,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.ConvertValue(argO.ArgType, typeof(object));
                 ilg.Ldc(false);
                 if (xmlnsSource == null)
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                 else
                 {
                     Debug.Assert(xmlnsSource.StartsWith("o.@", StringComparison.Ordinal));
@@ -1172,7 +1172,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 if (memberTypeDesc.IsNullable)
                 {
                     ilg.Ldloc(memberTypeDesc.Type!, aVar);
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.If(Cmp.NotEqualTo);
                 }
                 if (attribute.IsList)
@@ -1192,7 +1192,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                             )!;
                         ilg.Ldarg(0);
                         ilg.Call(XmlSerializationWriter_get_Writer);
-                        ilg.Load(null);
+                        ilg.Load<object>(null);
                         ilg.Ldstr(GetCSharpString(attribute.Name));
                         ilg.Ldstr(GetCSharpString(ns));
                         ilg.Call(XmlWriter_WriteStartAttribute);
@@ -1431,7 +1431,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             if (arrayTypeDesc.IsNullable)
             {
                 ilg.Ldloc(aLoc);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.If(Cmp.NotEqualTo);
             }
 
@@ -1447,7 +1447,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 Label labelTrue = ilg.DefineLabel();
                 LocalBuilder cLoc = ilg.GetLocal(cName);
                 ilg.Ldloc(cLoc);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Beq(labelTrue);
                 ilg.Ldloc(cLoc);
                 ilg.Ldlen();
@@ -1524,7 +1524,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.Stloc(eLoc);
 
                 ilg.Ldloc(eLoc);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.If(Cmp.NotEqualTo);
                 ilg.WhileBegin();
                 string arrayNamePlusA = $"{arrayName.Replace(arrayTypeDesc.Name, "")}a{arrayElementTypeDesc.Name}";
@@ -1586,7 +1586,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 if (isNullable && choice == null)
                 {
                     source.Load(typeof(object));
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.If(Cmp.NotEqualTo);
                     doEndIf = true;
                 }
@@ -1628,7 +1628,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                             Label labelEnd = ilg.DefineLabel();
                             ilg.Brfalse(labelFalse);
                             source.Load(typeof(object));
-                            ilg.Load(null);
+                            ilg.Load<object>(null);
                             ilg.Cne();
                             ilg.Br_S(labelEnd);
                             ilg.MarkLabel(labelFalse);
@@ -1672,7 +1672,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 
                     source.Load(typeof(object));
                     ilg.IsInst(typeof(XmlElement));
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Cne();
                     ilg.AndIf();
 
@@ -1702,7 +1702,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                             if (isNullable && !element.IsNullable)
                             {
                                 source.Load(typeof(object));
-                                ilg.Load(null);
+                                ilg.Load<object>(null);
                                 ilg.Cne();
                             }
                             else
@@ -1830,7 +1830,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     {
                         ilg.InitElseIf();
                         source.Load(null);
-                        ilg.Load(null);
+                        ilg.Load<object>(null);
                         ilg.AndIf(Cmp.NotEqualTo);
                     }
                     else
@@ -1921,7 +1921,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 else
                 {
                     source.Load(null);
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Cne();
                 }
                 ilg.If();
@@ -1956,7 +1956,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                         if (arrayMapping.TypeDesc.IsNullable)
                         {
                             ilg.Ldloc(ilg.GetLocal(arrayName));
-                            ilg.Load(null);
+                            ilg.Load<object>(null);
                             ilg.If(Cmp.NotEqualTo);
                         }
                     }
@@ -2039,7 +2039,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     ilg.IsInst(typeof(XmlNode));
                     ilg.Brtrue(ifLabel1);
                     source.Load(null);
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Ceq();
                     ilg.Br(ifLabel2);
                     ilg.MarkLabel(ifLabel1);
@@ -2129,7 +2129,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 if (value == null)
                 {
                     source.Load(typeof(object));
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Cne();
                 }
                 else if (value.GetType().IsPrimitive)
@@ -2162,7 +2162,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             Label labelFalse = ilg.DefineLabel();
             Label labelEnd = ilg.DefineLabel();
             source.Load(typeof(object));
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Beq(labelFalse);
             WriteInstanceOf(source, typeDesc.Type!);
             // Negative
@@ -2192,7 +2192,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             LocalBuilder local = ilg.GetLocal(source);
             Debug.Assert(!local.LocalType.IsValueType);
             ilg.Load(local);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.If(Cmp.EqualTo);
             WriteLiteralNullTag(element.Name, element.Form == XmlSchemaForm.Qualified ? element.Namespace : "");
             ilg.Else();

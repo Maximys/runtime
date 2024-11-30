@@ -187,7 +187,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             // constructorInfo.Invoke(null);
             MethodInfo constructorInvoke = typeof(ConstructorInfo).GetMethod("Invoke", new Type[] { typeof(object[]) })!;
             ilg.Ldloc(constructorInfo);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Call(constructorInvoke);
             ilg.Br(labelReturn);
 
@@ -223,7 +223,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             {
                 if (initValue == "null")
                 {
-                    initValue.ILG.Load(null);
+                    initValue.ILG.Load<object>(null);
                 }
                 else
                 {
@@ -269,7 +269,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
         {
             source.Load(typeof(object));
             ilg.IsInst(type);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Cne();
         }
 

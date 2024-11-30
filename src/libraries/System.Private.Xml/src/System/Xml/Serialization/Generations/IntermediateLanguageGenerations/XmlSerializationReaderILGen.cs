@@ -336,7 +336,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             ilg.Ldarg(0);
             Debug.Assert(node == "null" || node == "(object)p");
             if (node == "null")
-                ilg.Load(null);
+                ilg.Load<object>(null);
             else
             {
                 object pVar = ilg.GetVariable("p");
@@ -420,7 +420,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 Array.Empty<string>(),
                 CodeGenerator.PublicMethodAttributes
                 );
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Stloc(ilg.ReturnLocal);
             MethodInfo XmlSerializationReader_get_Reader = typeof(XmlSerializationReader).GetMethod(
                 "get_Reader",
@@ -664,7 +664,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 CodeGenerator.PublicMethodAttributes
                 );
             LocalBuilder oLoc = ilg.DeclareLocal(typeof(object), "o");
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Stloc(oLoc);
             MemberMapping member = new MemberMapping();
             member.TypeDesc = mapping.TypeDesc;
@@ -973,7 +973,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 
             ilg.Ldarg(0);
             ilg.LoadMember(fieldBuilder);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.If(Cmp.EqualTo);
 
             ConstructorInfo Hashtable_ctor = typeof(Hashtable).GetConstructor(
@@ -1261,7 +1261,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                                 ReflectionAwareILGen.ILGenForCreateInstance(ilg, td.Type!, false, false);
                             }
                             else
-                                ilg.Load(null);
+                                ilg.Load<object>(null);
                             ilg.Stloc(aLoc);
 
                             WriteArray(member.Source, member.ArrayName, arrayMapping, false, false, 0);
@@ -1364,7 +1364,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             Label labelEnd = ilg.DefineLabel();
             ilg.Ldarg("checkType");
             ilg.Brtrue(labelTrue);
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Br_S(labelEnd);
             ilg.MarkLabel(labelTrue);
             ilg.Ldarg(0);
@@ -1392,7 +1392,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.Ldloc(locIsNull);
                 ilg.If();
                 ilg.Ldloc(locXsiType);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.If(Cmp.NotEqualTo);
                 MethodInfo XmlSerializationReader_ReadTypedNull = typeof(XmlSerializationReader).GetMethod(
                        "ReadTypedNull",
@@ -1411,7 +1411,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 }
                 else
                 {
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Stloc(ilg.ReturnLocal);
                     ilg.Br(ilg.ReturnLabel);
                 }
@@ -1420,7 +1420,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.EndIf(); // if (isNull)
             }
             ilg.Ldloc(typeof(XmlQualifiedName), "xsiType");
-            ilg.Load(null);
+            ilg.Load<object>(null);
             ilg.Ceq();
             if (!structMapping.TypeDesc.IsRoot)
             {
@@ -1491,7 +1491,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.Ldloc(typeof(bool), "isNull");
                 ilg.If();
                 {
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Stloc(ilg.ReturnLocal);
                     ilg.Br(ilg.ReturnLabel);
                 }
@@ -1898,7 +1898,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 ilg.AndIf(Cmp.EqualTo);
 
                 ILGenLoad(xmlnsMember.Source);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.If(Cmp.EqualTo);
                 WriteSourceBegin(xmlnsMember.Source);
                 ConstructorInfo ctor = xmlnsMember.Mapping.TypeDesc!.Type!.GetConstructor(
@@ -2052,7 +2052,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     // to get code compat
                     if (attrLoc.LocalType == typeof(XmlAttribute))
                     {
-                        ilg.Load(null);
+                        ilg.Load<object>(null);
                         ilg.Cne();
                     }
                     else
@@ -2093,7 +2093,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     ilg.Call(XmlReader_get_Value);
                     ilg.Stloc(locListValues);
                     ilg.Ldloc(locListValues);
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.Call(String_Split);
                     ilg.Stloc(locVals);
                     LocalBuilder localI = ilg.DeclareOrGetLocal(typeof(int), ArraySourceTypeIteratorName);
@@ -2167,7 +2167,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                             {
                                 // we need to new the Collections and ArrayLists
                                 ILGenLoad(member.Source, typeof(object));
-                                ilg.Load(null);
+                                ilg.Load<object>(null);
                                 ilg.If(Cmp.EqualTo);
                                 if (!member.Mapping.TypeDesc.HasDefaultConstructor)
                                 {
@@ -2233,7 +2233,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
         {
             if (anyText != null)
             {
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Stloc(typeof(string), "tmp");
             }
 
@@ -2881,7 +2881,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             if (readOnly)
             {
                 ilg.Load(ilg.GetVariable(member.ArrayName));
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Beq(labelTrue);
             }
             else
@@ -3016,7 +3016,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                     }
                     else
                     {
-                        ilg.Load(null);
+                        ilg.Load<object>(null);
                     }
                     WriteSourceEnd(source, element.Mapping.TypeDesc.Type!);
                     ilg.Else();
@@ -3146,7 +3146,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                         Type.EmptyTypes
                         )!;
                     ilg.Ldloc(arrayName!);
-                    ilg.Load(null);
+                    ilg.Load<object>(null);
                     ilg.If(Cmp.EqualTo);
                     ilg.Ldarg(0);
                     ilg.Call(XmlSerializationReader_get_Reader);
@@ -3212,7 +3212,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                             ilg.Call(XmlSerializationReader_GetXsiType);
                             ilg.Stloc(tserLoc);
                             ilg.Ldloc(tserLoc);
-                            ilg.Load(null);
+                            ilg.Load<object>(null);
                             ilg.Ceq();
                             ilg.Brtrue(labelTrue);
                             WriteQNameEqual("tser", sm.XsiType!.Name, sm.XsiType.Namespace);
@@ -3280,7 +3280,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 LocalBuilder tserLoc = ilg.GetLocal("tser");
                 ilg.InitElseIf();
                 ilg.Ldloc(tserLoc);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Ceq();
                 ilg.Brtrue(labelTrue);
                 WriteQNameEqual("tser", derived.XsiType!.Name, derived.XsiType.Namespace);
@@ -3527,7 +3527,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
             if (match.Success)
             {
                 ilg.Ldarg(0);
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Ldstr(match.Groups["qnames"].Value);
                 ilg.Call(XmlSerializationReader_UnknownNode2);
                 return;
@@ -3552,7 +3552,7 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
                 LocalBuilder localO = ilg.GetLocal(match.Groups["o"].Value);
                 ilg.Ldloc(localO);
                 ilg.ConvertValue(localO.LocalType, typeof(object));
-                ilg.Load(null);
+                ilg.Load<object>(null);
                 ilg.Call(XmlSerializationReader_UnknownNode2);
                 return;
             }
