@@ -7,9 +7,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization.Generations.CodeGenerations;
 using System.Xml.Serialization.Types;
 
-namespace System.Xml.Serialization
+namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 {
     internal sealed partial class SourceInfo
     {

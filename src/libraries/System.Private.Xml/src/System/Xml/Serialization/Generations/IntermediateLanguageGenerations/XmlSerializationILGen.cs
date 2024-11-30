@@ -6,12 +6,15 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Xml.Serialization;
+using System.Xml.Serialization.CodeGenerations;
+using System.Xml.Serialization.Generations.CodeGenerations;
 using System.Xml.Serialization.Mappings.Accessors;
 using System.Xml.Serialization.Mappings.TypeMappings;
 using System.Xml.Serialization.Mappings.TypeMappings.SpecialMappings;
 using System.Xml.Serialization.Types;
 
-namespace System.Xml.Serialization
+namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
 {
     [RequiresUnreferencedCode(XmlSerializer.TrimSerializationWarning)]
     [RequiresDynamicCode(XmlSerializer.AotSerializationWarning)]
@@ -369,7 +372,7 @@ namespace System.Xml.Serialization
                 MethodInfo writerType_writeMethod = CreatedTypes[writerClass].GetMethod(
                     writeMethod,
                     CodeGenerator.InstanceBindingFlags,
-                    new Type[] { (mapping is XmlMembersMapping) ? typeof(object[]) : typeof(object) }
+                    new Type[] { mapping is XmlMembersMapping ? typeof(object[]) : typeof(object) }
                     )!;
                 ilg.Ldarg("writer");
                 ilg.Castclass(CreatedTypes[writerClass]);
@@ -419,7 +422,7 @@ namespace System.Xml.Serialization
 
             foreach (string key in serializers.Keys)
             {
-                ConstructorInfo ctor = CreatedTypes[(string)serializers[key]].GetConstructor(
+                ConstructorInfo ctor = CreatedTypes[serializers[key]].GetConstructor(
                     CodeGenerator.InstanceBindingFlags,
                     Type.EmptyTypes
                     )!;
@@ -459,7 +462,7 @@ namespace System.Xml.Serialization
                     ilg.Ldc(type);
                     ilg.If(Cmp.EqualTo);
                     {
-                        ConstructorInfo ctor = CreatedTypes[(string)serializers[xmlMappings[i].Key!]].GetConstructor(
+                        ConstructorInfo ctor = CreatedTypes[serializers[xmlMappings[i].Key!]].GetConstructor(
                             CodeGenerator.InstanceBindingFlags,
                             Type.EmptyTypes
                             )!;
@@ -585,7 +588,7 @@ namespace System.Xml.Serialization
                 ilg!.LoadMember(ilg.GetVariable("o"), memInfo);
                 if (type != null)
                 {
-                    Type memType = (memInfo is FieldInfo) ? ((FieldInfo)memInfo).FieldType : ((PropertyInfo)memInfo).PropertyType;
+                    Type memType = memInfo is FieldInfo ? ((FieldInfo)memInfo).FieldType : ((PropertyInfo)memInfo).PropertyType;
                     ilg.ConvertValue(memType, type);
                 }
             }
