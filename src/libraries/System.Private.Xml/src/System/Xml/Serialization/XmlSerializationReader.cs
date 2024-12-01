@@ -597,7 +597,6 @@ namespace System.Xml.Serialization
                     (object)type.Name == (object)_normalizedStringID)
                     value = ReadStringValue();
                 else if ((object)type.Name == (object)_anyURIID ||
-                    (object)type.Name == (object)_anyURIID ||
                     (object)type.Name == (object)_durationID ||
                     (object)type.Name == (object)_ENTITYID ||
                     (object)type.Name == (object)_ENTITIESID ||
