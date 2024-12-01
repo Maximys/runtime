@@ -267,143 +267,143 @@ namespace System.Xml.Serialization
         {
             InitPrimitiveIDs();
 
-            if ((object)typeName.Namespace == (object)_schemaNsID || (object)typeName.Namespace == (object)_soapNsID || (object)typeName.Namespace == (object)_soap12NsID)
+            if (typeName.Namespace == _schemaNsID || typeName.Namespace == _soapNsID || typeName.Namespace == _soap12NsID)
             {
-                if ((object)typeName.Name == (object)_stringID ||
-                    (object)typeName.Name == (object)_anyURIID ||
-                    (object)typeName.Name == (object)_durationID ||
-                    (object)typeName.Name == (object)_ENTITYID ||
-                    (object)typeName.Name == (object)_ENTITIESID ||
-                    (object)typeName.Name == (object)_gDayID ||
-                    (object)typeName.Name == (object)_gMonthID ||
-                    (object)typeName.Name == (object)_gMonthDayID ||
-                    (object)typeName.Name == (object)_gYearID ||
-                    (object)typeName.Name == (object)_gYearMonthID ||
-                    (object)typeName.Name == (object)_IDID ||
-                    (object)typeName.Name == (object)_IDREFID ||
-                    (object)typeName.Name == (object)_IDREFSID ||
-                    (object)typeName.Name == (object)_integerID ||
-                    (object)typeName.Name == (object)_languageID ||
-                    (object)typeName.Name == (object)_nameID ||
-                    (object)typeName.Name == (object)_NCNameID ||
-                    (object)typeName.Name == (object)_NMTOKENID ||
-                    (object)typeName.Name == (object)_NMTOKENSID ||
-                    (object)typeName.Name == (object)_negativeIntegerID ||
-                    (object)typeName.Name == (object)_nonPositiveIntegerID ||
-                    (object)typeName.Name == (object)_nonNegativeIntegerID ||
-                    (object)typeName.Name == (object)_normalizedStringID ||
-                    (object)typeName.Name == (object)_NOTATIONID ||
-                    (object)typeName.Name == (object)_positiveIntegerID ||
-                    (object)typeName.Name == (object)_tokenID)
+                if (typeName.Name == _stringID ||
+                    typeName.Name == _anyURIID ||
+                    typeName.Name == _durationID ||
+                    typeName.Name == _ENTITYID ||
+                    typeName.Name == _ENTITIESID ||
+                    typeName.Name == _gDayID ||
+                    typeName.Name == _gMonthID ||
+                    typeName.Name == _gMonthDayID ||
+                    typeName.Name == _gYearID ||
+                    typeName.Name == _gYearMonthID ||
+                    typeName.Name == _IDID ||
+                    typeName.Name == _IDREFID ||
+                    typeName.Name == _IDREFSID ||
+                    typeName.Name == _integerID ||
+                    typeName.Name == _languageID ||
+                    typeName.Name == _nameID ||
+                    typeName.Name == _NCNameID ||
+                    typeName.Name == _NMTOKENID ||
+                    typeName.Name == _NMTOKENSID ||
+                    typeName.Name == _negativeIntegerID ||
+                    typeName.Name == _nonPositiveIntegerID ||
+                    typeName.Name == _nonNegativeIntegerID ||
+                    typeName.Name == _normalizedStringID ||
+                    typeName.Name == _NOTATIONID ||
+                    typeName.Name == _positiveIntegerID ||
+                    typeName.Name == _tokenID)
                     return typeof(string);
-                else if ((object)typeName.Name == (object)_intID)
+                else if (typeName.Name == _intID)
                     return typeof(int);
-                else if ((object)typeName.Name == (object)_booleanID)
+                else if (typeName.Name == _booleanID)
                     return typeof(bool);
-                else if ((object)typeName.Name == (object)_shortID)
+                else if (typeName.Name == _shortID)
                     return typeof(short);
-                else if ((object)typeName.Name == (object)_longID)
+                else if (typeName.Name == _longID)
                     return typeof(long);
-                else if ((object)typeName.Name == (object)_floatID)
+                else if (typeName.Name == _floatID)
                     return typeof(float);
-                else if ((object)typeName.Name == (object)_doubleID)
+                else if (typeName.Name == _doubleID)
                     return typeof(double);
-                else if ((object)typeName.Name == (object)_decimalID)
+                else if (typeName.Name == _decimalID)
                     return typeof(decimal);
-                else if ((object)typeName.Name == (object)_dateTimeID)
+                else if (typeName.Name == _dateTimeID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_qnameID)
+                else if (typeName.Name == _qnameID)
                     return typeof(XmlQualifiedName);
-                else if ((object)typeName.Name == (object)_dateID)
+                else if (typeName.Name == _dateID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_timeID)
+                else if (typeName.Name == _timeID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_hexBinaryID)
+                else if (typeName.Name == _hexBinaryID)
                     return typeof(byte[]);
-                else if ((object)typeName.Name == (object)_base64BinaryID)
+                else if (typeName.Name == _base64BinaryID)
                     return typeof(byte[]);
-                else if ((object)typeName.Name == (object)_unsignedByteID)
+                else if (typeName.Name == _unsignedByteID)
                     return typeof(byte);
-                else if ((object)typeName.Name == (object)_byteID)
+                else if (typeName.Name == _byteID)
                     return typeof(sbyte);
-                else if ((object)typeName.Name == (object)_unsignedShortID)
+                else if (typeName.Name == _unsignedShortID)
                     return typeof(ushort);
-                else if ((object)typeName.Name == (object)_unsignedIntID)
+                else if (typeName.Name == _unsignedIntID)
                     return typeof(uint);
-                else if ((object)typeName.Name == (object)_unsignedLongID)
+                else if (typeName.Name == _unsignedLongID)
                     return typeof(ulong);
                 else
                     throw CreateUnknownTypeException(typeName);
             }
-            else if ((object)typeName.Namespace == (object)_schemaNs2000ID || (object)typeName.Namespace == (object)_schemaNs1999ID)
+            else if (typeName.Namespace == _schemaNs2000ID || typeName.Namespace == _schemaNs1999ID)
             {
-                if ((object)typeName.Name == (object)_stringID ||
-                    (object)typeName.Name == (object)_anyURIID ||
-                    (object)typeName.Name == (object)_durationID ||
-                    (object)typeName.Name == (object)_ENTITYID ||
-                    (object)typeName.Name == (object)_ENTITIESID ||
-                    (object)typeName.Name == (object)_gDayID ||
-                    (object)typeName.Name == (object)_gMonthID ||
-                    (object)typeName.Name == (object)_gMonthDayID ||
-                    (object)typeName.Name == (object)_gYearID ||
-                    (object)typeName.Name == (object)_gYearMonthID ||
-                    (object)typeName.Name == (object)_IDID ||
-                    (object)typeName.Name == (object)_IDREFID ||
-                    (object)typeName.Name == (object)_IDREFSID ||
-                    (object)typeName.Name == (object)_integerID ||
-                    (object)typeName.Name == (object)_languageID ||
-                    (object)typeName.Name == (object)_nameID ||
-                    (object)typeName.Name == (object)_NCNameID ||
-                    (object)typeName.Name == (object)_NMTOKENID ||
-                    (object)typeName.Name == (object)_NMTOKENSID ||
-                    (object)typeName.Name == (object)_negativeIntegerID ||
-                    (object)typeName.Name == (object)_nonPositiveIntegerID ||
-                    (object)typeName.Name == (object)_nonNegativeIntegerID ||
-                    (object)typeName.Name == (object)_normalizedStringID ||
-                    (object)typeName.Name == (object)_NOTATIONID ||
-                    (object)typeName.Name == (object)_positiveIntegerID ||
-                    (object)typeName.Name == (object)_tokenID)
+                if (typeName.Name == _stringID ||
+                    typeName.Name == _anyURIID ||
+                    typeName.Name == _durationID ||
+                    typeName.Name == _ENTITYID ||
+                    typeName.Name == _ENTITIESID ||
+                    typeName.Name == _gDayID ||
+                    typeName.Name == _gMonthID ||
+                    typeName.Name == _gMonthDayID ||
+                    typeName.Name == _gYearID ||
+                    typeName.Name == _gYearMonthID ||
+                    typeName.Name == _IDID ||
+                    typeName.Name == _IDREFID ||
+                    typeName.Name == _IDREFSID ||
+                    typeName.Name == _integerID ||
+                    typeName.Name == _languageID ||
+                    typeName.Name == _nameID ||
+                    typeName.Name == _NCNameID ||
+                    typeName.Name == _NMTOKENID ||
+                    typeName.Name == _NMTOKENSID ||
+                    typeName.Name == _negativeIntegerID ||
+                    typeName.Name == _nonPositiveIntegerID ||
+                    typeName.Name == _nonNegativeIntegerID ||
+                    typeName.Name == _normalizedStringID ||
+                    typeName.Name == _NOTATIONID ||
+                    typeName.Name == _positiveIntegerID ||
+                    typeName.Name == _tokenID)
                     return typeof(string);
-                else if ((object)typeName.Name == (object)_intID)
+                else if (typeName.Name == _intID)
                     return typeof(int);
-                else if ((object)typeName.Name == (object)_booleanID)
+                else if (typeName.Name == _booleanID)
                     return typeof(bool);
-                else if ((object)typeName.Name == (object)_shortID)
+                else if (typeName.Name == _shortID)
                     return typeof(short);
-                else if ((object)typeName.Name == (object)_longID)
+                else if (typeName.Name == _longID)
                     return typeof(long);
-                else if ((object)typeName.Name == (object)_floatID)
+                else if (typeName.Name == _floatID)
                     return typeof(float);
-                else if ((object)typeName.Name == (object)_doubleID)
+                else if (typeName.Name == _doubleID)
                     return typeof(double);
-                else if ((object)typeName.Name == (object)_oldDecimalID)
+                else if (typeName.Name == _oldDecimalID)
                     return typeof(decimal);
-                else if ((object)typeName.Name == (object)_oldTimeInstantID)
+                else if (typeName.Name == _oldTimeInstantID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_qnameID)
+                else if (typeName.Name == _qnameID)
                     return typeof(XmlQualifiedName);
-                else if ((object)typeName.Name == (object)_dateID)
+                else if (typeName.Name == _dateID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_timeID)
+                else if (typeName.Name == _timeID)
                     return typeof(DateTime);
-                else if ((object)typeName.Name == (object)_hexBinaryID)
+                else if (typeName.Name == _hexBinaryID)
                     return typeof(byte[]);
-                else if ((object)typeName.Name == (object)_byteID)
+                else if (typeName.Name == _byteID)
                     return typeof(sbyte);
-                else if ((object)typeName.Name == (object)_unsignedShortID)
+                else if (typeName.Name == _unsignedShortID)
                     return typeof(ushort);
-                else if ((object)typeName.Name == (object)_unsignedIntID)
+                else if (typeName.Name == _unsignedIntID)
                     return typeof(uint);
-                else if ((object)typeName.Name == (object)_unsignedLongID)
+                else if (typeName.Name == _unsignedLongID)
                     return typeof(ulong);
                 else
                     throw CreateUnknownTypeException(typeName);
             }
-            else if ((object)typeName.Namespace == (object)_schemaNonXsdTypesNsID)
+            else if (typeName.Namespace == _schemaNonXsdTypesNsID)
             {
-                if ((object)typeName.Name == (object)_charID)
+                if (typeName.Name == _charID)
                     return typeof(char);
-                else if ((object)typeName.Name == (object)_guidID)
+                else if (typeName.Name == _guidID)
                     return typeof(Guid);
                 else
                     throw CreateUnknownTypeException(typeName);
@@ -416,12 +416,12 @@ namespace System.Xml.Serialization
 
         private bool IsPrimitiveNamespace(string ns)
         {
-            return (object)ns == (object)_schemaNsID ||
-                   (object)ns == (object)_schemaNonXsdTypesNsID ||
-                   (object)ns == (object)_soapNsID ||
-                   (object)ns == (object)_soap12NsID ||
-                   (object)ns == (object)_schemaNs2000ID ||
-                   (object)ns == (object)_schemaNs1999ID;
+            return ns == _schemaNsID ||
+                   ns == _schemaNonXsdTypesNsID ||
+                   ns == _soapNsID ||
+                   ns == _soap12NsID ||
+                   ns == _schemaNs2000ID ||
+                   ns == _schemaNs1999ID;
         }
 
         private string ReadStringValue()
@@ -517,154 +517,156 @@ namespace System.Xml.Serialization
         {
             InitPrimitiveIDs();
             object? value;
-            if (!IsPrimitiveNamespace(type.Namespace) || (object)type.Name == (object)_urTypeID)
+            if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
+            {
                 return ReadXmlNodes(elementCanBeType);
+            }
 
-            if ((object)type.Namespace == (object)_schemaNsID || (object)type.Namespace == (object)_soapNsID || (object)type.Namespace == (object)_soap12NsID)
+            if (type.Namespace == _schemaNsID || type.Namespace == _soapNsID || type.Namespace == _soap12NsID)
             {
-                if ((object)type.Name == (object)_stringID ||
-                    (object)type.Name == (object)_normalizedStringID)
+                if (type.Name == _stringID ||
+                    type.Name == _normalizedStringID)
                     value = ReadStringValue();
-                else if ((object)type.Name == (object)_anyURIID ||
-                    (object)type.Name == (object)_durationID ||
-                    (object)type.Name == (object)_ENTITYID ||
-                    (object)type.Name == (object)_ENTITIESID ||
-                    (object)type.Name == (object)_gDayID ||
-                    (object)type.Name == (object)_gMonthID ||
-                    (object)type.Name == (object)_gMonthDayID ||
-                    (object)type.Name == (object)_gYearID ||
-                    (object)type.Name == (object)_gYearMonthID ||
-                    (object)type.Name == (object)_IDID ||
-                    (object)type.Name == (object)_IDREFID ||
-                    (object)type.Name == (object)_IDREFSID ||
-                    (object)type.Name == (object)_integerID ||
-                    (object)type.Name == (object)_languageID ||
-                    (object)type.Name == (object)_nameID ||
-                    (object)type.Name == (object)_NCNameID ||
-                    (object)type.Name == (object)_NMTOKENID ||
-                    (object)type.Name == (object)_NMTOKENSID ||
-                    (object)type.Name == (object)_negativeIntegerID ||
-                    (object)type.Name == (object)_nonPositiveIntegerID ||
-                    (object)type.Name == (object)_nonNegativeIntegerID ||
-                    (object)type.Name == (object)_NOTATIONID ||
-                    (object)type.Name == (object)_positiveIntegerID ||
-                    (object)type.Name == (object)_tokenID)
+                else if (type.Name == _anyURIID ||
+                    type.Name == _durationID ||
+                    type.Name == _ENTITYID ||
+                    type.Name == _ENTITIESID ||
+                    type.Name == _gDayID ||
+                    type.Name == _gMonthID ||
+                    type.Name == _gMonthDayID ||
+                    type.Name == _gYearID ||
+                    type.Name == _gYearMonthID ||
+                    type.Name == _IDID ||
+                    type.Name == _IDREFID ||
+                    type.Name == _IDREFSID ||
+                    type.Name == _integerID ||
+                    type.Name == _languageID ||
+                    type.Name == _nameID ||
+                    type.Name == _NCNameID ||
+                    type.Name == _NMTOKENID ||
+                    type.Name == _NMTOKENSID ||
+                    type.Name == _negativeIntegerID ||
+                    type.Name == _nonPositiveIntegerID ||
+                    type.Name == _nonNegativeIntegerID ||
+                    type.Name == _NOTATIONID ||
+                    type.Name == _positiveIntegerID ||
+                    type.Name == _tokenID)
                     value = CollapseWhitespace(ReadStringValue());
-                else if ((object)type.Name == (object)_intID)
+                else if (type.Name == _intID)
                     value = XmlConvert.ToInt32(ReadStringValue());
-                else if ((object)type.Name == (object)_booleanID)
+                else if (type.Name == _booleanID)
                     value = XmlConvert.ToBoolean(ReadStringValue());
-                else if ((object)type.Name == (object)_shortID)
+                else if (type.Name == _shortID)
                     value = XmlConvert.ToInt16(ReadStringValue());
-                else if ((object)type.Name == (object)_longID)
+                else if (type.Name == _longID)
                     value = XmlConvert.ToInt64(ReadStringValue());
-                else if ((object)type.Name == (object)_floatID)
+                else if (type.Name == _floatID)
                     value = XmlConvert.ToSingle(ReadStringValue());
-                else if ((object)type.Name == (object)_doubleID)
+                else if (type.Name == _doubleID)
                     value = XmlConvert.ToDouble(ReadStringValue());
-                else if ((object)type.Name == (object)_decimalID)
+                else if (type.Name == _decimalID)
                     value = XmlConvert.ToDecimal(ReadStringValue());
-                else if ((object)type.Name == (object)_dateTimeID)
+                else if (type.Name == _dateTimeID)
                     value = ToDateTime(ReadStringValue());
-                else if ((object)type.Name == (object)_qnameID)
+                else if (type.Name == _qnameID)
                     value = ReadXmlQualifiedName();
-                else if ((object)type.Name == (object)_dateID)
+                else if (type.Name == _dateID)
                     value = ToDate(ReadStringValue());
-                else if ((object)type.Name == (object)_timeID)
+                else if (type.Name == _timeID)
                     value = ToTime(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedByteID)
+                else if (type.Name == _unsignedByteID)
                     value = XmlConvert.ToByte(ReadStringValue());
-                else if ((object)type.Name == (object)_byteID)
+                else if (type.Name == _byteID)
                     value = XmlConvert.ToSByte(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedShortID)
+                else if (type.Name == _unsignedShortID)
                     value = XmlConvert.ToUInt16(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedIntID)
+                else if (type.Name == _unsignedIntID)
                     value = XmlConvert.ToUInt32(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedLongID)
+                else if (type.Name == _unsignedLongID)
                     value = XmlConvert.ToUInt64(ReadStringValue());
-                else if ((object)type.Name == (object)_hexBinaryID)
+                else if (type.Name == _hexBinaryID)
                     value = ToByteArrayHex(false);
-                else if ((object)type.Name == (object)_base64BinaryID)
+                else if (type.Name == _base64BinaryID)
                     value = ToByteArrayBase64(false);
-                else if ((object)type.Name == (object)_base64ID && ((object)type.Namespace == (object)_soapNsID || (object)type.Namespace == (object)_soap12NsID))
+                else if (type.Name == _base64ID && (type.Namespace == _soapNsID || type.Namespace == _soap12NsID))
                     value = ToByteArrayBase64(false);
                 else
                     value = ReadXmlNodes(elementCanBeType);
             }
-            else if ((object)type.Namespace == (object)_schemaNs2000ID || (object)type.Namespace == (object)_schemaNs1999ID)
+            else if (type.Namespace == _schemaNs2000ID || type.Namespace == _schemaNs1999ID)
             {
-                if ((object)type.Name == (object)_stringID ||
-                    (object)type.Name == (object)_normalizedStringID)
+                if (type.Name == _stringID ||
+                    type.Name == _normalizedStringID)
                     value = ReadStringValue();
-                else if ((object)type.Name == (object)_anyURIID ||
-                    (object)type.Name == (object)_durationID ||
-                    (object)type.Name == (object)_ENTITYID ||
-                    (object)type.Name == (object)_ENTITIESID ||
-                    (object)type.Name == (object)_gDayID ||
-                    (object)type.Name == (object)_gMonthID ||
-                    (object)type.Name == (object)_gMonthDayID ||
-                    (object)type.Name == (object)_gYearID ||
-                    (object)type.Name == (object)_gYearMonthID ||
-                    (object)type.Name == (object)_IDID ||
-                    (object)type.Name == (object)_IDREFID ||
-                    (object)type.Name == (object)_IDREFSID ||
-                    (object)type.Name == (object)_integerID ||
-                    (object)type.Name == (object)_languageID ||
-                    (object)type.Name == (object)_nameID ||
-                    (object)type.Name == (object)_NCNameID ||
-                    (object)type.Name == (object)_NMTOKENID ||
-                    (object)type.Name == (object)_NMTOKENSID ||
-                    (object)type.Name == (object)_negativeIntegerID ||
-                    (object)type.Name == (object)_nonPositiveIntegerID ||
-                    (object)type.Name == (object)_nonNegativeIntegerID ||
-                    (object)type.Name == (object)_NOTATIONID ||
-                    (object)type.Name == (object)_positiveIntegerID ||
-                    (object)type.Name == (object)_tokenID)
+                else if (type.Name == _anyURIID ||
+                    type.Name == _durationID ||
+                    type.Name == _ENTITYID ||
+                    type.Name == _ENTITIESID ||
+                    type.Name == _gDayID ||
+                    type.Name == _gMonthID ||
+                    type.Name == _gMonthDayID ||
+                    type.Name == _gYearID ||
+                    type.Name == _gYearMonthID ||
+                    type.Name == _IDID ||
+                    type.Name == _IDREFID ||
+                    type.Name == _IDREFSID ||
+                    type.Name == _integerID ||
+                    type.Name == _languageID ||
+                    type.Name == _nameID ||
+                    type.Name == _NCNameID ||
+                    type.Name == _NMTOKENID ||
+                    type.Name == _NMTOKENSID ||
+                    type.Name == _negativeIntegerID ||
+                    type.Name == _nonPositiveIntegerID ||
+                    type.Name == _nonNegativeIntegerID ||
+                    type.Name == _NOTATIONID ||
+                    type.Name == _positiveIntegerID ||
+                    type.Name == _tokenID)
                     value = CollapseWhitespace(ReadStringValue());
-                else if ((object)type.Name == (object)_intID)
+                else if (type.Name == _intID)
                     value = XmlConvert.ToInt32(ReadStringValue());
-                else if ((object)type.Name == (object)_booleanID)
+                else if (type.Name == _booleanID)
                     value = XmlConvert.ToBoolean(ReadStringValue());
-                else if ((object)type.Name == (object)_shortID)
+                else if (type.Name == _shortID)
                     value = XmlConvert.ToInt16(ReadStringValue());
-                else if ((object)type.Name == (object)_longID)
+                else if (type.Name == _longID)
                     value = XmlConvert.ToInt64(ReadStringValue());
-                else if ((object)type.Name == (object)_floatID)
+                else if (type.Name == _floatID)
                     value = XmlConvert.ToSingle(ReadStringValue());
-                else if ((object)type.Name == (object)_doubleID)
+                else if (type.Name == _doubleID)
                     value = XmlConvert.ToDouble(ReadStringValue());
-                else if ((object)type.Name == (object)_oldDecimalID)
+                else if (type.Name == _oldDecimalID)
                     value = XmlConvert.ToDecimal(ReadStringValue());
-                else if ((object)type.Name == (object)_oldTimeInstantID)
+                else if (type.Name == _oldTimeInstantID)
                     value = ToDateTime(ReadStringValue());
-                else if ((object)type.Name == (object)_qnameID)
+                else if (type.Name == _qnameID)
                     value = ReadXmlQualifiedName();
-                else if ((object)type.Name == (object)_dateID)
+                else if (type.Name == _dateID)
                     value = ToDate(ReadStringValue());
-                else if ((object)type.Name == (object)_timeID)
+                else if (type.Name == _timeID)
                     value = ToTime(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedByteID)
+                else if (type.Name == _unsignedByteID)
                     value = XmlConvert.ToByte(ReadStringValue());
-                else if ((object)type.Name == (object)_byteID)
+                else if (type.Name == _byteID)
                     value = XmlConvert.ToSByte(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedShortID)
+                else if (type.Name == _unsignedShortID)
                     value = XmlConvert.ToUInt16(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedIntID)
+                else if (type.Name == _unsignedIntID)
                     value = XmlConvert.ToUInt32(ReadStringValue());
-                else if ((object)type.Name == (object)_unsignedLongID)
+                else if (type.Name == _unsignedLongID)
                     value = XmlConvert.ToUInt64(ReadStringValue());
                 else
                     value = ReadXmlNodes(elementCanBeType);
             }
-            else if ((object)type.Namespace == (object)_schemaNonXsdTypesNsID)
+            else if (type.Namespace == _schemaNonXsdTypesNsID)
             {
-                if ((object)type.Name == (object)_charID)
+                if (type.Name == _charID)
                     value = ToChar(ReadStringValue());
-                else if ((object)type.Name == (object)_guidID)
+                else if (type.Name == _guidID)
                     value = new Guid(CollapseWhitespace(ReadStringValue()));
-                else if ((object)type.Name == (object)_timeSpanID)
+                else if (type.Name == _timeSpanID)
                     value = XmlConvert.ToTimeSpan(ReadStringValue());
-                else if ((object)type.Name == (object)_dateTimeOffsetID)
+                else if (type.Name == _dateTimeOffsetID)
                     value = XmlConvert.ToDateTimeOffset(ReadStringValue());
                 else
                     value = ReadXmlNodes(elementCanBeType);
@@ -678,92 +680,92 @@ namespace System.Xml.Serialization
         {
             InitPrimitiveIDs();
             object? value;
-            if (!IsPrimitiveNamespace(type.Namespace) || (object)type.Name == (object)_urTypeID)
+            if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
             {
                 return null;
             }
 
-            if ((object)type.Namespace == (object)_schemaNsID || (object)type.Namespace == (object)_soapNsID || (object)type.Namespace == (object)_soap12NsID)
+            if (type.Namespace == _schemaNsID || type.Namespace == _soapNsID || type.Namespace == _soap12NsID)
             {
-                if ((object)type.Name == (object)_stringID ||
-                    (object)type.Name == (object)_anyURIID ||
-                    (object)type.Name == (object)_durationID ||
-                    (object)type.Name == (object)_ENTITYID ||
-                    (object)type.Name == (object)_ENTITIESID ||
-                    (object)type.Name == (object)_gDayID ||
-                    (object)type.Name == (object)_gMonthID ||
-                    (object)type.Name == (object)_gMonthDayID ||
-                    (object)type.Name == (object)_gYearID ||
-                    (object)type.Name == (object)_gYearMonthID ||
-                    (object)type.Name == (object)_IDID ||
-                    (object)type.Name == (object)_IDREFID ||
-                    (object)type.Name == (object)_IDREFSID ||
-                    (object)type.Name == (object)_integerID ||
-                    (object)type.Name == (object)_languageID ||
-                    (object)type.Name == (object)_nameID ||
-                    (object)type.Name == (object)_NCNameID ||
-                    (object)type.Name == (object)_NMTOKENID ||
-                    (object)type.Name == (object)_NMTOKENSID ||
-                    (object)type.Name == (object)_negativeIntegerID ||
-                    (object)type.Name == (object)_nonPositiveIntegerID ||
-                    (object)type.Name == (object)_nonNegativeIntegerID ||
-                    (object)type.Name == (object)_normalizedStringID ||
-                    (object)type.Name == (object)_NOTATIONID ||
-                    (object)type.Name == (object)_positiveIntegerID ||
-                    (object)type.Name == (object)_tokenID)
+                if (type.Name == _stringID ||
+                    type.Name == _anyURIID ||
+                    type.Name == _durationID ||
+                    type.Name == _ENTITYID ||
+                    type.Name == _ENTITIESID ||
+                    type.Name == _gDayID ||
+                    type.Name == _gMonthID ||
+                    type.Name == _gMonthDayID ||
+                    type.Name == _gYearID ||
+                    type.Name == _gYearMonthID ||
+                    type.Name == _IDID ||
+                    type.Name == _IDREFID ||
+                    type.Name == _IDREFSID ||
+                    type.Name == _integerID ||
+                    type.Name == _languageID ||
+                    type.Name == _nameID ||
+                    type.Name == _NCNameID ||
+                    type.Name == _NMTOKENID ||
+                    type.Name == _NMTOKENSID ||
+                    type.Name == _negativeIntegerID ||
+                    type.Name == _nonPositiveIntegerID ||
+                    type.Name == _nonNegativeIntegerID ||
+                    type.Name == _normalizedStringID ||
+                    type.Name == _NOTATIONID ||
+                    type.Name == _positiveIntegerID ||
+                    type.Name == _tokenID)
                     value = null;
-                else if ((object)type.Name == (object)_intID)
+                else if (type.Name == _intID)
                 {
                     value = default(Nullable<int>);
                 }
-                else if ((object)type.Name == (object)_booleanID)
+                else if (type.Name == _booleanID)
                     value = default(Nullable<bool>);
-                else if ((object)type.Name == (object)_shortID)
+                else if (type.Name == _shortID)
                     value = default(Nullable<short>);
-                else if ((object)type.Name == (object)_longID)
+                else if (type.Name == _longID)
                     value = default(Nullable<long>);
-                else if ((object)type.Name == (object)_floatID)
+                else if (type.Name == _floatID)
                     value = default(Nullable<float>);
-                else if ((object)type.Name == (object)_doubleID)
+                else if (type.Name == _doubleID)
                     value = default(Nullable<double>);
-                else if ((object)type.Name == (object)_decimalID)
+                else if (type.Name == _decimalID)
                     value = default(Nullable<decimal>);
-                else if ((object)type.Name == (object)_dateTimeID)
+                else if (type.Name == _dateTimeID)
                     value = default(Nullable<DateTime>);
-                else if ((object)type.Name == (object)_qnameID)
+                else if (type.Name == _qnameID)
                     value = null;
-                else if ((object)type.Name == (object)_dateID)
+                else if (type.Name == _dateID)
                     value = default(Nullable<DateTime>);
-                else if ((object)type.Name == (object)_timeID)
+                else if (type.Name == _timeID)
                     value = default(Nullable<DateTime>);
-                else if ((object)type.Name == (object)_unsignedByteID)
+                else if (type.Name == _unsignedByteID)
                     value = default(Nullable<byte>);
-                else if ((object)type.Name == (object)_byteID)
+                else if (type.Name == _byteID)
                     value = default(Nullable<sbyte>);
-                else if ((object)type.Name == (object)_unsignedShortID)
+                else if (type.Name == _unsignedShortID)
                     value = default(Nullable<ushort>);
-                else if ((object)type.Name == (object)_unsignedIntID)
+                else if (type.Name == _unsignedIntID)
                     value = default(Nullable<uint>);
-                else if ((object)type.Name == (object)_unsignedLongID)
+                else if (type.Name == _unsignedLongID)
                     value = default(Nullable<ulong>);
-                else if ((object)type.Name == (object)_hexBinaryID)
+                else if (type.Name == _hexBinaryID)
                     value = null;
-                else if ((object)type.Name == (object)_base64BinaryID)
+                else if (type.Name == _base64BinaryID)
                     value = null;
-                else if ((object)type.Name == (object)_base64ID && ((object)type.Namespace == (object)_soapNsID || (object)type.Namespace == (object)_soap12NsID))
+                else if (type.Name == _base64ID && (type.Namespace == _soapNsID || type.Namespace == _soap12NsID))
                     value = null;
                 else
                     value = null;
             }
-            else if ((object)type.Namespace == (object)_schemaNonXsdTypesNsID)
+            else if (type.Namespace == _schemaNonXsdTypesNsID)
             {
-                if ((object)type.Name == (object)_charID)
+                if (type.Name == _charID)
                     value = default(Nullable<char>);
-                else if ((object)type.Name == (object)_guidID)
+                else if (type.Name == _guidID)
                     value = default(Nullable<Guid>);
-                else if ((object)type.Name == (object)_timeSpanID)
+                else if (type.Name == _timeSpanID)
                     value = default(Nullable<TimeSpan>);
-                else if ((object)type.Name == (object)_dateTimeOffsetID)
+                else if (type.Name == _dateTimeOffsetID)
                     value = default(Nullable<DateTimeOffset>);
                 else
                     value = null;
@@ -782,7 +784,7 @@ namespace System.Xml.Serialization
 
         protected void ParseWsdlArrayType(XmlAttribute attr)
         {
-            if ((object)attr.LocalName == (object)_wsdlArrayTypeID && (object)attr.NamespaceURI == (object)_wsdlNsID)
+            if (attr.LocalName == _wsdlArrayTypeID && attr.NamespaceURI == _wsdlNsID)
             {
                 int colon = attr.Value.LastIndexOf(':');
                 if (colon < 0)
@@ -1686,7 +1688,7 @@ namespace System.Xml.Serialization
                     if (_r.NamespaceURI.Length != 0)
                     {
                         type = _r.LocalName;
-                        if ((object)_r.NamespaceURI == (object)_soapNsID)
+                        if (_r.NamespaceURI == _soapNsID)
                             typens = XmlSchema.Namespace;
                         else
                             typens = _r.NamespaceURI;
@@ -1889,10 +1891,10 @@ namespace System.Xml.Serialization
             {
                 if (IsXmlnsAttribute(Reader.Name) || (Reader.Name == "id" && (!_soap12 || Reader.NamespaceURI == Soap12.Encoding)))
                     skippableNodeCount++;
-                if ((object)Reader.LocalName == (object)_typeID &&
-                     ((object)Reader.NamespaceURI == (object)_instanceNsID ||
-                       (object)Reader.NamespaceURI == (object)_instanceNs2000ID ||
-                       (object)Reader.NamespaceURI == (object)_instanceNs1999ID
+                if (Reader.LocalName == _typeID &&
+                     (Reader.NamespaceURI == _instanceNsID ||
+                       Reader.NamespaceURI == _instanceNs2000ID ||
+                       Reader.NamespaceURI == _instanceNs1999ID
                      )
                    )
                 {
@@ -1918,9 +1920,9 @@ namespace System.Xml.Serialization
                 xmlNodeList.Add(xsiTypeAttribute);
             }
             if (xsiTypeName == Soap.UrType &&
-                ((object?)xsiTypeNs == (object)_schemaNsID ||
-                  (object?)xsiTypeNs == (object)_schemaNs1999ID ||
-                  (object?)xsiTypeNs == (object)_schemaNs2000ID
+                (xsiTypeNs == _schemaNsID ||
+                  xsiTypeNs == _schemaNs1999ID ||
+                  xsiTypeNs == _schemaNs2000ID
                 )
                )
                 skippableNodeCount++;
