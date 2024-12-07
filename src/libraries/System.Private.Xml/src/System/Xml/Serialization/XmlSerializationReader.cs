@@ -39,7 +39,6 @@ namespace System.Xml.Serialization
         private string _instanceNs1999ID = null!;
         private string _soapNsID = null!;
         private string _soap12NsID = null!;
-        private string _schemaID = null!;
         private string _wsdlNsID = null!;
         private string _wsdlArrayTypeID = null!;
         private string _nullID = null!;
@@ -123,7 +122,7 @@ namespace System.Xml.Serialization
             _instanceNs1999ID = r.NameTable.Add("http://www.w3.org/1999/XMLSchema-instance");
             _soapNsID = r.NameTable.Add(Soap.Encoding);
             _soap12NsID = r.NameTable.Add(Soap12.Encoding);
-            _schemaID = r.NameTable.Add("schema");
+            r.NameTable.Add("schema");
             _wsdlNsID = r.NameTable.Add(Wsdl.Namespace);
             _wsdlArrayTypeID = r.NameTable.Add(Wsdl.ArrayType);
             _nullID = r.NameTable.Add("null");
