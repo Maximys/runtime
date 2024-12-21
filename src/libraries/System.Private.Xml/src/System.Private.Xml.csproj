@@ -42,6 +42,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Environments\Schemas\InstancesEnvironment.cs" />
+    <Compile Include="System\Xml\Serialization\Environments\Schemas\SchemasEnvironment.cs" />
+    <Compile Include="System\Xml\Serialization\Environments\Types\PrimitiveTypesEnvironment.cs" />
+    <Compile Include="System\Xml\Serialization\Environments\Values\ValuesEnvironment.cs" />
+    <Compile Include="System\Xml\Serialization\Environments\Types\TypesEnvironment.cs" />
+    <Compile Include="System\Xml\Serialization\Environments\XmlEnvironment.cs" />
     <Compile Include="System\Xml\Serialization\Generations\Building\ArgBuilder.cs" />
     <Compile Include="System\Xml\Serialization\Generations\Building\MethodBuilderInfo.cs" />
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\Exceptions\CodeGeneratorConversionException.cs" />
