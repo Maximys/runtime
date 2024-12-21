@@ -8,6 +8,11 @@ namespace System.Xml
     /// </summary>
     internal static class XmlReservedNs
     {
+        internal const string InstanceNamespace1999 = "http://www.w3.org/1999/XMLSchema-instance";
+        internal const string InstanceNamespace2000 = "http://www.w3.org/2000/10/XMLSchema-instance";
+
+        internal const string Namespace1999 = "http://www.w3.org/1999/XMLSchema";
+        internal const string Namespace2000 = "http://www.w3.org/2000/10/XMLSchema";
         internal const string NsXml = "http://www.w3.org/XML/1998/namespace";
         internal const string NsXmlNs = "http://www.w3.org/2000/xmlns/";
         internal const string NsDataType = "urn:schemas-microsoft-com:datatypes";

@@ -8,6 +8,10 @@ using System.Globalization;
 using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization.CodeGenerations;
+using System.Xml.Serialization.Environments;
+using System.Xml.Serialization.Environments.Schemas;
+using System.Xml.Serialization.Environments.Types;
+using System.Xml.Serialization.Environments.Values;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -29,78 +33,16 @@ namespace System.Xml.Serialization
         private bool _soap12;
         private bool _isReturnValue;
         private bool _decodeName = true;
+        private XmlEnvironment Environment { get; set; } = null!;
 
-        private string _schemaNsID = null!;
-        private string _schemaNs1999ID = null!;
-        private string _schemaNs2000ID = null!;
-        private string _schemaNonXsdTypesNsID = null!;
-        private string _instanceNsID = null!;
-        private string _instanceNs2000ID = null!;
-        private string _instanceNs1999ID = null!;
-        private string _soapNsID = null!;
-        private string _soap12NsID = null!;
         private string _wsdlNsID = null!;
         private string _wsdlArrayTypeID = null!;
-        private string _nullID = null!;
-        private string _nilID = null!;
         private string _typeID = null!;
         private string _arrayTypeID = null!;
         private string _itemTypeID = null!;
         private string _arraySizeID = null!;
         private string _arrayID = null!;
         private string _urTypeID = null!;
-        private string _stringID = null!;
-        private string _intID = null!;
-        private string _booleanID = null!;
-        private string _shortID = null!;
-        private string _longID = null!;
-        private string _floatID = null!;
-        private string _doubleID = null!;
-        private string _decimalID = null!;
-        private string _dateTimeID = null!;
-        private string _qnameID = null!;
-        private string _dateID = null!;
-        private string _timeID = null!;
-        private string _hexBinaryID = null!;
-        private string _base64BinaryID = null!;
-        private string _base64ID = null!;
-        private string _unsignedByteID = null!;
-        private string _byteID = null!;
-        private string _unsignedShortID = null!;
-        private string _unsignedIntID = null!;
-        private string _unsignedLongID = null!;
-        private string _oldTimeInstantID = null!;
-
-        private string _anyURIID = null!;
-        private string _durationID = null!;
-        private string _ENTITYID = null!;
-        private string _ENTITIESID = null!;
-        private string _gDayID = null!;
-        private string _gMonthID = null!;
-        private string _gMonthDayID = null!;
-        private string _gYearID = null!;
-        private string _gYearMonthID = null!;
-        private string _IDID = null!;
-        private string _IDREFID = null!;
-        private string _IDREFSID = null!;
-        private string _integerID = null!;
-        private string _languageID = null!;
-        private string _nameID = null!;
-        private string _NCNameID = null!;
-        private string _NMTOKENID = null!;
-        private string _NMTOKENSID = null!;
-        private string _negativeIntegerID = null!;
-        private string _nonPositiveIntegerID = null!;
-        private string _nonNegativeIntegerID = null!;
-        private string _normalizedStringID = null!;
-        private string _NOTATIONID = null!;
-        private string _positiveIntegerID = null!;
-        private string _tokenID = null!;
-
-        private string _charID = null!;
-        private string _guidID = null!;
-        private string _timeSpanID = null!;
-        private string _dateTimeOffsetID = null!;
 
         protected abstract void InitIDs();
 
@@ -112,20 +54,9 @@ namespace System.Xml.Serialization
             _d = null;
             _soap12 = (encodingStyle == Soap12.Encoding);
 
-            _schemaNsID = r.NameTable.Add(XmlSchema.Namespace);
-            _schemaNs2000ID = r.NameTable.Add("http://www.w3.org/2000/10/XMLSchema");
-            _schemaNs1999ID = r.NameTable.Add("http://www.w3.org/1999/XMLSchema");
-            _schemaNonXsdTypesNsID = r.NameTable.Add(UrtTypes.Namespace);
-            _instanceNsID = r.NameTable.Add(XmlSchema.InstanceNamespace);
-            _instanceNs2000ID = r.NameTable.Add("http://www.w3.org/2000/10/XMLSchema-instance");
-            _instanceNs1999ID = r.NameTable.Add("http://www.w3.org/1999/XMLSchema-instance");
-            _soapNsID = r.NameTable.Add(Soap.Encoding);
-            _soap12NsID = r.NameTable.Add(Soap12.Encoding);
             r.NameTable.Add("schema");
             _wsdlNsID = r.NameTable.Add(Wsdl.Namespace);
             _wsdlArrayTypeID = r.NameTable.Add(Wsdl.ArrayType);
-            _nullID = r.NameTable.Add("null");
-            _nilID = r.NameTable.Add("nil");
             _typeID = r.NameTable.Add("type");
             _arrayTypeID = r.NameTable.Add("arrayType");
             _itemTypeID = r.NameTable.Add("itemType");
@@ -133,6 +64,8 @@ namespace System.Xml.Serialization
             _arrayID = r.NameTable.Add("Array");
             _urTypeID = r.NameTable.Add(Soap.UrType);
             InitIDs();
+
+            Environment = PrepareEnvironment();
         }
 
         protected bool DecodeName
@@ -179,63 +112,65 @@ namespace System.Xml.Serialization
             return DynamicAssemblies.Get(assemblyFullName);
         }
 
-        private void InitPrimitiveIDs()
+        private PrimitiveTypesEnvironment PreparePrimitiveTypes()
         {
-            if (_tokenID != null) return;
-            _r.NameTable.Add(XmlSchema.Namespace);
-            _r.NameTable.Add(UrtTypes.Namespace);
+            PrimitiveTypesEnvironment returnValue;
 
-            _stringID = _r.NameTable.Add(DataTypeNames.String);
-            _intID = _r.NameTable.Add(DataTypeNames.Int32);
-            _booleanID = _r.NameTable.Add(DataTypeNames.Boolean);
-            _shortID = _r.NameTable.Add(DataTypeNames.Int16);
-            _longID = _r.NameTable.Add(DataTypeNames.Int64);
-            _floatID = _r.NameTable.Add(DataTypeNames.Single);
-            _doubleID = _r.NameTable.Add(DataTypeNames.Double);
-            _decimalID = _r.NameTable.Add(DataTypeNames.Decimal);
-            _dateTimeID = _r.NameTable.Add(DataTypeNames.DateTime);
-            _qnameID = _r.NameTable.Add(DataTypeNames.XmlQualifiedName);
-            _dateID = _r.NameTable.Add(DataTypeNames.Date);
-            _timeID = _r.NameTable.Add(DataTypeNames.Time);
-            _hexBinaryID = _r.NameTable.Add(DataTypeNames.ByteArrayHex);
-            _base64BinaryID = _r.NameTable.Add(DataTypeNames.ByteArrayBase64);
-            _unsignedByteID = _r.NameTable.Add(DataTypeNames.Byte);
-            _byteID = _r.NameTable.Add(DataTypeNames.SByte);
-            _unsignedShortID = _r.NameTable.Add(DataTypeNames.UInt16);
-            _unsignedIntID = _r.NameTable.Add(DataTypeNames.UInt32);
-            _unsignedLongID = _r.NameTable.Add(DataTypeNames.UInt64);
-            _oldTimeInstantID = _r.NameTable.Add(DataTypeNames.OldTimeInstant);
-            _charID = _r.NameTable.Add(DataTypeNames.Char);
-            _guidID = _r.NameTable.Add(DataTypeNames.Guid);
-            _timeSpanID = _r.NameTable.Add(DataTypeNames.TimeSpan);
-            _dateTimeOffsetID = _r.NameTable.Add(DataTypeNames.DateTimeOffset);
-            _base64ID = _r.NameTable.Add(DataTypeNames.Base64);
+            returnValue = new PrimitiveTypesEnvironment
+            {
+                AnyUriId = _r.NameTable.Add(DataTypeNames.AnyUri),
+                Base64Id = _r.NameTable.Add(DataTypeNames.Base64),
+                BooleanId = _r.NameTable.Add(DataTypeNames.Boolean),
+                ByteArrayBase64Id = _r.NameTable.Add(DataTypeNames.ByteArrayBase64),
+                ByteArrayHexId = _r.NameTable.Add(DataTypeNames.ByteArrayHex),
+                ByteId = _r.NameTable.Add(DataTypeNames.Byte),
+                CharId = _r.NameTable.Add(DataTypeNames.Char),
+                DateId = _r.NameTable.Add(DataTypeNames.Date),
+                DateTimeId = _r.NameTable.Add(DataTypeNames.DateTime),
+                DateTimeOffsetId = _r.NameTable.Add(DataTypeNames.DateTimeOffset),
+                DecimalId = _r.NameTable.Add(DataTypeNames.Decimal),
+                DoubleId = _r.NameTable.Add(DataTypeNames.Double),
+                DurationId = _r.NameTable.Add(DataTypeNames.Duration),
+                EntitiesId = _r.NameTable.Add(DataTypeNames.Entities),
+                EntityId = _r.NameTable.Add(DataTypeNames.Entity),
+                GDayId = _r.NameTable.Add(DataTypeNames.GDay),
+                GMonthDayId = _r.NameTable.Add(DataTypeNames.GMonthDay),
+                GMonthId = _r.NameTable.Add(DataTypeNames.GMonth),
+                GuidId = _r.NameTable.Add(DataTypeNames.Guid),
+                GYearId = _r.NameTable.Add(DataTypeNames.GYear),
+                GYearMonthId = _r.NameTable.Add(DataTypeNames.GYearMonth),
+                IdId = _r.NameTable.Add(DataTypeNames.Id),
+                IdRefId = _r.NameTable.Add(DataTypeNames.IdRef),
+                IdRefsId = _r.NameTable.Add(DataTypeNames.IdRefs),
+                Int16Id = _r.NameTable.Add(DataTypeNames.Int16),
+                Int32Id = _r.NameTable.Add(DataTypeNames.Int32),
+                Int64Id = _r.NameTable.Add(DataTypeNames.Int64),
+                IntegerId = _r.NameTable.Add(DataTypeNames.Integer),
+                LanguageId = _r.NameTable.Add(DataTypeNames.Language),
+                NegativeIntegerId = _r.NameTable.Add(DataTypeNames.NegativeInteger),
+                NoncolonizedNameId = _r.NameTable.Add(DataTypeNames.NoncolonizedName),
+                NonNegativeIntegerId = _r.NameTable.Add(DataTypeNames.NonNegativeInteger),
+                NonPositiveIntegerId = _r.NameTable.Add(DataTypeNames.NonPositiveInteger),
+                NormalizedStringId = _r.NameTable.Add(DataTypeNames.NormalizedString),
+                NotationId = _r.NameTable.Add(DataTypeNames.Notation),
+                OldTimeInstantId = _r.NameTable.Add(DataTypeNames.OldTimeInstant),
+                PositiveIntegerId = _r.NameTable.Add(DataTypeNames.PositiveInteger),
+                SByteId = _r.NameTable.Add(DataTypeNames.SByte),
+                SingleId = _r.NameTable.Add(DataTypeNames.Single),
+                StringId = _r.NameTable.Add(DataTypeNames.String),
+                TimeId = _r.NameTable.Add(DataTypeNames.Time),
+                TimeSpanId = _r.NameTable.Add(DataTypeNames.TimeSpan),
+                TokenId = _r.NameTable.Add(DataTypeNames.Token),
+                UInt16Id = _r.NameTable.Add(DataTypeNames.UInt16),
+                UInt32Id = _r.NameTable.Add(DataTypeNames.UInt32),
+                UInt64Id = _r.NameTable.Add(DataTypeNames.UInt64),
+                XmlNameId = _r.NameTable.Add(DataTypeNames.XmlName),
+                XmlNmTokenId = _r.NameTable.Add(DataTypeNames.XmlNmToken),
+                XmlNmTokensId = _r.NameTable.Add(DataTypeNames.XmlNmTokens),
+                XmlQualifiedNameId = _r.NameTable.Add(DataTypeNames.XmlQualifiedName),
+            };
 
-            _anyURIID = _r.NameTable.Add(DataTypeNames.AnyUri);
-            _durationID = _r.NameTable.Add(DataTypeNames.Duration);
-            _ENTITYID = _r.NameTable.Add(DataTypeNames.Entity);
-            _ENTITIESID = _r.NameTable.Add(DataTypeNames.Entities);
-            _gDayID = _r.NameTable.Add(DataTypeNames.GDay);
-            _gMonthID = _r.NameTable.Add(DataTypeNames.GMonth);
-            _gMonthDayID = _r.NameTable.Add(DataTypeNames.GMonthDay);
-            _gYearID = _r.NameTable.Add(DataTypeNames.GYear);
-            _gYearMonthID = _r.NameTable.Add(DataTypeNames.GYearMonth);
-            _IDID = _r.NameTable.Add(DataTypeNames.Id);
-            _IDREFID = _r.NameTable.Add(DataTypeNames.IdRef);
-            _IDREFSID = _r.NameTable.Add(DataTypeNames.IdRefs);
-            _integerID = _r.NameTable.Add(DataTypeNames.Integer);
-            _languageID = _r.NameTable.Add(DataTypeNames.Language);
-            _nameID = _r.NameTable.Add(DataTypeNames.XmlName);
-            _NCNameID = _r.NameTable.Add(DataTypeNames.NoncolonizedName);
-            _NMTOKENID = _r.NameTable.Add(DataTypeNames.XmlNmToken);
-            _NMTOKENSID = _r.NameTable.Add(DataTypeNames.XmlNmTokens);
-            _negativeIntegerID = _r.NameTable.Add(DataTypeNames.NegativeInteger);
-            _nonNegativeIntegerID = _r.NameTable.Add(DataTypeNames.NonNegativeInteger);
-            _nonPositiveIntegerID = _r.NameTable.Add(DataTypeNames.NonPositiveInteger);
-            _normalizedStringID = _r.NameTable.Add(DataTypeNames.NormalizedString);
-            _NOTATIONID = _r.NameTable.Add(DataTypeNames.Notation);
-            _positiveIntegerID = _r.NameTable.Add(DataTypeNames.PositiveInteger);
-            _tokenID = _r.NameTable.Add(DataTypeNames.Token);
+            return returnValue;
         }
 
         /// <devdoc>
@@ -243,13 +178,13 @@ namespace System.Xml.Serialization
         /// </devdoc>
         protected XmlQualifiedName? GetXsiType()
         {
-            string? type = _r.GetAttribute(_typeID, _instanceNsID);
+            string? type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.NamespaceId);
             if (type == null)
             {
-                type = _r.GetAttribute(_typeID, _instanceNs2000ID);
+                type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace2000Id);
                 if (type == null)
                 {
-                    type = _r.GetAttribute(_typeID, _instanceNs1999ID);
+                    type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace1999Id);
                     if (type == null)
                         return null;
                 }
@@ -262,145 +197,143 @@ namespace System.Xml.Serialization
         // is recognized but typeName.Name isn't.
         private Type? GetPrimitiveType(XmlQualifiedName typeName, bool throwOnUnknown)
         {
-            InitPrimitiveIDs();
-
-            if (typeName.Namespace == _schemaNsID || typeName.Namespace == _soapNsID || typeName.Namespace == _soap12NsID)
+            if (typeName.Namespace == Environment.Schemas.NamespaceId || typeName.Namespace == Environment.Schemas.SoapNamespaceId || typeName.Namespace == Environment.Schemas.Soap12NamespaceId)
             {
-                if (typeName.Name == _stringID ||
-                    typeName.Name == _anyURIID ||
-                    typeName.Name == _durationID ||
-                    typeName.Name == _ENTITYID ||
-                    typeName.Name == _ENTITIESID ||
-                    typeName.Name == _gDayID ||
-                    typeName.Name == _gMonthID ||
-                    typeName.Name == _gMonthDayID ||
-                    typeName.Name == _gYearID ||
-                    typeName.Name == _gYearMonthID ||
-                    typeName.Name == _IDID ||
-                    typeName.Name == _IDREFID ||
-                    typeName.Name == _IDREFSID ||
-                    typeName.Name == _integerID ||
-                    typeName.Name == _languageID ||
-                    typeName.Name == _nameID ||
-                    typeName.Name == _NCNameID ||
-                    typeName.Name == _NMTOKENID ||
-                    typeName.Name == _NMTOKENSID ||
-                    typeName.Name == _negativeIntegerID ||
-                    typeName.Name == _nonPositiveIntegerID ||
-                    typeName.Name == _nonNegativeIntegerID ||
-                    typeName.Name == _normalizedStringID ||
-                    typeName.Name == _NOTATIONID ||
-                    typeName.Name == _positiveIntegerID ||
-                    typeName.Name == _tokenID)
+                if (typeName.Name == Environment.Types.PrimitiveTypes.StringId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.DurationId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.EntityId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GDayId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GYearId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.LanguageId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NormalizedStringId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NotationId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.TokenId)
                     return typeof(string);
-                else if (typeName.Name == _intID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int32Id)
                     return typeof(int);
-                else if (typeName.Name == _booleanID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.BooleanId)
                     return typeof(bool);
-                else if (typeName.Name == _shortID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int16Id)
                     return typeof(short);
-                else if (typeName.Name == _longID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int64Id)
                     return typeof(long);
-                else if (typeName.Name == _floatID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.SingleId)
                     return typeof(float);
-                else if (typeName.Name == _doubleID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DoubleId)
                     return typeof(double);
-                else if (typeName.Name == _decimalID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DecimalId)
                     return typeof(decimal);
-                else if (typeName.Name == _dateTimeID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateTimeId)
                     return typeof(DateTime);
-                else if (typeName.Name == _qnameID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
                     return typeof(XmlQualifiedName);
-                else if (typeName.Name == _dateID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateId)
                     return typeof(DateTime);
-                else if (typeName.Name == _timeID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.TimeId)
                     return typeof(DateTime);
-                else if (typeName.Name == _hexBinaryID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
                     return typeof(byte[]);
-                else if (typeName.Name == _base64BinaryID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayBase64Id)
                     return typeof(byte[]);
-                else if (typeName.Name == _unsignedByteID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteId)
                     return typeof(byte);
-                else if (typeName.Name == _byteID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.SByteId)
                     return typeof(sbyte);
-                else if (typeName.Name == _unsignedShortID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt16Id)
                     return typeof(ushort);
-                else if (typeName.Name == _unsignedIntID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt32Id)
                     return typeof(uint);
-                else if (typeName.Name == _unsignedLongID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt64Id)
                     return typeof(ulong);
                 else
                     throw CreateUnknownTypeException(typeName);
             }
-            else if (typeName.Namespace == _schemaNs2000ID || typeName.Namespace == _schemaNs1999ID)
+            else if (typeName.Namespace == Environment.Schemas.Namespace2000Id || typeName.Namespace == Environment.Schemas.Namespace1999Id)
             {
-                if (typeName.Name == _stringID ||
-                    typeName.Name == _anyURIID ||
-                    typeName.Name == _durationID ||
-                    typeName.Name == _ENTITYID ||
-                    typeName.Name == _ENTITIESID ||
-                    typeName.Name == _gDayID ||
-                    typeName.Name == _gMonthID ||
-                    typeName.Name == _gMonthDayID ||
-                    typeName.Name == _gYearID ||
-                    typeName.Name == _gYearMonthID ||
-                    typeName.Name == _IDID ||
-                    typeName.Name == _IDREFID ||
-                    typeName.Name == _IDREFSID ||
-                    typeName.Name == _integerID ||
-                    typeName.Name == _languageID ||
-                    typeName.Name == _nameID ||
-                    typeName.Name == _NCNameID ||
-                    typeName.Name == _NMTOKENID ||
-                    typeName.Name == _NMTOKENSID ||
-                    typeName.Name == _negativeIntegerID ||
-                    typeName.Name == _nonPositiveIntegerID ||
-                    typeName.Name == _nonNegativeIntegerID ||
-                    typeName.Name == _normalizedStringID ||
-                    typeName.Name == _NOTATIONID ||
-                    typeName.Name == _positiveIntegerID ||
-                    typeName.Name == _tokenID)
+                if (typeName.Name == Environment.Types.PrimitiveTypes.StringId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.DurationId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.EntityId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GDayId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GYearId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.IntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.LanguageId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NormalizedStringId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.NotationId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
+                    typeName.Name == Environment.Types.PrimitiveTypes.TokenId)
                     return typeof(string);
-                else if (typeName.Name == _intID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int32Id)
                     return typeof(int);
-                else if (typeName.Name == _booleanID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.BooleanId)
                     return typeof(bool);
-                else if (typeName.Name == _shortID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int16Id)
                     return typeof(short);
-                else if (typeName.Name == _longID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int64Id)
                     return typeof(long);
-                else if (typeName.Name == _floatID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.SingleId)
                     return typeof(float);
-                else if (typeName.Name == _doubleID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DoubleId)
                     return typeof(double);
-                else if (typeName.Name == _decimalID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DecimalId)
                     return typeof(decimal);
-                else if (typeName.Name == _oldTimeInstantID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.OldTimeInstantId)
                     return typeof(DateTime);
-                else if (typeName.Name == _qnameID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
                     return typeof(XmlQualifiedName);
-                else if (typeName.Name == _dateID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateId)
                     return typeof(DateTime);
-                else if (typeName.Name == _timeID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.TimeId)
                     return typeof(DateTime);
-                else if (typeName.Name == _hexBinaryID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
                     return typeof(byte[]);
-                else if (typeName.Name == _byteID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.SByteId)
                     return typeof(sbyte);
-                else if (typeName.Name == _unsignedShortID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt16Id)
                     return typeof(ushort);
-                else if (typeName.Name == _unsignedIntID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt32Id)
                     return typeof(uint);
-                else if (typeName.Name == _unsignedLongID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt64Id)
                     return typeof(ulong);
                 else
                     throw CreateUnknownTypeException(typeName);
             }
-            else if (typeName.Namespace == _schemaNonXsdTypesNsID)
+            else if (typeName.Namespace == Environment.Schemas.NonXsdTypesNamespaceId)
             {
-                if (typeName.Name == _charID)
+                if (typeName.Name == Environment.Types.PrimitiveTypes.CharId)
                     return typeof(char);
-                else if (typeName.Name == _guidID)
+                else if (typeName.Name == Environment.Types.PrimitiveTypes.GuidId)
                     return typeof(Guid);
                 else
                     throw CreateUnknownTypeException(typeName);
@@ -413,12 +346,54 @@ namespace System.Xml.Serialization
 
         private bool IsPrimitiveNamespace(string ns)
         {
-            return ns == _schemaNsID ||
-                   ns == _schemaNonXsdTypesNsID ||
-                   ns == _soapNsID ||
-                   ns == _soap12NsID ||
-                   ns == _schemaNs2000ID ||
-                   ns == _schemaNs1999ID;
+            return ns == Environment.Schemas.NamespaceId ||
+                   ns == Environment.Schemas.NonXsdTypesNamespaceId ||
+                   ns == Environment.Schemas.SoapNamespaceId ||
+                   ns == Environment.Schemas.Soap12NamespaceId ||
+                   ns == Environment.Schemas.Namespace2000Id ||
+                   ns == Environment.Schemas.Namespace1999Id;
+        }
+
+        internal XmlEnvironment PrepareEnvironment()
+        {
+            InstancesEnvironment instances;
+            SchemasEnvironment schemas;
+            TypesEnvironment types;
+            ValuesEnvironment values;
+            XmlEnvironment returnValue;
+
+            instances = new InstancesEnvironment
+            {
+                NamespaceId = _r.NameTable.Add(XmlSchema.InstanceNamespace),
+                Namespace1999Id = _r.NameTable.Add(XmlReservedNs.InstanceNamespace1999),
+                Namespace2000Id = _r.NameTable.Add(XmlReservedNs.InstanceNamespace2000)
+            };
+
+            schemas = new SchemasEnvironment
+            {
+                Instances = instances,
+                NamespaceId = _r.NameTable.Add(XmlSchema.Namespace),
+                Namespace1999Id = _r.NameTable.Add(XmlReservedNs.Namespace1999),
+                Namespace2000Id = _r.NameTable.Add(XmlReservedNs.Namespace2000),
+                NonXsdTypesNamespaceId = _r.NameTable.Add(UrtTypes.Namespace),
+                SoapNamespaceId = _r.NameTable.Add(Soap.Encoding),
+                Soap12NamespaceId = _r.NameTable.Add(Soap12.Encoding)
+            };
+
+            types = new TypesEnvironment
+            {
+                PrimitiveTypes = PreparePrimitiveTypes()
+            };
+
+            values = new ValuesEnvironment
+            {
+                NilId = _r.NameTable.Add("nil"),
+                NullId = _r.NameTable.Add("null"),
+            };
+
+            returnValue = new XmlEnvironment(schemas, types, values);
+
+            return returnValue;
         }
 
         private string ReadStringValue()
@@ -512,158 +487,157 @@ namespace System.Xml.Serialization
 
         private object? ReadTypedPrimitive(XmlQualifiedName type, bool elementCanBeType)
         {
-            InitPrimitiveIDs();
             object? value;
             if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
             {
                 return ReadXmlNodes(elementCanBeType);
             }
 
-            if (type.Namespace == _schemaNsID || type.Namespace == _soapNsID || type.Namespace == _soap12NsID)
+            if (type.Namespace == Environment.Schemas.NamespaceId || type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId)
             {
-                if (type.Name == _stringID ||
-                    type.Name == _normalizedStringID)
+                if (type.Name == Environment.Types.PrimitiveTypes.StringId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NormalizedStringId)
                     value = ReadStringValue();
-                else if (type.Name == _anyURIID ||
-                    type.Name == _durationID ||
-                    type.Name == _ENTITYID ||
-                    type.Name == _ENTITIESID ||
-                    type.Name == _gDayID ||
-                    type.Name == _gMonthID ||
-                    type.Name == _gMonthDayID ||
-                    type.Name == _gYearID ||
-                    type.Name == _gYearMonthID ||
-                    type.Name == _IDID ||
-                    type.Name == _IDREFID ||
-                    type.Name == _IDREFSID ||
-                    type.Name == _integerID ||
-                    type.Name == _languageID ||
-                    type.Name == _nameID ||
-                    type.Name == _NCNameID ||
-                    type.Name == _NMTOKENID ||
-                    type.Name == _NMTOKENSID ||
-                    type.Name == _negativeIntegerID ||
-                    type.Name == _nonPositiveIntegerID ||
-                    type.Name == _nonNegativeIntegerID ||
-                    type.Name == _NOTATIONID ||
-                    type.Name == _positiveIntegerID ||
-                    type.Name == _tokenID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
+                    type.Name == Environment.Types.PrimitiveTypes.DurationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntityId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.LanguageId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NotationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.TokenId)
                     value = CollapseWhitespace(ReadStringValue());
-                else if (type.Name == _intID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int32Id)
                     value = XmlConvert.ToInt32(ReadStringValue());
-                else if (type.Name == _booleanID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.BooleanId)
                     value = XmlConvert.ToBoolean(ReadStringValue());
-                else if (type.Name == _shortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int16Id)
                     value = XmlConvert.ToInt16(ReadStringValue());
-                else if (type.Name == _longID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int64Id)
                     value = XmlConvert.ToInt64(ReadStringValue());
-                else if (type.Name == _floatID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SingleId)
                     value = XmlConvert.ToSingle(ReadStringValue());
-                else if (type.Name == _doubleID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DoubleId)
                     value = XmlConvert.ToDouble(ReadStringValue());
-                else if (type.Name == _decimalID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DecimalId)
                     value = XmlConvert.ToDecimal(ReadStringValue());
-                else if (type.Name == _dateTimeID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeId)
                     value = ToDateTime(ReadStringValue());
-                else if (type.Name == _qnameID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
                     value = ReadXmlQualifiedName();
-                else if (type.Name == _dateID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateId)
                     value = ToDate(ReadStringValue());
-                else if (type.Name == _timeID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.TimeId)
                     value = ToTime(ReadStringValue());
-                else if (type.Name == _unsignedByteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteId)
                     value = XmlConvert.ToByte(ReadStringValue());
-                else if (type.Name == _byteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SByteId)
                     value = XmlConvert.ToSByte(ReadStringValue());
-                else if (type.Name == _unsignedShortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt16Id)
                     value = XmlConvert.ToUInt16(ReadStringValue());
-                else if (type.Name == _unsignedIntID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt32Id)
                     value = XmlConvert.ToUInt32(ReadStringValue());
-                else if (type.Name == _unsignedLongID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt64Id)
                     value = XmlConvert.ToUInt64(ReadStringValue());
-                else if (type.Name == _hexBinaryID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
                     value = ToByteArrayHex(false);
-                else if (type.Name == _base64BinaryID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayBase64Id)
                     value = ToByteArrayBase64(false);
-                else if (type.Name == _base64ID && (type.Namespace == _soapNsID || type.Namespace == _soap12NsID))
+                else if (type.Name == Environment.Types.PrimitiveTypes.Base64Id && (type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId))
                     value = ToByteArrayBase64(false);
                 else
                     value = ReadXmlNodes(elementCanBeType);
             }
-            else if (type.Namespace == _schemaNs2000ID || type.Namespace == _schemaNs1999ID)
+            else if (type.Namespace == Environment.Schemas.Namespace2000Id || type.Namespace == Environment.Schemas.Namespace1999Id)
             {
-                if (type.Name == _stringID ||
-                    type.Name == _normalizedStringID)
+                if (type.Name == Environment.Types.PrimitiveTypes.StringId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NormalizedStringId)
                     value = ReadStringValue();
-                else if (type.Name == _anyURIID ||
-                    type.Name == _durationID ||
-                    type.Name == _ENTITYID ||
-                    type.Name == _ENTITIESID ||
-                    type.Name == _gDayID ||
-                    type.Name == _gMonthID ||
-                    type.Name == _gMonthDayID ||
-                    type.Name == _gYearID ||
-                    type.Name == _gYearMonthID ||
-                    type.Name == _IDID ||
-                    type.Name == _IDREFID ||
-                    type.Name == _IDREFSID ||
-                    type.Name == _integerID ||
-                    type.Name == _languageID ||
-                    type.Name == _nameID ||
-                    type.Name == _NCNameID ||
-                    type.Name == _NMTOKENID ||
-                    type.Name == _NMTOKENSID ||
-                    type.Name == _negativeIntegerID ||
-                    type.Name == _nonPositiveIntegerID ||
-                    type.Name == _nonNegativeIntegerID ||
-                    type.Name == _NOTATIONID ||
-                    type.Name == _positiveIntegerID ||
-                    type.Name == _tokenID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
+                    type.Name == Environment.Types.PrimitiveTypes.DurationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntityId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.LanguageId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NotationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.TokenId)
                     value = CollapseWhitespace(ReadStringValue());
-                else if (type.Name == _intID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int32Id)
                     value = XmlConvert.ToInt32(ReadStringValue());
-                else if (type.Name == _booleanID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.BooleanId)
                     value = XmlConvert.ToBoolean(ReadStringValue());
-                else if (type.Name == _shortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int16Id)
                     value = XmlConvert.ToInt16(ReadStringValue());
-                else if (type.Name == _longID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int64Id)
                     value = XmlConvert.ToInt64(ReadStringValue());
-                else if (type.Name == _floatID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SingleId)
                     value = XmlConvert.ToSingle(ReadStringValue());
-                else if (type.Name == _doubleID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DoubleId)
                     value = XmlConvert.ToDouble(ReadStringValue());
-                else if (type.Name == _decimalID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DecimalId)
                     value = XmlConvert.ToDecimal(ReadStringValue());
-                else if (type.Name == _oldTimeInstantID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.OldTimeInstantId)
                     value = ToDateTime(ReadStringValue());
-                else if (type.Name == _qnameID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
                     value = ReadXmlQualifiedName();
-                else if (type.Name == _dateID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateId)
                     value = ToDate(ReadStringValue());
-                else if (type.Name == _timeID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.TimeId)
                     value = ToTime(ReadStringValue());
-                else if (type.Name == _unsignedByteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteId)
                     value = XmlConvert.ToByte(ReadStringValue());
-                else if (type.Name == _byteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SByteId)
                     value = XmlConvert.ToSByte(ReadStringValue());
-                else if (type.Name == _unsignedShortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt16Id)
                     value = XmlConvert.ToUInt16(ReadStringValue());
-                else if (type.Name == _unsignedIntID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt32Id)
                     value = XmlConvert.ToUInt32(ReadStringValue());
-                else if (type.Name == _unsignedLongID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt64Id)
                     value = XmlConvert.ToUInt64(ReadStringValue());
                 else
                     value = ReadXmlNodes(elementCanBeType);
             }
-            else if (type.Namespace == _schemaNonXsdTypesNsID)
+            else if (type.Namespace == Environment.Schemas.NonXsdTypesNamespaceId)
             {
-                if (type.Name == _charID)
+                if (type.Name == Environment.Types.PrimitiveTypes.CharId)
                     value = ToChar(ReadStringValue());
-                else if (type.Name == _guidID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.GuidId)
                     value = new Guid(CollapseWhitespace(ReadStringValue()));
-                else if (type.Name == _timeSpanID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.TimeSpanId)
                     value = XmlConvert.ToTimeSpan(ReadStringValue());
-                else if (type.Name == _dateTimeOffsetID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeOffsetId)
                     value = XmlConvert.ToDateTimeOffset(ReadStringValue());
                 else
                     value = ReadXmlNodes(elementCanBeType);
@@ -675,94 +649,93 @@ namespace System.Xml.Serialization
 
         protected object? ReadTypedNull(XmlQualifiedName type)
         {
-            InitPrimitiveIDs();
             object? value;
             if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
             {
                 return null;
             }
 
-            if (type.Namespace == _schemaNsID || type.Namespace == _soapNsID || type.Namespace == _soap12NsID)
+            if (type.Namespace == Environment.Schemas.NamespaceId || type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId)
             {
-                if (type.Name == _stringID ||
-                    type.Name == _anyURIID ||
-                    type.Name == _durationID ||
-                    type.Name == _ENTITYID ||
-                    type.Name == _ENTITIESID ||
-                    type.Name == _gDayID ||
-                    type.Name == _gMonthID ||
-                    type.Name == _gMonthDayID ||
-                    type.Name == _gYearID ||
-                    type.Name == _gYearMonthID ||
-                    type.Name == _IDID ||
-                    type.Name == _IDREFID ||
-                    type.Name == _IDREFSID ||
-                    type.Name == _integerID ||
-                    type.Name == _languageID ||
-                    type.Name == _nameID ||
-                    type.Name == _NCNameID ||
-                    type.Name == _NMTOKENID ||
-                    type.Name == _NMTOKENSID ||
-                    type.Name == _negativeIntegerID ||
-                    type.Name == _nonPositiveIntegerID ||
-                    type.Name == _nonNegativeIntegerID ||
-                    type.Name == _normalizedStringID ||
-                    type.Name == _NOTATIONID ||
-                    type.Name == _positiveIntegerID ||
-                    type.Name == _tokenID)
+                if (type.Name == Environment.Types.PrimitiveTypes.StringId ||
+                    type.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
+                    type.Name == Environment.Types.PrimitiveTypes.DurationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntityId ||
+                    type.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearId ||
+                    type.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
+                    type.Name == Environment.Types.PrimitiveTypes.IntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.LanguageId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
+                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NormalizedStringId ||
+                    type.Name == Environment.Types.PrimitiveTypes.NotationId ||
+                    type.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
+                    type.Name == Environment.Types.PrimitiveTypes.TokenId)
                     value = null;
-                else if (type.Name == _intID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int32Id)
                 {
                     value = default(Nullable<int>);
                 }
-                else if (type.Name == _booleanID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.BooleanId)
                     value = default(Nullable<bool>);
-                else if (type.Name == _shortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int16Id)
                     value = default(Nullable<short>);
-                else if (type.Name == _longID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.Int64Id)
                     value = default(Nullable<long>);
-                else if (type.Name == _floatID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SingleId)
                     value = default(Nullable<float>);
-                else if (type.Name == _doubleID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DoubleId)
                     value = default(Nullable<double>);
-                else if (type.Name == _decimalID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DecimalId)
                     value = default(Nullable<decimal>);
-                else if (type.Name == _dateTimeID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeId)
                     value = default(Nullable<DateTime>);
-                else if (type.Name == _qnameID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
                     value = null;
-                else if (type.Name == _dateID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateId)
                     value = default(Nullable<DateTime>);
-                else if (type.Name == _timeID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.TimeId)
                     value = default(Nullable<DateTime>);
-                else if (type.Name == _unsignedByteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteId)
                     value = default(Nullable<byte>);
-                else if (type.Name == _byteID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.SByteId)
                     value = default(Nullable<sbyte>);
-                else if (type.Name == _unsignedShortID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt16Id)
                     value = default(Nullable<ushort>);
-                else if (type.Name == _unsignedIntID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt32Id)
                     value = default(Nullable<uint>);
-                else if (type.Name == _unsignedLongID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.UInt64Id)
                     value = default(Nullable<ulong>);
-                else if (type.Name == _hexBinaryID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
                     value = null;
-                else if (type.Name == _base64BinaryID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayBase64Id)
                     value = null;
-                else if (type.Name == _base64ID && (type.Namespace == _soapNsID || type.Namespace == _soap12NsID))
+                else if (type.Name == Environment.Types.PrimitiveTypes.Base64Id && (type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId))
                     value = null;
                 else
                     value = null;
             }
-            else if (type.Namespace == _schemaNonXsdTypesNsID)
+            else if (type.Namespace == Environment.Schemas.NonXsdTypesNamespaceId)
             {
-                if (type.Name == _charID)
+                if (type.Name == Environment.Types.PrimitiveTypes.CharId)
                     value = default(Nullable<char>);
-                else if (type.Name == _guidID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.GuidId)
                     value = default(Nullable<Guid>);
-                else if (type.Name == _timeSpanID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.TimeSpanId)
                     value = default(Nullable<TimeSpan>);
-                else if (type.Name == _dateTimeOffsetID)
+                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeOffsetId)
                     value = default(Nullable<DateTimeOffset>);
                 else
                     value = null;
@@ -823,10 +796,10 @@ namespace System.Xml.Serialization
         protected bool GetNullAttr()
         {
             string? isNull =
-                _r.GetAttribute(_nilID, _instanceNsID) ??
-                _r.GetAttribute(_nullID, _instanceNsID) ??
-                _r.GetAttribute(_nullID, _instanceNs2000ID) ??
-                _r.GetAttribute(_nullID, _instanceNs1999ID);
+                _r.GetAttribute(Environment.Values.NilId, Environment.Schemas.Instances.NamespaceId) ??
+                _r.GetAttribute(Environment.Values.NullId, Environment.Schemas.Instances.NamespaceId) ??
+                _r.GetAttribute(Environment.Values.NullId, Environment.Schemas.Instances.Namespace2000Id) ??
+                _r.GetAttribute(Environment.Values.NullId, Environment.Schemas.Instances.Namespace1999Id);
 
             if (isNull == null || !XmlConvert.ToBoolean(isNull)) return false;
             return true;
@@ -937,7 +910,7 @@ namespace System.Xml.Serialization
         protected int GetArrayLength(string name, string ns)
         {
             if (GetNullAttr()) return 0;
-            string? arrayType = _r.GetAttribute(_arrayTypeID, _soapNsID);
+            string? arrayType = _r.GetAttribute(_arrayTypeID, Environment.Schemas.SoapNamespaceId);
             SoapArrayInfo arrayInfo = ParseArrayType(arrayType!);
             if (arrayInfo.dimensions != 1) throw new InvalidOperationException(SR.Format(SR.XmlInvalidArrayDimentions, CurrentTag()));
             XmlQualifiedName qname = ToXmlQualifiedName(arrayInfo.qname, false);
@@ -1551,8 +1524,8 @@ namespace System.Xml.Serialization
             Type? fallbackElementType = null;
             if (_soap12)
             {
-                string? itemType = _r.GetAttribute(_itemTypeID, _soap12NsID);
-                string? arraySize = _r.GetAttribute(_arraySizeID, _soap12NsID);
+                string? itemType = _r.GetAttribute(_itemTypeID, Environment.Schemas.Soap12NamespaceId);
+                string? arraySize = _r.GetAttribute(_arraySizeID, Environment.Schemas.Soap12NamespaceId);
                 Type? arrayType = (Type?)_types[new XmlQualifiedName(typeName, typeNs)];
                 // no indication that this is an array?
                 if (itemType == null && arraySize == null && (arrayType == null || !arrayType.IsArray))
@@ -1564,7 +1537,7 @@ namespace System.Xml.Serialization
             }
             else
             {
-                string? arrayType = _r.GetAttribute(_arrayTypeID, _soapNsID);
+                string? arrayType = _r.GetAttribute(_arrayTypeID, Environment.Schemas.SoapNamespaceId);
                 if (arrayType == null)
                     return null;
 
@@ -1579,7 +1552,7 @@ namespace System.Xml.Serialization
             XmlQualifiedName qname;
             bool isPrimitive;
             Type? elementType = null;
-            XmlQualifiedName urTypeName = new XmlQualifiedName(_urTypeID, _schemaNsID);
+            XmlQualifiedName urTypeName = new XmlQualifiedName(_urTypeID, Environment.Schemas.NamespaceId);
             if (arrayInfo.qname.Length > 0)
             {
                 qname = ToXmlQualifiedName(arrayInfo.qname, false);
@@ -1685,7 +1658,7 @@ namespace System.Xml.Serialization
                     if (_r.NamespaceURI.Length != 0)
                     {
                         type = _r.LocalName;
-                        if (_r.NamespaceURI == _soapNsID)
+                        if (_r.NamespaceURI == Environment.Schemas.SoapNamespaceId)
                             typens = XmlSchema.Namespace;
                         else
                             typens = _r.NamespaceURI;
@@ -1801,9 +1774,15 @@ namespace System.Xml.Serialization
 
             _r.MoveToContent();
 
-            if (ReadReference(out fixupReference)) return null;
+            if (ReadReference(out fixupReference))
+            {
+                return null;
+            }
 
-            if (ReadNull()) return null;
+            if (ReadNull())
+            {
+                return null;
+            }
 
             string? id = _soap12 ? _r.GetAttribute("id", Soap12.Encoding) : _r.GetAttribute("id", null);
 
@@ -1813,17 +1792,25 @@ namespace System.Xml.Serialization
                 if (typeId == null)
                 {
                     if (name == null)
+                    {
                         typeId = new XmlQualifiedName(_r.NameTable.Add(_r.LocalName), _r.NameTable.Add(_r.NamespaceURI));
+                    }
                     else
+                    {
                         typeId = new XmlQualifiedName(_r.NameTable.Add(name), _r.NameTable.Add(ns!));
+                    }
                 }
+
                 XmlSerializationReadCallback? callback = (XmlSerializationReadCallback?)_callbacks[typeId];
+
                 if (callback != null)
                 {
                     o = callback();
                 }
                 else
+                {
                     o = ReadTypedPrimitive(typeId, elementCanBeType);
+                }
             }
 
             AddTarget(id, o);
@@ -1889,9 +1876,9 @@ namespace System.Xml.Serialization
                 if (IsXmlnsAttribute(Reader.Name) || (Reader.Name == "id" && (!_soap12 || Reader.NamespaceURI == Soap12.Encoding)))
                     skippableNodeCount++;
                 if (Reader.LocalName == _typeID &&
-                     (Reader.NamespaceURI == _instanceNsID ||
-                       Reader.NamespaceURI == _instanceNs2000ID ||
-                       Reader.NamespaceURI == _instanceNs1999ID
+                     (Reader.NamespaceURI == Environment.Schemas.Instances.NamespaceId ||
+                       Reader.NamespaceURI == Environment.Schemas.Instances.Namespace2000Id ||
+                       Reader.NamespaceURI == Environment.Schemas.Instances.Namespace1999Id
                      )
                    )
                 {
@@ -1912,14 +1899,14 @@ namespace System.Xml.Serialization
             {
                 xsiTypeName = elemLocalName;
                 xsiTypeNs = elemNs;
-                XmlAttribute xsiTypeAttribute = Document.CreateAttribute(_typeID, _instanceNsID);
+                XmlAttribute xsiTypeAttribute = Document.CreateAttribute(_typeID, Environment.Schemas.Instances.NamespaceId);
                 xsiTypeAttribute.Value = elemName;
                 xmlNodeList.Add(xsiTypeAttribute);
             }
             if (xsiTypeName == Soap.UrType &&
-                (xsiTypeNs == _schemaNsID ||
-                  xsiTypeNs == _schemaNs1999ID ||
-                  xsiTypeNs == _schemaNs2000ID
+                (xsiTypeNs == Environment.Schemas.NamespaceId ||
+                  xsiTypeNs == Environment.Schemas.Namespace1999Id ||
+                  xsiTypeNs == Environment.Schemas.Namespace2000Id
                 )
                )
                 skippableNodeCount++;
