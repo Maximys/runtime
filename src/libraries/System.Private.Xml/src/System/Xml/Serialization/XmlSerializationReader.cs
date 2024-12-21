@@ -69,7 +69,6 @@ namespace System.Xml.Serialization
         private string _unsignedShortID = null!;
         private string _unsignedIntID = null!;
         private string _unsignedLongID = null!;
-        private string _oldDecimalID = null!;
         private string _oldTimeInstantID = null!;
 
         private string _anyURIID = null!;
@@ -205,7 +204,6 @@ namespace System.Xml.Serialization
             _unsignedShortID = _r.NameTable.Add(DataTypeNames.UInt16);
             _unsignedIntID = _r.NameTable.Add(DataTypeNames.UInt32);
             _unsignedLongID = _r.NameTable.Add(DataTypeNames.UInt64);
-            _oldDecimalID = _r.NameTable.Add(DataTypeNames.Decimal);
             _oldTimeInstantID = _r.NameTable.Add(DataTypeNames.OldTimeInstant);
             _charID = _r.NameTable.Add(DataTypeNames.Char);
             _guidID = _r.NameTable.Add(DataTypeNames.Guid);
@@ -375,7 +373,7 @@ namespace System.Xml.Serialization
                     return typeof(float);
                 else if (typeName.Name == _doubleID)
                     return typeof(double);
-                else if (typeName.Name == _oldDecimalID)
+                else if (typeName.Name == _decimalID)
                     return typeof(decimal);
                 else if (typeName.Name == _oldTimeInstantID)
                     return typeof(DateTime);
@@ -634,7 +632,7 @@ namespace System.Xml.Serialization
                     value = XmlConvert.ToSingle(ReadStringValue());
                 else if (type.Name == _doubleID)
                     value = XmlConvert.ToDouble(ReadStringValue());
-                else if (type.Name == _oldDecimalID)
+                else if (type.Name == _decimalID)
                     value = XmlConvert.ToDecimal(ReadStringValue());
                 else if (type.Name == _oldTimeInstantID)
                     value = ToDateTime(ReadStringValue());
