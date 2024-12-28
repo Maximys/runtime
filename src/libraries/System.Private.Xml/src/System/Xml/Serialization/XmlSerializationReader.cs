@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -9,9 +10,11 @@ using System.Reflection;
 using System.Xml.Schema;
 using System.Xml.Serialization.CodeGenerations;
 using System.Xml.Serialization.Environments;
+using System.Xml.Serialization.Environments.Comparers;
 using System.Xml.Serialization.Environments.Schemas;
 using System.Xml.Serialization.Environments.Types;
 using System.Xml.Serialization.Environments.Values;
+using System.Xml.Serialization.Mappings;
 using System.Xml.Serialization.Types;
 
 namespace System.Xml.Serialization
@@ -33,6 +36,7 @@ namespace System.Xml.Serialization
         private bool _soap12;
         private bool _isReturnValue;
         private bool _decodeName = true;
+        private FrozenDictionary<XmlQualifiedName, Mapper> TypeMappers { get; set; } = null!;
         private XmlEnvironment Environment { get; set; } = null!;
 
         private string _wsdlNsID = null!;
@@ -65,7 +69,8 @@ namespace System.Xml.Serialization
             _urTypeID = r.NameTable.Add(Soap.UrType);
             InitIDs();
 
-            Environment = PrepareEnvironment();
+            Environment ??= PrepareEnvironment();
+            TypeMappers ??= PrepareTypeMappers();
         }
 
         protected bool DecodeName
@@ -197,161 +202,41 @@ namespace System.Xml.Serialization
         // is recognized but typeName.Name isn't.
         private Type? GetPrimitiveType(XmlQualifiedName typeName, bool throwOnUnknown)
         {
-            if (typeName.Namespace == Environment.Schemas.NamespaceId || typeName.Namespace == Environment.Schemas.SoapNamespaceId || typeName.Namespace == Environment.Schemas.Soap12NamespaceId)
+            Type? returnValue;
+
+            if (TypeMappers.TryGetValue(typeName, out Mapper? mapper))
             {
-                if (typeName.Name == Environment.Types.PrimitiveTypes.StringId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.DurationId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.EntityId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GDayId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GYearId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.LanguageId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NormalizedStringId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NotationId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.TokenId)
-                    return typeof(string);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int32Id)
-                    return typeof(int);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.BooleanId)
-                    return typeof(bool);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int16Id)
-                    return typeof(short);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int64Id)
-                    return typeof(long);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.SingleId)
-                    return typeof(float);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DoubleId)
-                    return typeof(double);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DecimalId)
-                    return typeof(decimal);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateTimeId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
-                    return typeof(XmlQualifiedName);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.TimeId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
-                    return typeof(byte[]);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayBase64Id)
-                    return typeof(byte[]);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteId)
-                    return typeof(byte);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.SByteId)
-                    return typeof(sbyte);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt16Id)
-                    return typeof(ushort);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt32Id)
-                    return typeof(uint);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt64Id)
-                    return typeof(ulong);
-                else
-                    throw CreateUnknownTypeException(typeName);
+                returnValue = mapper.PrimitiveType;
             }
-            else if (typeName.Namespace == Environment.Schemas.Namespace2000Id || typeName.Namespace == Environment.Schemas.Namespace1999Id)
-            {
-                if (typeName.Name == Environment.Types.PrimitiveTypes.StringId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.DurationId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.EntityId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GDayId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GYearId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.IntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.LanguageId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NormalizedStringId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.NotationId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
-                    typeName.Name == Environment.Types.PrimitiveTypes.TokenId)
-                    return typeof(string);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int32Id)
-                    return typeof(int);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.BooleanId)
-                    return typeof(bool);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int16Id)
-                    return typeof(short);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.Int64Id)
-                    return typeof(long);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.SingleId)
-                    return typeof(float);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DoubleId)
-                    return typeof(double);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DecimalId)
-                    return typeof(decimal);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.OldTimeInstantId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
-                    return typeof(XmlQualifiedName);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.DateId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.TimeId)
-                    return typeof(DateTime);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
-                    return typeof(byte[]);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.SByteId)
-                    return typeof(sbyte);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt16Id)
-                    return typeof(ushort);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt32Id)
-                    return typeof(uint);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.UInt64Id)
-                    return typeof(ulong);
-                else
-                    throw CreateUnknownTypeException(typeName);
-            }
-            else if (typeName.Namespace == Environment.Schemas.NonXsdTypesNamespaceId)
-            {
-                if (typeName.Name == Environment.Types.PrimitiveTypes.CharId)
-                    return typeof(char);
-                else if (typeName.Name == Environment.Types.PrimitiveTypes.GuidId)
-                    return typeof(Guid);
-                else
-                    throw CreateUnknownTypeException(typeName);
-            }
-            else if (throwOnUnknown)
-                throw CreateUnknownTypeException(typeName);
             else
-                return null;
+            {
+                if ((typeName.Namespace == Environment.Schemas.NamespaceId)
+                    || (typeName.Namespace == Environment.Schemas.SoapNamespaceId)
+                    || (typeName.Namespace == Environment.Schemas.Soap12NamespaceId)
+                    || (typeName.Namespace == Environment.Schemas.Namespace2000Id)
+                    || (typeName.Namespace == Environment.Schemas.Namespace1999Id))
+                {
+                    throw CreateUnknownTypeException(typeName);
+                }
+                else
+                {
+                    if (throwOnUnknown)
+                    {
+                        throw CreateUnknownTypeException(typeName);
+                    }
+                    else
+                    {
+                        returnValue = null;
+                    }
+                }
+            }
+
+            return returnValue;
         }
 
         private bool IsPrimitiveNamespace(string ns)
         {
-            return ns == Environment.Schemas.NamespaceId ||
-                   ns == Environment.Schemas.NonXsdTypesNamespaceId ||
-                   ns == Environment.Schemas.SoapNamespaceId ||
-                   ns == Environment.Schemas.Soap12NamespaceId ||
-                   ns == Environment.Schemas.Namespace2000Id ||
-                   ns == Environment.Schemas.Namespace1999Id;
+            return Environment.Schemas.PrimitiveNamespaceIds.Value.Contains(ns);
         }
 
         internal XmlEnvironment PrepareEnvironment()
@@ -392,6 +277,379 @@ namespace System.Xml.Serialization
             };
 
             returnValue = new XmlEnvironment(schemas, types, values);
+
+            return returnValue;
+        }
+
+        internal FrozenDictionary<XmlQualifiedName, Mapper> PrepareTypeMappers()
+        {
+            Mapper mapperForAnyUriId,
+                mapperForBooleanId,
+                mapperForByteArrayBase64Id,
+                mapperForByteArrayHexId,
+                mapperForByteId,
+                mapperForCharId,
+                mapperForDateId,
+                mapperForDateTimeId,
+                mapperForDecimalId,
+                mapperForDoubleId,
+                mapperForDurationId,
+                mapperForEntitiesId,
+                mapperForEntityId,
+                mapperForGDayId,
+                mapperForGMonthDayId,
+                mapperForGMonthId,
+                mapperForGuidId,
+                mapperForGYearId,
+                mapperForGYearMonthId,
+                mapperForIdId,
+                mapperForIdRefId,
+                mapperForIdRefsId,
+                mapperForInt16Id,
+                mapperForInt32Id,
+                mapperForInt64Id,
+                mapperForIntegerId,
+                mapperForLanguageId,
+                mapperForNegativeIntegerId,
+                mapperForNoncolonizedNameId,
+                mapperForNonNegativeIntegerId,
+                mapperForNonPositiveIntegerId,
+                mapperForNormalizedStringId,
+                mapperForNotationId,
+                mapperForOldTimeInstantId,
+                mapperForPositiveIntegerId,
+                mapperForSByteId,
+                mapperForSingleId,
+                mapperForStringId,
+                mapperForTimeId,
+                mapperForTokenId,
+                mapperForUInt16Id,
+                mapperForUInt32Id,
+                mapperForUInt64Id,
+                mapperForXmlNameId,
+                mapperForXmlNmTokenId,
+                mapperForXmlNmTokensId,
+                mapperForXmlQualifiedNameId;
+            IReadOnlyList<KeyValuePair<XmlQualifiedName, Mapper>> rawTypeMappers;
+            FrozenDictionary<XmlQualifiedName, Mapper> returnValue;
+
+            mapperForAnyUriId = new Mapper(typeof(string));
+            mapperForBooleanId = new Mapper(typeof(bool));
+            mapperForByteArrayBase64Id = new Mapper(typeof(byte[]));
+            mapperForByteArrayHexId = new Mapper(typeof(byte[]));
+            mapperForByteId = new Mapper(typeof(byte));
+            mapperForCharId = new Mapper(typeof(char));
+            mapperForDateId = new Mapper(typeof(DateTime));
+            mapperForDateTimeId = new Mapper(typeof(DateTime));
+            mapperForDecimalId = new Mapper(typeof(decimal));
+            mapperForDoubleId = new Mapper(typeof(double));
+            mapperForDurationId = new Mapper(typeof(string));
+            mapperForEntitiesId = new Mapper(typeof(string));
+            mapperForEntityId = new Mapper(typeof(string));
+            mapperForGDayId = new Mapper(typeof(string));
+            mapperForGMonthDayId = new Mapper(typeof(string));
+            mapperForGMonthId = new Mapper(typeof(string));
+            mapperForGuidId = new Mapper(typeof(Guid));
+            mapperForGYearId = new Mapper(typeof(string));
+            mapperForGYearMonthId = new Mapper(typeof(string));
+            mapperForIdId = new Mapper(typeof(string));
+            mapperForIdRefId = new Mapper(typeof(string));
+            mapperForIdRefsId = new Mapper(typeof(string));
+            mapperForInt16Id = new Mapper(typeof(short));
+            mapperForInt32Id = new Mapper(typeof(int));
+            mapperForInt64Id = new Mapper(typeof(long));
+            mapperForIntegerId = new Mapper(typeof(string));
+            mapperForLanguageId = new Mapper(typeof(string));
+            mapperForNegativeIntegerId = new Mapper(typeof(string));
+            mapperForNoncolonizedNameId = new Mapper(typeof(string));
+            mapperForNonNegativeIntegerId = new Mapper(typeof(string));
+            mapperForNonPositiveIntegerId = new Mapper(typeof(string));
+            mapperForNormalizedStringId = new Mapper(typeof(string));
+            mapperForNotationId = new Mapper(typeof(string));
+            mapperForOldTimeInstantId = new Mapper(typeof(DateTime));
+            mapperForPositiveIntegerId = new Mapper(typeof(string));
+            mapperForSByteId = new Mapper(typeof(sbyte));
+            mapperForSingleId = new Mapper(typeof(float));
+            mapperForStringId = new Mapper(typeof(string));
+            mapperForTimeId = new Mapper(typeof(DateTime));
+            mapperForTokenId = new Mapper(typeof(string));
+            mapperForUInt16Id = new Mapper(typeof(ushort));
+            mapperForUInt32Id = new Mapper(typeof(uint));
+            mapperForUInt64Id = new Mapper(typeof(ulong));
+            mapperForXmlNameId = new Mapper(typeof(string));
+            mapperForXmlNmTokenId = new Mapper(typeof(string));
+            mapperForXmlNmTokensId = new Mapper(typeof(string));
+            mapperForXmlQualifiedNameId = new Mapper(typeof(XmlQualifiedName));
+
+            rawTypeMappers = new List<KeyValuePair<XmlQualifiedName, Mapper>>
+            {
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.NamespaceId), mapperForAnyUriId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Namespace1999Id), mapperForAnyUriId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Namespace2000Id), mapperForAnyUriId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.SoapNamespaceId), mapperForAnyUriId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Soap12NamespaceId), mapperForAnyUriId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.NamespaceId), mapperForBooleanId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.Namespace1999Id), mapperForBooleanId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.Namespace2000Id), mapperForBooleanId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.SoapNamespaceId), mapperForBooleanId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.Soap12NamespaceId), mapperForBooleanId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayBase64Id, Environment.Schemas.NamespaceId), mapperForByteArrayBase64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayBase64Id, Environment.Schemas.SoapNamespaceId), mapperForByteArrayBase64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayBase64Id, Environment.Schemas.Soap12NamespaceId), mapperForByteArrayBase64Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayHexId, Environment.Schemas.NamespaceId), mapperForByteArrayHexId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayHexId, Environment.Schemas.Namespace1999Id), mapperForByteArrayHexId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayHexId, Environment.Schemas.Namespace2000Id), mapperForByteArrayHexId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayHexId, Environment.Schemas.SoapNamespaceId), mapperForByteArrayHexId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteArrayHexId, Environment.Schemas.Soap12NamespaceId), mapperForByteArrayHexId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteId, Environment.Schemas.NamespaceId), mapperForByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteId, Environment.Schemas.SoapNamespaceId), mapperForByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.ByteId, Environment.Schemas.Soap12NamespaceId), mapperForByteId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.CharId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForCharId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateId, Environment.Schemas.NamespaceId), mapperForDateId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateId, Environment.Schemas.Namespace1999Id), mapperForDateId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateId, Environment.Schemas.Namespace2000Id), mapperForDateId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateId, Environment.Schemas.SoapNamespaceId), mapperForDateId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateId, Environment.Schemas.Soap12NamespaceId), mapperForDateId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.NamespaceId), mapperForDateTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.SoapNamespaceId), mapperForDateTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.Soap12NamespaceId), mapperForDateTimeId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.NamespaceId), mapperForDecimalId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.Namespace1999Id), mapperForDecimalId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.Namespace2000Id), mapperForDecimalId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.SoapNamespaceId), mapperForDecimalId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.Soap12NamespaceId), mapperForDecimalId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DoubleId, Environment.Schemas.NamespaceId), mapperForDoubleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DoubleId, Environment.Schemas.Namespace1999Id), mapperForDoubleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DoubleId, Environment.Schemas.Namespace2000Id), mapperForDoubleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DoubleId, Environment.Schemas.SoapNamespaceId), mapperForDoubleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DoubleId, Environment.Schemas.Soap12NamespaceId), mapperForDoubleId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DurationId, Environment.Schemas.NamespaceId), mapperForDurationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DurationId, Environment.Schemas.Namespace1999Id), mapperForDurationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DurationId, Environment.Schemas.Namespace2000Id), mapperForDurationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DurationId, Environment.Schemas.SoapNamespaceId), mapperForDurationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DurationId, Environment.Schemas.Soap12NamespaceId), mapperForDurationId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntitiesId, Environment.Schemas.NamespaceId), mapperForEntitiesId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntitiesId, Environment.Schemas.Namespace1999Id), mapperForEntitiesId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntitiesId, Environment.Schemas.Namespace2000Id), mapperForEntitiesId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntitiesId, Environment.Schemas.SoapNamespaceId), mapperForEntitiesId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntitiesId, Environment.Schemas.Soap12NamespaceId), mapperForEntitiesId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntityId, Environment.Schemas.NamespaceId), mapperForEntityId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntityId, Environment.Schemas.Namespace1999Id), mapperForEntityId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntityId, Environment.Schemas.Namespace2000Id), mapperForEntityId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntityId, Environment.Schemas.SoapNamespaceId), mapperForEntityId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.EntityId, Environment.Schemas.Soap12NamespaceId), mapperForEntityId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GDayId, Environment.Schemas.NamespaceId), mapperForGDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GDayId, Environment.Schemas.Namespace1999Id), mapperForGDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GDayId, Environment.Schemas.Namespace2000Id), mapperForGDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GDayId, Environment.Schemas.SoapNamespaceId), mapperForGDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GDayId, Environment.Schemas.Soap12NamespaceId), mapperForGDayId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthDayId, Environment.Schemas.NamespaceId), mapperForGMonthDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthDayId, Environment.Schemas.Namespace1999Id), mapperForGMonthDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthDayId, Environment.Schemas.Namespace2000Id), mapperForGMonthDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthDayId, Environment.Schemas.SoapNamespaceId), mapperForGMonthDayId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthDayId, Environment.Schemas.Soap12NamespaceId), mapperForGMonthDayId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthId, Environment.Schemas.NamespaceId), mapperForGMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthId, Environment.Schemas.Namespace1999Id), mapperForGMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthId, Environment.Schemas.Namespace2000Id), mapperForGMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthId, Environment.Schemas.SoapNamespaceId), mapperForGMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GMonthId, Environment.Schemas.Soap12NamespaceId), mapperForGMonthId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GuidId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForGuidId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearId, Environment.Schemas.NamespaceId), mapperForGYearId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearId, Environment.Schemas.Namespace1999Id), mapperForGYearId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearId, Environment.Schemas.Namespace2000Id), mapperForGYearId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearId, Environment.Schemas.SoapNamespaceId), mapperForGYearId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearId, Environment.Schemas.Soap12NamespaceId), mapperForGYearId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearMonthId, Environment.Schemas.NamespaceId), mapperForGYearMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearMonthId, Environment.Schemas.Namespace1999Id), mapperForGYearMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearMonthId, Environment.Schemas.Namespace2000Id), mapperForGYearMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearMonthId, Environment.Schemas.SoapNamespaceId), mapperForGYearMonthId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.GYearMonthId, Environment.Schemas.Soap12NamespaceId), mapperForGYearMonthId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdId, Environment.Schemas.NamespaceId), mapperForIdId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdId, Environment.Schemas.Namespace1999Id), mapperForIdId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdId, Environment.Schemas.Namespace2000Id), mapperForIdId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdId, Environment.Schemas.SoapNamespaceId), mapperForIdId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdId, Environment.Schemas.Soap12NamespaceId), mapperForIdId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefId, Environment.Schemas.NamespaceId), mapperForIdRefId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefId, Environment.Schemas.Namespace1999Id), mapperForIdRefId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefId, Environment.Schemas.Namespace2000Id), mapperForIdRefId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefId, Environment.Schemas.SoapNamespaceId), mapperForIdRefId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefId, Environment.Schemas.Soap12NamespaceId), mapperForIdRefId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefsId, Environment.Schemas.NamespaceId), mapperForIdRefsId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefsId, Environment.Schemas.Namespace1999Id), mapperForIdRefsId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefsId, Environment.Schemas.Namespace2000Id), mapperForIdRefsId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefsId, Environment.Schemas.SoapNamespaceId), mapperForIdRefsId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IdRefsId, Environment.Schemas.Soap12NamespaceId), mapperForIdRefsId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int16Id, Environment.Schemas.NamespaceId), mapperForInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int16Id, Environment.Schemas.Namespace1999Id), mapperForInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int16Id, Environment.Schemas.Namespace2000Id), mapperForInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int16Id, Environment.Schemas.SoapNamespaceId), mapperForInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int16Id, Environment.Schemas.Soap12NamespaceId), mapperForInt16Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int32Id, Environment.Schemas.NamespaceId), mapperForInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int32Id, Environment.Schemas.Namespace1999Id), mapperForInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int32Id, Environment.Schemas.Namespace2000Id), mapperForInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int32Id, Environment.Schemas.SoapNamespaceId), mapperForInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int32Id, Environment.Schemas.Soap12NamespaceId), mapperForInt32Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int64Id, Environment.Schemas.NamespaceId), mapperForInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int64Id, Environment.Schemas.Namespace1999Id), mapperForInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int64Id, Environment.Schemas.Namespace2000Id), mapperForInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int64Id, Environment.Schemas.SoapNamespaceId), mapperForInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Int64Id, Environment.Schemas.Soap12NamespaceId), mapperForInt64Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IntegerId, Environment.Schemas.NamespaceId), mapperForIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IntegerId, Environment.Schemas.Namespace1999Id), mapperForIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IntegerId, Environment.Schemas.Namespace2000Id), mapperForIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IntegerId, Environment.Schemas.SoapNamespaceId), mapperForIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.IntegerId, Environment.Schemas.Soap12NamespaceId), mapperForIntegerId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.LanguageId, Environment.Schemas.NamespaceId), mapperForLanguageId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.LanguageId, Environment.Schemas.Namespace1999Id), mapperForLanguageId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.LanguageId, Environment.Schemas.Namespace2000Id), mapperForLanguageId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.LanguageId, Environment.Schemas.SoapNamespaceId), mapperForLanguageId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.LanguageId, Environment.Schemas.Soap12NamespaceId), mapperForLanguageId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NegativeIntegerId, Environment.Schemas.NamespaceId), mapperForNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NegativeIntegerId, Environment.Schemas.Namespace1999Id), mapperForNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NegativeIntegerId, Environment.Schemas.Namespace2000Id), mapperForNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NegativeIntegerId, Environment.Schemas.SoapNamespaceId), mapperForNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NegativeIntegerId, Environment.Schemas.Soap12NamespaceId), mapperForNegativeIntegerId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NoncolonizedNameId, Environment.Schemas.NamespaceId), mapperForNoncolonizedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NoncolonizedNameId, Environment.Schemas.Namespace1999Id), mapperForNoncolonizedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NoncolonizedNameId, Environment.Schemas.Namespace2000Id), mapperForNoncolonizedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NoncolonizedNameId, Environment.Schemas.SoapNamespaceId), mapperForNoncolonizedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NoncolonizedNameId, Environment.Schemas.Soap12NamespaceId), mapperForNoncolonizedNameId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonNegativeIntegerId, Environment.Schemas.NamespaceId), mapperForNonNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonNegativeIntegerId, Environment.Schemas.Namespace1999Id), mapperForNonNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonNegativeIntegerId, Environment.Schemas.Namespace2000Id), mapperForNonNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonNegativeIntegerId, Environment.Schemas.SoapNamespaceId), mapperForNonNegativeIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonNegativeIntegerId, Environment.Schemas.Soap12NamespaceId), mapperForNonNegativeIntegerId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonPositiveIntegerId, Environment.Schemas.NamespaceId), mapperForNonPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonPositiveIntegerId, Environment.Schemas.Namespace1999Id), mapperForNonPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonPositiveIntegerId, Environment.Schemas.Namespace2000Id), mapperForNonPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonPositiveIntegerId, Environment.Schemas.SoapNamespaceId), mapperForNonPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NonPositiveIntegerId, Environment.Schemas.Soap12NamespaceId), mapperForNonPositiveIntegerId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NormalizedStringId, Environment.Schemas.NamespaceId), mapperForNormalizedStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NormalizedStringId, Environment.Schemas.Namespace1999Id), mapperForNormalizedStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NormalizedStringId, Environment.Schemas.Namespace2000Id), mapperForNormalizedStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NormalizedStringId, Environment.Schemas.SoapNamespaceId), mapperForNormalizedStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NormalizedStringId, Environment.Schemas.Soap12NamespaceId), mapperForNormalizedStringId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.NamespaceId), mapperForNotationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.Namespace1999Id), mapperForNotationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.Namespace2000Id), mapperForNotationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.SoapNamespaceId), mapperForNotationId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.Soap12NamespaceId), mapperForNotationId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.Namespace1999Id), mapperForOldTimeInstantId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.Namespace2000Id), mapperForOldTimeInstantId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.NamespaceId), mapperForPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.Namespace1999Id), mapperForPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.Namespace2000Id), mapperForPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.SoapNamespaceId), mapperForPositiveIntegerId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.Soap12NamespaceId), mapperForPositiveIntegerId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SByteId, Environment.Schemas.NamespaceId), mapperForSByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SByteId, Environment.Schemas.Namespace1999Id), mapperForSByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SByteId, Environment.Schemas.Namespace2000Id), mapperForSByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SByteId, Environment.Schemas.SoapNamespaceId), mapperForSByteId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SByteId, Environment.Schemas.Soap12NamespaceId), mapperForSByteId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SingleId, Environment.Schemas.NamespaceId), mapperForSingleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SingleId, Environment.Schemas.Namespace1999Id), mapperForSingleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SingleId, Environment.Schemas.Namespace2000Id), mapperForSingleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SingleId, Environment.Schemas.SoapNamespaceId), mapperForSingleId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.SingleId, Environment.Schemas.Soap12NamespaceId), mapperForSingleId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.StringId, Environment.Schemas.NamespaceId), mapperForStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.StringId, Environment.Schemas.Namespace1999Id), mapperForStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.StringId, Environment.Schemas.Namespace2000Id), mapperForStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.StringId, Environment.Schemas.SoapNamespaceId), mapperForStringId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.StringId, Environment.Schemas.Soap12NamespaceId), mapperForStringId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.NamespaceId), mapperForTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Namespace1999Id), mapperForTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Namespace2000Id), mapperForTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.SoapNamespaceId), mapperForTimeId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Soap12NamespaceId), mapperForTimeId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.NamespaceId), mapperForTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.Namespace1999Id), mapperForTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.Namespace2000Id), mapperForTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.SoapNamespaceId), mapperForTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.Soap12NamespaceId), mapperForTokenId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt16Id, Environment.Schemas.NamespaceId), mapperForUInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt16Id, Environment.Schemas.Namespace1999Id), mapperForUInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt16Id, Environment.Schemas.Namespace2000Id), mapperForUInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt16Id, Environment.Schemas.SoapNamespaceId), mapperForUInt16Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt16Id, Environment.Schemas.Soap12NamespaceId), mapperForUInt16Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt32Id, Environment.Schemas.NamespaceId), mapperForUInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt32Id, Environment.Schemas.Namespace1999Id), mapperForUInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt32Id, Environment.Schemas.Namespace2000Id), mapperForUInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt32Id, Environment.Schemas.SoapNamespaceId), mapperForUInt32Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt32Id, Environment.Schemas.Soap12NamespaceId), mapperForUInt32Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt64Id, Environment.Schemas.NamespaceId), mapperForUInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt64Id, Environment.Schemas.Namespace1999Id), mapperForUInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt64Id, Environment.Schemas.Namespace2000Id), mapperForUInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt64Id, Environment.Schemas.SoapNamespaceId), mapperForUInt64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.UInt64Id, Environment.Schemas.Soap12NamespaceId), mapperForUInt64Id),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNameId, Environment.Schemas.NamespaceId), mapperForXmlNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNameId, Environment.Schemas.Namespace1999Id), mapperForXmlNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNameId, Environment.Schemas.Namespace2000Id), mapperForXmlNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNameId, Environment.Schemas.SoapNamespaceId), mapperForXmlNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNameId, Environment.Schemas.Soap12NamespaceId), mapperForXmlNameId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokenId, Environment.Schemas.NamespaceId), mapperForXmlNmTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokenId, Environment.Schemas.Namespace1999Id), mapperForXmlNmTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokenId, Environment.Schemas.Namespace2000Id), mapperForXmlNmTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokenId, Environment.Schemas.SoapNamespaceId), mapperForXmlNmTokenId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokenId, Environment.Schemas.Soap12NamespaceId), mapperForXmlNmTokenId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokensId, Environment.Schemas.NamespaceId), mapperForXmlNmTokensId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokensId, Environment.Schemas.Namespace1999Id), mapperForXmlNmTokensId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokensId, Environment.Schemas.Namespace2000Id), mapperForXmlNmTokensId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokensId, Environment.Schemas.SoapNamespaceId), mapperForXmlNmTokensId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlNmTokensId, Environment.Schemas.Soap12NamespaceId), mapperForXmlNmTokensId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlQualifiedNameId, Environment.Schemas.NamespaceId), mapperForXmlQualifiedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlQualifiedNameId, Environment.Schemas.Namespace1999Id), mapperForXmlQualifiedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlQualifiedNameId, Environment.Schemas.Namespace2000Id), mapperForXmlQualifiedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlQualifiedNameId, Environment.Schemas.SoapNamespaceId), mapperForXmlQualifiedNameId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.XmlQualifiedNameId, Environment.Schemas.Soap12NamespaceId), mapperForXmlQualifiedNameId),
+            };
+
+            returnValue = FrozenDictionary.ToFrozenDictionary(rawTypeMappers, new XmlQualifiedNameComparer());
 
             return returnValue;
         }

@@ -42,6 +42,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>TextUtf8RawTextWriter.tt</DependentUpon>
     </Compile>
+    <Compile Include="System\Xml\Serialization\Environments\Comparers\XmlQualifiedNameComparer.cs" />
     <Compile Include="System\Xml\Serialization\Environments\Schemas\InstancesEnvironment.cs" />
     <Compile Include="System\Xml\Serialization\Environments\Schemas\SchemasEnvironment.cs" />
     <Compile Include="System\Xml\Serialization\Environments\Types\PrimitiveTypesEnvironment.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\TextAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Accessors\XmlnsAccessor.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\ConstantMapping.cs" />
+    <Compile Include="System\Xml\Serialization\Mappings\Mapper.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\INavigationNameScope.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameKey.cs" />
     <Compile Include="System\Xml\Serialization\Mappings\Navigation\NavigationNameTable.cs" />
@@ -813,6 +815,7 @@
     <ProjectReference Include="$(LibrariesProjectRoot)System.Text.RegularExpressions\gen\System.Text.RegularExpressions.Generator.csproj" ReferenceOutputAssembly="false" SetTargetFramework="TargetFramework=netstandard2.0" OutputItemType="Analyzer" />
     <Reference Include="System.Collections" />
     <Reference Include="System.Collections.Concurrent" />
+    <Reference Include="System.Collections.Immutable" />
     <Reference Include="System.Collections.NonGeneric" />
     <Reference Include="System.Collections.Specialized" />
     <Reference Include="System.Console" />
