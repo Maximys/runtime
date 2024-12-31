@@ -284,6 +284,7 @@ namespace System.Xml.Serialization
         internal FrozenDictionary<XmlQualifiedName, Mapper> PrepareTypeMappers()
         {
             Mapper mapperForAnyUriId,
+                mapperForBase64Id,
                 mapperForBooleanId,
                 mapperForByteArrayBase64Id,
                 mapperForByteArrayHexId,
@@ -291,6 +292,7 @@ namespace System.Xml.Serialization
                 mapperForCharId,
                 mapperForDateId,
                 mapperForDateTimeId,
+                mapperForDateTimeOffsetId,
                 mapperForDecimalId,
                 mapperForDoubleId,
                 mapperForDurationId,
@@ -322,6 +324,7 @@ namespace System.Xml.Serialization
                 mapperForSingleId,
                 mapperForStringId,
                 mapperForTimeId,
+                mapperForTimeSpanId,
                 mapperForTokenId,
                 mapperForUInt16Id,
                 mapperForUInt32Id,
@@ -334,6 +337,7 @@ namespace System.Xml.Serialization
             FrozenDictionary<XmlQualifiedName, Mapper> returnValue;
 
             mapperForAnyUriId = new Mapper(typeof(string));
+            mapperForBase64Id = new Mapper(typeof(byte[]));
             mapperForBooleanId = new Mapper(typeof(bool));
             mapperForByteArrayBase64Id = new Mapper(typeof(byte[]));
             mapperForByteArrayHexId = new Mapper(typeof(byte[]));
@@ -341,6 +345,7 @@ namespace System.Xml.Serialization
             mapperForCharId = new Mapper(typeof(char));
             mapperForDateId = new Mapper(typeof(DateTime));
             mapperForDateTimeId = new Mapper(typeof(DateTime));
+            mapperForDateTimeOffsetId = new Mapper(typeof(DateTimeOffset));
             mapperForDecimalId = new Mapper(typeof(decimal));
             mapperForDoubleId = new Mapper(typeof(double));
             mapperForDurationId = new Mapper(typeof(string));
@@ -372,6 +377,7 @@ namespace System.Xml.Serialization
             mapperForSingleId = new Mapper(typeof(float));
             mapperForStringId = new Mapper(typeof(string));
             mapperForTimeId = new Mapper(typeof(DateTime));
+            mapperForTimeSpanId = new Mapper(typeof(TimeSpan));
             mapperForTokenId = new Mapper(typeof(string));
             mapperForUInt16Id = new Mapper(typeof(ushort));
             mapperForUInt32Id = new Mapper(typeof(uint));
@@ -388,6 +394,9 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Namespace2000Id), mapperForAnyUriId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.SoapNamespaceId), mapperForAnyUriId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Soap12NamespaceId), mapperForAnyUriId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Base64Id, Environment.Schemas.SoapNamespaceId), mapperForBase64Id),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Base64Id, Environment.Schemas.Soap12NamespaceId), mapperForBase64Id),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.NamespaceId), mapperForBooleanId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.Namespace1999Id), mapperForBooleanId),
@@ -420,6 +429,8 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.NamespaceId), mapperForDateTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.SoapNamespaceId), mapperForDateTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.Soap12NamespaceId), mapperForDateTimeId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeOffsetId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForDateTimeOffsetId),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.NamespaceId), mapperForDecimalId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.Namespace1999Id), mapperForDecimalId),
@@ -599,6 +610,8 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Namespace2000Id), mapperForTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.SoapNamespaceId), mapperForTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Soap12NamespaceId), mapperForTimeId),
+
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeSpanId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForTimeSpanId),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.NamespaceId), mapperForTokenId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.Namespace1999Id), mapperForTokenId),
