@@ -7,9 +7,14 @@ namespace System.Xml.Serialization.Mappings
     {
         public Type PrimitiveType { get; }
 
-        public Mapper(Type primitiveType)
+        public Func<object?> ReadPrimitiveValue { get; }
+
+        public Mapper(
+            Type primitiveType,
+            Func<object?> readPrimitiveValue)
         {
             PrimitiveType = primitiveType;
+            ReadPrimitiveValue = readPrimitiveValue;
         }
     }
 }

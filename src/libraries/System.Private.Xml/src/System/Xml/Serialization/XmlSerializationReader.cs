@@ -336,56 +336,56 @@ namespace System.Xml.Serialization
             IReadOnlyList<KeyValuePair<XmlQualifiedName, Mapper>> rawTypeMappers;
             FrozenDictionary<XmlQualifiedName, Mapper> returnValue;
 
-            mapperForAnyUriId = new Mapper(typeof(string));
-            mapperForBase64Id = new Mapper(typeof(byte[]));
-            mapperForBooleanId = new Mapper(typeof(bool));
-            mapperForByteArrayBase64Id = new Mapper(typeof(byte[]));
-            mapperForByteArrayHexId = new Mapper(typeof(byte[]));
-            mapperForByteId = new Mapper(typeof(byte));
-            mapperForCharId = new Mapper(typeof(char));
-            mapperForDateId = new Mapper(typeof(DateTime));
-            mapperForDateTimeId = new Mapper(typeof(DateTime));
-            mapperForDateTimeOffsetId = new Mapper(typeof(DateTimeOffset));
-            mapperForDecimalId = new Mapper(typeof(decimal));
-            mapperForDoubleId = new Mapper(typeof(double));
-            mapperForDurationId = new Mapper(typeof(string));
-            mapperForEntitiesId = new Mapper(typeof(string));
-            mapperForEntityId = new Mapper(typeof(string));
-            mapperForGDayId = new Mapper(typeof(string));
-            mapperForGMonthDayId = new Mapper(typeof(string));
-            mapperForGMonthId = new Mapper(typeof(string));
-            mapperForGuidId = new Mapper(typeof(Guid));
-            mapperForGYearId = new Mapper(typeof(string));
-            mapperForGYearMonthId = new Mapper(typeof(string));
-            mapperForIdId = new Mapper(typeof(string));
-            mapperForIdRefId = new Mapper(typeof(string));
-            mapperForIdRefsId = new Mapper(typeof(string));
-            mapperForInt16Id = new Mapper(typeof(short));
-            mapperForInt32Id = new Mapper(typeof(int));
-            mapperForInt64Id = new Mapper(typeof(long));
-            mapperForIntegerId = new Mapper(typeof(string));
-            mapperForLanguageId = new Mapper(typeof(string));
-            mapperForNegativeIntegerId = new Mapper(typeof(string));
-            mapperForNoncolonizedNameId = new Mapper(typeof(string));
-            mapperForNonNegativeIntegerId = new Mapper(typeof(string));
-            mapperForNonPositiveIntegerId = new Mapper(typeof(string));
-            mapperForNormalizedStringId = new Mapper(typeof(string));
-            mapperForNotationId = new Mapper(typeof(string));
-            mapperForOldTimeInstantId = new Mapper(typeof(DateTime));
-            mapperForPositiveIntegerId = new Mapper(typeof(string));
-            mapperForSByteId = new Mapper(typeof(sbyte));
-            mapperForSingleId = new Mapper(typeof(float));
-            mapperForStringId = new Mapper(typeof(string));
-            mapperForTimeId = new Mapper(typeof(DateTime));
-            mapperForTimeSpanId = new Mapper(typeof(TimeSpan));
-            mapperForTokenId = new Mapper(typeof(string));
-            mapperForUInt16Id = new Mapper(typeof(ushort));
-            mapperForUInt32Id = new Mapper(typeof(uint));
-            mapperForUInt64Id = new Mapper(typeof(ulong));
-            mapperForXmlNameId = new Mapper(typeof(string));
-            mapperForXmlNmTokenId = new Mapper(typeof(string));
-            mapperForXmlNmTokensId = new Mapper(typeof(string));
-            mapperForXmlQualifiedNameId = new Mapper(typeof(XmlQualifiedName));
+            mapperForAnyUriId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForBase64Id = new Mapper(typeof(byte[]), () => ReadByteArray(true));
+            mapperForBooleanId = new Mapper(typeof(bool), () => XmlConvert.ToBoolean(ReadStringValue()));
+            mapperForByteArrayBase64Id = new Mapper(typeof(byte[]), () => ReadByteArray(true));
+            mapperForByteArrayHexId = new Mapper(typeof(byte[]), () => ReadByteArray(false));
+            mapperForByteId = new Mapper(typeof(byte), () => XmlConvert.ToByte(ReadStringValue()));
+            mapperForCharId = new Mapper(typeof(char), () => XmlCustomFormatter.ToChar(ReadStringValue()));
+            mapperForDateId = new Mapper(typeof(DateTime), () => XmlCustomFormatter.ToDate(ReadStringValue()));
+            mapperForDateTimeId = new Mapper(typeof(DateTime), () => XmlCustomFormatter.ToDateTime(ReadStringValue()));
+            mapperForDateTimeOffsetId = new Mapper(typeof(DateTimeOffset), () => XmlConvert.ToDateTimeOffset(ReadStringValue()));
+            mapperForDecimalId = new Mapper(typeof(decimal), () => XmlConvert.ToDecimal(ReadStringValue()));
+            mapperForDoubleId = new Mapper(typeof(double), () => XmlConvert.ToDouble(ReadStringValue()));
+            mapperForDurationId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForEntitiesId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForEntityId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForGDayId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForGMonthDayId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForGMonthId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForGuidId = new Mapper(typeof(Guid), () => new Guid(CollapseWhitespace(ReadStringValue())));
+            mapperForGYearId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForGYearMonthId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForIdId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForIdRefId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForIdRefsId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForInt16Id = new Mapper(typeof(short), () => XmlConvert.ToInt16(ReadStringValue()));
+            mapperForInt32Id = new Mapper(typeof(int), () => XmlConvert.ToInt32(ReadStringValue()));
+            mapperForInt64Id = new Mapper(typeof(long), () => XmlConvert.ToInt64(ReadStringValue()));
+            mapperForIntegerId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForLanguageId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForNegativeIntegerId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForNoncolonizedNameId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForNonNegativeIntegerId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForNonPositiveIntegerId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForNormalizedStringId = new Mapper(typeof(string), ReadStringValue);
+            mapperForNotationId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForOldTimeInstantId = new Mapper(typeof(DateTime), () => XmlCustomFormatter.ToDateTime(ReadStringValue()));
+            mapperForPositiveIntegerId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForSByteId = new Mapper(typeof(sbyte), () => XmlConvert.ToSByte(ReadStringValue()));
+            mapperForSingleId = new Mapper(typeof(float), () => XmlConvert.ToSingle(ReadStringValue()));
+            mapperForStringId = new Mapper(typeof(string), ReadStringValue);
+            mapperForTimeId = new Mapper(typeof(DateTime), () => XmlCustomFormatter.ToTime(ReadStringValue()));
+            mapperForTimeSpanId = new Mapper(typeof(TimeSpan), () => XmlConvert.ToTimeSpan(ReadStringValue()));
+            mapperForTokenId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForUInt16Id = new Mapper(typeof(ushort), () => XmlConvert.ToUInt16(ReadStringValue()));
+            mapperForUInt32Id = new Mapper(typeof(uint), () => XmlConvert.ToUInt32(ReadStringValue()));
+            mapperForUInt64Id = new Mapper(typeof(ulong), () => XmlConvert.ToUInt64(ReadStringValue()));
+            mapperForXmlNameId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForXmlNmTokenId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForXmlNmTokensId = new Mapper(typeof(string), () => CollapseWhitespace(ReadStringValue()));
+            mapperForXmlQualifiedNameId = new Mapper(typeof(XmlQualifiedName), ReadXmlQualifiedName);
 
             rawTypeMappers = new List<KeyValuePair<XmlQualifiedName, Mapper>>
             {
@@ -764,157 +764,15 @@ namespace System.Xml.Serialization
                 return ReadXmlNodes(elementCanBeType);
             }
 
-            if (type.Namespace == Environment.Schemas.NamespaceId || type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId)
+            if (TypeMappers.TryGetValue(type, out Mapper? mapper))
             {
-                if (type.Name == Environment.Types.PrimitiveTypes.StringId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NormalizedStringId)
-                    value = ReadStringValue();
-                else if (type.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
-                    type.Name == Environment.Types.PrimitiveTypes.DurationId ||
-                    type.Name == Environment.Types.PrimitiveTypes.EntityId ||
-                    type.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GDayId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GMonthId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GYearId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdRefId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.LanguageId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NotationId ||
-                    type.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.TokenId)
-                    value = CollapseWhitespace(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int32Id)
-                    value = XmlConvert.ToInt32(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.BooleanId)
-                    value = XmlConvert.ToBoolean(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int16Id)
-                    value = XmlConvert.ToInt16(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int64Id)
-                    value = XmlConvert.ToInt64(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.SingleId)
-                    value = XmlConvert.ToSingle(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DoubleId)
-                    value = XmlConvert.ToDouble(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DecimalId)
-                    value = XmlConvert.ToDecimal(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeId)
-                    value = ToDateTime(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
-                    value = ReadXmlQualifiedName();
-                else if (type.Name == Environment.Types.PrimitiveTypes.DateId)
-                    value = ToDate(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.TimeId)
-                    value = ToTime(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.ByteId)
-                    value = XmlConvert.ToByte(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.SByteId)
-                    value = XmlConvert.ToSByte(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt16Id)
-                    value = XmlConvert.ToUInt16(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt32Id)
-                    value = XmlConvert.ToUInt32(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt64Id)
-                    value = XmlConvert.ToUInt64(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayHexId)
-                    value = ToByteArrayHex(false);
-                else if (type.Name == Environment.Types.PrimitiveTypes.ByteArrayBase64Id)
-                    value = ToByteArrayBase64(false);
-                else if (type.Name == Environment.Types.PrimitiveTypes.Base64Id && (type.Namespace == Environment.Schemas.SoapNamespaceId || type.Namespace == Environment.Schemas.Soap12NamespaceId))
-                    value = ToByteArrayBase64(false);
-                else
-                    value = ReadXmlNodes(elementCanBeType);
-            }
-            else if (type.Namespace == Environment.Schemas.Namespace2000Id || type.Namespace == Environment.Schemas.Namespace1999Id)
-            {
-                if (type.Name == Environment.Types.PrimitiveTypes.StringId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NormalizedStringId)
-                    value = ReadStringValue();
-                else if (type.Name == Environment.Types.PrimitiveTypes.AnyUriId ||
-                    type.Name == Environment.Types.PrimitiveTypes.DurationId ||
-                    type.Name == Environment.Types.PrimitiveTypes.EntityId ||
-                    type.Name == Environment.Types.PrimitiveTypes.EntitiesId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GDayId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GMonthId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GMonthDayId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GYearId ||
-                    type.Name == Environment.Types.PrimitiveTypes.GYearMonthId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdRefId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IdRefsId ||
-                    type.Name == Environment.Types.PrimitiveTypes.IntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.LanguageId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNameId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NoncolonizedNameId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokenId ||
-                    type.Name == Environment.Types.PrimitiveTypes.XmlNmTokensId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NegativeIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NonPositiveIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NonNegativeIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.NotationId ||
-                    type.Name == Environment.Types.PrimitiveTypes.PositiveIntegerId ||
-                    type.Name == Environment.Types.PrimitiveTypes.TokenId)
-                    value = CollapseWhitespace(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int32Id)
-                    value = XmlConvert.ToInt32(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.BooleanId)
-                    value = XmlConvert.ToBoolean(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int16Id)
-                    value = XmlConvert.ToInt16(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.Int64Id)
-                    value = XmlConvert.ToInt64(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.SingleId)
-                    value = XmlConvert.ToSingle(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DoubleId)
-                    value = XmlConvert.ToDouble(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DecimalId)
-                    value = XmlConvert.ToDecimal(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.OldTimeInstantId)
-                    value = ToDateTime(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.XmlQualifiedNameId)
-                    value = ReadXmlQualifiedName();
-                else if (type.Name == Environment.Types.PrimitiveTypes.DateId)
-                    value = ToDate(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.TimeId)
-                    value = ToTime(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.ByteId)
-                    value = XmlConvert.ToByte(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.SByteId)
-                    value = XmlConvert.ToSByte(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt16Id)
-                    value = XmlConvert.ToUInt16(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt32Id)
-                    value = XmlConvert.ToUInt32(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.UInt64Id)
-                    value = XmlConvert.ToUInt64(ReadStringValue());
-                else
-                    value = ReadXmlNodes(elementCanBeType);
-            }
-            else if (type.Namespace == Environment.Schemas.NonXsdTypesNamespaceId)
-            {
-                if (type.Name == Environment.Types.PrimitiveTypes.CharId)
-                    value = ToChar(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.GuidId)
-                    value = new Guid(CollapseWhitespace(ReadStringValue()));
-                else if (type.Name == Environment.Types.PrimitiveTypes.TimeSpanId)
-                    value = XmlConvert.ToTimeSpan(ReadStringValue());
-                else if (type.Name == Environment.Types.PrimitiveTypes.DateTimeOffsetId)
-                    value = XmlConvert.ToDateTimeOffset(ReadStringValue());
-                else
-                    value = ReadXmlNodes(elementCanBeType);
+                value = mapper.ReadPrimitiveValue();
             }
             else
+            {
                 value = ReadXmlNodes(elementCanBeType);
+            }
+
             return value;
         }
 
