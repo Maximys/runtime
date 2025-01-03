@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>$(NetCoreAppCurrent)-windows;$(NetCoreAppCurrent)</TargetFrameworks>
@@ -306,6 +306,8 @@
     <Compile Include="System\Xml\Serialization\Generations\CodeGenerations\XmlSerializationCodeGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationILGen.cs" />
     <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.Member.cs" />
+    <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.SourceType.cs" />
     <Compile Include="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationWriterILGen.cs" />
     <Compile Include="System\Xml\XPath\IXPathNavigable.cs" />
     <Compile Include="System\Xml\XPath\XPathDocument.cs" />
@@ -565,6 +567,15 @@
     <Compile Include="System\Xml\Serialization\PrimitiveXmlSerializers.cs" />
     <Compile Include="System\Xml\Serialization\Configuration\DateTimeSerializationSection.cs" />
     <Compile Include="System\Xml\Serialization\Globals.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.Member.cs" >
+      <DependentUpon>XmlSerializationReaderILGen.cs</DependentUpon>
+    </Compile>
+    <Compile Update="System\Xml\Serialization\Generations\IntermediateLanguageGenerations\XmlSerializationReaderILGen.SourceType.cs" >
+      <DependentUpon>XmlSerializationReaderILGen.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <!-- Embedded DTD files -->
