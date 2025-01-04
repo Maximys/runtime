@@ -482,6 +482,33 @@ namespace System.Xml.Serialization
             return value;
         }
 
+        internal static XmlQualifiedName ToXmlQualifiedName(string? value, bool decodeName, XmlReader reader)
+        {
+            int colon = value == null ? -1 : value.LastIndexOf(':');
+            string? prefix = colon < 0 ? null : value!.Substring(0, colon);
+            string localName = value!.Substring(colon + 1);
+
+            if (decodeName)
+            {
+                prefix = XmlConvert.DecodeName(prefix);
+                localName = XmlConvert.DecodeName(localName);
+            }
+            if (string.IsNullOrEmpty(prefix))
+            {
+                return new XmlQualifiedName(reader.NameTable.Add(value), reader.LookupNamespace(string.Empty));
+            }
+            else
+            {
+                string? ns = reader.LookupNamespace(prefix);
+                if (ns == null)
+                {
+                    // Namespace prefix '{0}' is not defined.
+                    throw new InvalidOperationException(SR.Format(SR.XmlUndefinedAlias, prefix));
+                }
+                return new XmlQualifiedName(reader.NameTable.Add(localName), ns);
+            }
+        }
+
         [return: NotNullIfNotNull(nameof(value))]
         private static string? CollapseWhitespace(string? value)
         {

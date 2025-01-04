@@ -1192,42 +1192,8 @@ namespace System.Xml.Serialization
             }
             else
             {
-                if (!mapping.TypeDesc.HasCustomFormatter)
-                {
-                    string value = readFunc(funcState);
-                    object retObj = mapping.TypeDesc.Formatter.Name switch
-                    {
-                        TypeScope.BooleanFormatterName => XmlConvert.ToBoolean(value),
-                        TypeScope.Int32FormatterName => XmlConvert.ToInt32(value),
-                        TypeScope.Int16FormatterName => XmlConvert.ToInt16(value),
-                        TypeScope.Int64FormatterName => XmlConvert.ToInt64(value),
-                        TypeScope.SingleFormatterName => XmlConvert.ToSingle(value),
-                        TypeScope.DoubleFormatterName => XmlConvert.ToDouble(value),
-                        TypeScope.DecimalFormatterName => XmlConvert.ToDecimal(value),
-                        TypeScope.ByteFormatterName => XmlConvert.ToByte(value),
-                        TypeScope.SByteFormatterName => XmlConvert.ToSByte(value),
-                        TypeScope.UInt16FormatterName => XmlConvert.ToUInt16(value),
-                        TypeScope.UInt32FormatterName => XmlConvert.ToUInt32(value),
-                        TypeScope.UInt64FormatterName => XmlConvert.ToUInt64(value),
-                        TypeScope.GuidFormatterName => XmlConvert.ToGuid(value),
-                        TypeScope.CharFormatterName => XmlConvert.ToChar(value),
-                        TypeScope.TimeSpanFormatterName => XmlConvert.ToTimeSpan(value),
-                        TypeScope.DateTimeOffsetFormatterName => XmlConvert.ToDateTimeOffset(value),
-                        _ => throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown Name of Formatter: {mapping.TypeDesc.Formatter.Name}")),
-                    };
-                    return retObj;
-                }
-                else
-                {
-                    string methodName = $"To{mapping.TypeDesc.Formatter.Name}";
-                    MethodInfo? method = typeof(XmlSerializationReader).GetMethod(methodName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, new Type[] { typeof(string) });
-                    if (method == null)
-                    {
-                        throw new InvalidOperationException(SR.Format(SR.XmlInternalErrorDetails, $"unknown Name of Formatter: {mapping.TypeDesc.Formatter.Name}"));
-                    }
-
-                    return method.Invoke(this, new object[] { readFunc(funcState) })!;
-                }
+                ReadValueArgs args = new ReadValueArgs(readFunc(funcState), DecodeName, Reader);
+                return mapping.TypeDesc.Formatter.Read(args);
             }
         }
 
