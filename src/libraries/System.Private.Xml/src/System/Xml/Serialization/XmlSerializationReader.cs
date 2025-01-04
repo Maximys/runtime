@@ -194,7 +194,7 @@ namespace System.Xml.Serialization
                         return null;
                 }
             }
-            return ToXmlQualifiedName(type, false);
+            return XmlCustomFormatter.ToXmlQualifiedName(type, false, Reader);
         }
 
         // throwOnUnknown flag controls whether this method throws an exception or just returns
@@ -967,7 +967,7 @@ namespace System.Xml.Serialization
             string? arrayType = _r.GetAttribute(_arrayTypeID, Environment.Schemas.SoapNamespaceId);
             SoapArrayInfo arrayInfo = ParseArrayType(arrayType!);
             if (arrayInfo.dimensions != 1) throw new InvalidOperationException(SR.Format(SR.XmlInvalidArrayDimentions, CurrentTag()));
-            XmlQualifiedName qname = ToXmlQualifiedName(arrayInfo.qname, false);
+            XmlQualifiedName qname = XmlCustomFormatter.ToXmlQualifiedName(arrayInfo.qname, false, Reader);
             if (qname.Name != name) throw new InvalidOperationException(SR.Format(SR.XmlInvalidArrayTypeName, qname.Name, name, CurrentTag()));
             if (qname.Namespace != ns) throw new InvalidOperationException(SR.Format(SR.XmlInvalidArrayTypeNamespace, qname.Namespace, ns, CurrentTag()));
             return arrayInfo.length;
@@ -1154,35 +1154,9 @@ namespace System.Xml.Serialization
 
         protected XmlQualifiedName ToXmlQualifiedName(string? value)
         {
-            return ToXmlQualifiedName(value, DecodeName);
+            return XmlCustomFormatter.ToXmlQualifiedName(value, DecodeName, Reader);
         }
 
-        internal XmlQualifiedName ToXmlQualifiedName(string? value, bool decodeName)
-        {
-            int colon = value == null ? -1 : value.LastIndexOf(':');
-            string? prefix = colon < 0 ? null : value!.Substring(0, colon);
-            string localName = value!.Substring(colon + 1);
-
-            if (decodeName)
-            {
-                prefix = XmlConvert.DecodeName(prefix);
-                localName = XmlConvert.DecodeName(localName);
-            }
-            if (string.IsNullOrEmpty(prefix))
-            {
-                return new XmlQualifiedName(_r.NameTable.Add(value), _r.LookupNamespace(string.Empty));
-            }
-            else
-            {
-                string? ns = _r.LookupNamespace(prefix);
-                if (ns == null)
-                {
-                    // Namespace prefix '{0}' is not defined.
-                    throw new InvalidOperationException(SR.Format(SR.XmlUndefinedAlias, prefix));
-                }
-                return new XmlQualifiedName(_r.NameTable.Add(localName), ns);
-            }
-        }
         protected void UnknownAttribute(object? o, XmlAttribute attr)
         {
             UnknownAttribute(o, attr, null);
@@ -1609,7 +1583,7 @@ namespace System.Xml.Serialization
             XmlQualifiedName urTypeName = new XmlQualifiedName(_urTypeID, Environment.Schemas.NamespaceId);
             if (arrayInfo.qname.Length > 0)
             {
-                qname = ToXmlQualifiedName(arrayInfo.qname, false);
+                qname = XmlCustomFormatter.ToXmlQualifiedName(arrayInfo.qname, false, Reader);
                 elementType = (Type?)_types[qname];
             }
             else

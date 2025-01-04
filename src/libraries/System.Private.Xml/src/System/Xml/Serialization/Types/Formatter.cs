@@ -5,11 +5,16 @@ namespace System.Xml.Serialization.Types
 {
     internal sealed class Formatter
     {
-        public Formatter(string name)
+        public Formatter(
+            string name,
+            Func<ReadValueArgs, object> read)
         {
             Name = name;
+            Read = read;
         }
 
         internal string Name { get; }
+
+        internal Func<ReadValueArgs, object> Read { get; }
     }
 }
