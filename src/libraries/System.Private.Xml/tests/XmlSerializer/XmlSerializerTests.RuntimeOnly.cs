@@ -2356,15 +2356,15 @@ public static partial class XmlSerializerTests
     public static void XmlMembersMapping_TypeHavingIntArray()
     {
         string memberName = "data";
-        var requestBodyValue = new XmlMembersMappingTypeHavingIntArray() { IntArray = new int[] { 1, 2, 3 } };
-        var requestBodyActual = RoundTripWithXmlMembersMapping<XmlMembersMappingTypeHavingIntArray>(requestBodyValue, memberName,
-            "<?xml version=\"1.0\"?>\r\n<wrapper xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"http://tempuri.org/\">\r\n  <data>\r\n    <IntArray>\r\n      <int>1</int>\r\n      <int>2</int>\r\n      <int>3</int>\r\n    </IntArray>\r\n  </data>\r\n</wrapper>",
+        var requestBodyValue = new TypeWithGenericProperty<int[]>() { Value = new int[] { 1, 2, 3 } };
+        var requestBodyActual = RoundTripWithXmlMembersMapping<TypeWithGenericProperty<int[]>>(requestBodyValue, memberName,
+            "<?xml version=\"1.0\"?>\r\n<wrapper xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"http://tempuri.org/\">\r\n  <data>\r\n    <Value>\r\n      <int>1</int>\r\n      <int>2</int>\r\n      <int>3</int>\r\n    </Value>\r\n  </data>\r\n</wrapper>",
             wrapperName: "wrapper");
 
         Assert.NotNull(requestBodyActual);
-        Assert.NotNull(requestBodyActual.IntArray);
-        Assert.Equal(requestBodyValue.IntArray.Length, requestBodyActual.IntArray.Length);
-        Assert.True(Enumerable.SequenceEqual(requestBodyValue.IntArray, requestBodyActual.IntArray));
+        Assert.NotNull(requestBodyActual.Value);
+        Assert.Equal(requestBodyValue.Value.Length, requestBodyActual.Value.Length);
+        Assert.True(Enumerable.SequenceEqual(requestBodyValue.Value, requestBodyActual.Value));
     }
 
     [Fact]

@@ -373,18 +373,18 @@ public static partial class XmlSerializerTests
     [Fact]
     public static void Xml_BuiltInTypes()
     {
-        BuiltInTypes x = new BuiltInTypes
+        TypeWithGenericProperty<byte[]> x = new TypeWithGenericProperty<byte[]>
         {
-            ByteArray = new byte[] { 1, 2 }
+            Value = new byte[] { 1, 2 }
         };
-        BuiltInTypes y = SerializeAndDeserialize<BuiltInTypes>(x,
+        TypeWithGenericProperty<byte[]> y = SerializeAndDeserialize<TypeWithGenericProperty<byte[]>>(x,
 @"<?xml version=""1.0""?>
-<BuiltInTypes xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <ByteArray>AQI=</ByteArray>
-</BuiltInTypes>");
+<TypeWithGenericPropertyOfArrayOfByte xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <Value>AQI=</Value>
+</TypeWithGenericPropertyOfArrayOfByte>");
 
         Assert.NotNull(y);
-        Assert.Equal(x.ByteArray, y.ByteArray);
+        Assert.Equal(x.Value, y.Value);
     }
 
     [Fact]
@@ -542,19 +542,19 @@ public static partial class XmlSerializerTests
     [Fact]
     public static void Xml_Struct()
     {
-        var value = new WithStruct { Some = new SomeStruct { A = 1, B = 2 } };
+        var value = new TypeWithGenericProperty<SomeStruct> { Value = new SomeStruct { A = 1, B = 2 } };
         var result = SerializeAndDeserialize(value,
 @"<?xml version=""1.0""?>
-<WithStruct xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <Some>
+<TypeWithGenericPropertyOfSomeStruct xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <Value>
     <A>1</A>
     <B>2</B>
-  </Some>
-</WithStruct>");
+  </Value>
+</TypeWithGenericPropertyOfSomeStruct>");
 
         // Assert
-        Assert.StrictEqual(result.Some.A, value.Some.A);
-        Assert.StrictEqual(result.Some.B, value.Some.B);
+        Assert.StrictEqual(result.Value.A, value.Value.A);
+        Assert.StrictEqual(result.Value.B, value.Value.B);
     }
 
     [Fact]
@@ -829,11 +829,11 @@ public static partial class XmlSerializerTests
     [Fact]
     public static void Xml_TypeWithTimeSpanProperty()
     {
-        var obj = new TypeWithTimeSpanProperty { TimeSpanProperty = TimeSpan.FromMilliseconds(1) };
-        var deserializedObj = SerializeAndDeserialize(obj, WithXmlHeader(@"<TypeWithTimeSpanProperty xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-<TimeSpanProperty>PT0.001S</TimeSpanProperty>
-</TypeWithTimeSpanProperty>"));
-        Assert.StrictEqual(obj.TimeSpanProperty, deserializedObj.TimeSpanProperty);
+        var obj = new TypeWithGenericProperty<TimeSpan> { Value = TimeSpan.FromMilliseconds(1) };
+        var deserializedObj = SerializeAndDeserialize(obj, WithXmlHeader(@"<TypeWithGenericPropertyOfTimeSpan xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+<Value>PT0.001S</Value>
+</TypeWithGenericPropertyOfTimeSpan>"));
+        Assert.StrictEqual(obj.Value, deserializedObj.Value);
     }
 
     [ConditionalFact(nameof(DefaultValueAttributeIsSupported))]
@@ -851,16 +851,16 @@ public static partial class XmlSerializerTests
     {
         string xml =
             @"<?xml version=""1.0""?>
-            <TypeWithTimeSpanProperty xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-            <TimeSpanProperty />
-            </TypeWithTimeSpanProperty>";
-        XmlSerializer serializer = new XmlSerializer(typeof(TypeWithTimeSpanProperty));
+            <TypeWithGenericPropertyOfTimeSpan xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+            <Value />
+            </TypeWithGenericPropertyOfTimeSpan>";
+        XmlSerializer serializer = new XmlSerializer(typeof(TypeWithGenericProperty<TimeSpan>));
 
         using (StringReader reader = new StringReader(xml))
         {
-            TypeWithTimeSpanProperty deserializedObj = (TypeWithTimeSpanProperty)serializer.Deserialize(reader);
+            TypeWithGenericProperty<TimeSpan> deserializedObj = (TypeWithGenericProperty<TimeSpan>)serializer.Deserialize(reader);
             Assert.NotNull(deserializedObj);
-            Assert.Equal(default(TimeSpan), deserializedObj.TimeSpanProperty);
+            Assert.Equal(default(TimeSpan), deserializedObj.Value);
         }
     }
 
@@ -960,29 +960,29 @@ public static partial class XmlSerializerTests
     [Fact]
     public static void Xml_TypeWithByteProperty()
     {
-        var obj = new TypeWithByteProperty() { ByteProperty = 123 };
+        var obj = new TypeWithGenericProperty<byte>() { Value = 123 };
         var deserializedObj = SerializeAndDeserialize(obj,
-WithXmlHeader(@"<TypeWithByteProperty xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <ByteProperty>123</ByteProperty>
-</TypeWithByteProperty>"));
-        Assert.StrictEqual(obj.ByteProperty, deserializedObj.ByteProperty);
+WithXmlHeader(@"<TypeWithGenericPropertyOfByte xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <Value>123</Value>
+</TypeWithGenericPropertyOfByte>"));
+        Assert.StrictEqual(obj.Value, deserializedObj.Value);
     }
 
     [Fact]
     public static void Xml_DeserializeOutOfRangeByteProperty()
     {
         //Deserialize an instance with out-of-range value for the byte property, expecting exception from deserialization process
-        var serializer = new XmlSerializer(typeof(TypeWithByteProperty));
+        var serializer = new XmlSerializer(typeof(TypeWithGenericProperty<byte>));
         using (var stream = new MemoryStream())
         {
             var writer = new StreamWriter(stream);
             writer.Write(
-WithXmlHeader(@"<TypeWithByteProperty xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <ByteProperty>-1</ByteProperty>
-</TypeWithByteProperty>"));
+WithXmlHeader(@"<TypeWithGenericPropertyOfByte xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <Value>-1</Value>
+</TypeWithGenericPropertyOfByte>"));
             writer.Flush();
             stream.Position = 0;
-            Assert.Throws<InvalidOperationException>(() => (TypeWithByteProperty)serializer.Deserialize(stream));
+            Assert.Throws<InvalidOperationException>(() => (TypeWithGenericProperty<byte>)serializer.Deserialize(stream));
         }
     }
 
