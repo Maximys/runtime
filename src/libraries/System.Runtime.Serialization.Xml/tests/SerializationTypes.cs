@@ -312,10 +312,6 @@ namespace SerializationTypes
             MyStruct = new DCStruct(init);
         }
     }
-    public class BuiltInTypes
-    {
-        public byte[] ByteArray { get; set; }
-    }
 
     public class TypeA
     {
@@ -473,11 +469,6 @@ namespace SerializationTypes
 
 
     #region XmlSerializer specific
-    public class WithStruct
-    {
-        public SomeStruct Some { get; set; }
-    }
-
     public struct SomeStruct
     {
         public int A;
@@ -1031,11 +1022,6 @@ public class TypeWithDateTimeOffsetProperties
     public DateTimeOffset? NullableDTOWithDefault { get; set; }
 }
 
-public class TypeWithTimeSpanProperty
-{
-    public TimeSpan TimeSpanProperty;
-}
-
 public class TypeWithDefaultTimeSpanProperty
 {
     public TypeWithDefaultTimeSpanProperty()
@@ -1067,12 +1053,6 @@ public class TypeWithDefaultTimeSpanProperty
         }
     }
 }
-
-public class TypeWithByteProperty
-{
-    public byte ByteProperty;
-}
-
 
 [XmlRoot()]
 public class TypeWithXmlNodeArrayProperty
@@ -1564,4 +1544,9 @@ public struct XElementStruct
 public class XElementArrayWrapper
 {
     public XElement[] xelements;
+}
+
+public class TypeWithGenericProperty<T>
+{
+    public T Value { get; set; }
 }

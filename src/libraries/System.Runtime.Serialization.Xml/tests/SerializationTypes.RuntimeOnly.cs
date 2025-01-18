@@ -3518,11 +3518,6 @@ public partial class CompositeTypeForXmlMembersMapping
     }
 }
 
-public class XmlMembersMappingTypeHavingIntArray
-{
-    public int[] IntArray;
-}
-
 public class TypeWithXmlAttributes
 {
     [XmlAttribute(Namespace = "http://www.MyNs.org")]
