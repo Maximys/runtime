@@ -27,6 +27,36 @@ using Xunit;
 #endif
 public static partial class XmlSerializerTests
 {
+    public static IEnumerable<object[]> GetTestDataForSerializeAndDeserializePrimitiveTypeTest
+    {
+        get
+        {
+            const string xml1 = @"<TypeWithGenericPropertyOfTimeSpan xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+<Value>PT0.001S</Value>
+</TypeWithGenericPropertyOfTimeSpan>";
+            const string xml2 = @"<TypeWithGenericPropertyOfByte xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <Value>123</Value>
+</TypeWithGenericPropertyOfByte>";
+
+            TypeWithGenericProperty<TimeSpan> expectedValue1;
+            TypeWithGenericProperty<byte> expectedValue2;
+
+            expectedValue1 = new TypeWithGenericProperty<TimeSpan> { Value = TimeSpan.FromMilliseconds(1) };
+            expectedValue2 = new TypeWithGenericProperty<byte>() { Value = 123 };
+
+            yield return new object[]
+            {
+                xml1,
+                expectedValue1
+            };
+            yield return new object[]
+            {
+                xml2,
+                expectedValue2
+            };
+        }
+    }
+
 #if ReflectionOnly || XMLSERIALIZERGENERATORTESTS
     private static readonly string SerializationModeSetterName = "set_Mode";
 
@@ -42,6 +72,14 @@ public static partial class XmlSerializerTests
 #endif
     }
 #endif
+
+    [Theory]
+    [MemberData(nameof(GetTestDataForSerializeAndDeserializePrimitiveTypeTest))]
+    public static void SerializeAndDeserializePrimitiveTypeTest<T>(string xml, TypeWithGenericProperty<T> expectedValue)
+    {
+        var actualValue = SerializeAndDeserialize(expectedValue, WithXmlHeader(xml));
+        Assert.StrictEqual(expectedValue.Value, actualValue.Value);
+    }
 
     public static bool DefaultValueAttributeIsSupported => AppContext.TryGetSwitch("System.ComponentModel.DefaultValueAttribute.IsSupported", out bool isEnabled) ? isEnabled : true;
 
@@ -826,16 +864,6 @@ public static partial class XmlSerializerTests
         }
     }
 
-    [Fact]
-    public static void Xml_TypeWithTimeSpanProperty()
-    {
-        var obj = new TypeWithGenericProperty<TimeSpan> { Value = TimeSpan.FromMilliseconds(1) };
-        var deserializedObj = SerializeAndDeserialize(obj, WithXmlHeader(@"<TypeWithGenericPropertyOfTimeSpan xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-<Value>PT0.001S</Value>
-</TypeWithGenericPropertyOfTimeSpan>"));
-        Assert.StrictEqual(obj.Value, deserializedObj.Value);
-    }
-
     [ConditionalFact(nameof(DefaultValueAttributeIsSupported))]
     public static void Xml_TypeWithDefaultTimeSpanProperty()
     {
@@ -955,17 +983,6 @@ public static partial class XmlSerializerTests
             DateTimeOffset deserializedObj = (DateTimeOffset)serializer.Deserialize(reader);
             Assert.Equal(default(DateTimeOffset), deserializedObj);
         }
-    }
-
-    [Fact]
-    public static void Xml_TypeWithByteProperty()
-    {
-        var obj = new TypeWithGenericProperty<byte>() { Value = 123 };
-        var deserializedObj = SerializeAndDeserialize(obj,
-WithXmlHeader(@"<TypeWithGenericPropertyOfByte xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <Value>123</Value>
-</TypeWithGenericPropertyOfByte>"));
-        Assert.StrictEqual(obj.Value, deserializedObj.Value);
     }
 
     [Fact]
