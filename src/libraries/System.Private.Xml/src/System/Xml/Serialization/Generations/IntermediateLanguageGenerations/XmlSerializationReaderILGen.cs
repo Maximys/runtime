@@ -674,38 +674,39 @@ namespace System.Xml.Serialization.Generations.IntermediateLanguageGenerations
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]
         private void PreparePrimitiveDefault(TypeMapping mapping, SourceType source)
         {
-            Type argType = source == SourceType.Boolean ? typeof(bool) : typeof(string);
-            MethodInfo ToXXX;
-            if (mapping.TypeDesc!.HasCustomFormatter)
-            {
-                // Only these methods below that is non Static and need to ldarg("this") for Call.
-                BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
-                if ((mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayBase64FormatterName && source == SourceType.Boolean)
-                    || (mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayHexFormatterName && source == SourceType.Boolean)
-                    || (mapping.TypeDesc.Formatter!.Name == TypeScope.XmlQualifiedNameFormatterName))
-                {
-                    bindingFlags = CodeGenerator.InstanceBindingFlags;
-                    ilg.Ldarg(0);
-                }
+            throw new NotImplementedException("HelloWorld1 ");
+            //Type argType = source == SourceType.Boolean ? typeof(bool) : typeof(string);
+            //MethodInfo ToXXX;
+            //if (mapping.TypeDesc!.HasCustomFormatter)
+            //{
+            //    // Only these methods below that is non Static and need to ldarg("this") for Call.
+            //    BindingFlags bindingFlags = CodeGenerator.StaticBindingFlags;
+            //    if ((mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayBase64FormatterName && source == SourceType.Boolean)
+            //        || (mapping.TypeDesc.Formatter!.Name == TypeScope.ByteArrayHexFormatterName && source == SourceType.Boolean)
+            //        || (mapping.TypeDesc.Formatter!.Name == TypeScope.XmlQualifiedNameFormatterName))
+            //    {
+            //        bindingFlags = CodeGenerator.InstanceBindingFlags;
+            //        ilg.Ldarg(0);
+            //    }
 
-                ToXXX = typeof(XmlSerializationReader).GetMethod(
-                    $"To{mapping.TypeDesc.Formatter!.Name}",
-                    bindingFlags,
-                    new Type[] { argType }
-                )!;
-            }
-            else
-            {
-                ToXXX = typeof(XmlConvert).GetMethod(
-                    $"To{mapping.TypeDesc.Formatter!.Name}",
-                    CodeGenerator.StaticBindingFlags,
-                    new Type[] { argType }
-                )!;
-            }
+            //    ToXXX = typeof(XmlSerializationReader).GetMethod(
+            //        $"To{mapping.TypeDesc.Formatter!.Name}",
+            //        bindingFlags,
+            //        new Type[] { argType }
+            //    )!;
+            //}
+            //else
+            //{
+            //    ToXXX = typeof(XmlConvert).GetMethod(
+            //        $"To{mapping.TypeDesc.Formatter!.Name}",
+            //        CodeGenerator.StaticBindingFlags,
+            //        new Type[] { argType }
+            //    )!;
+            //}
 
-            PrepareCallOfIntermediateLanguage(source);
+            //PrepareCallOfIntermediateLanguage(source);
 
-            ilg.Call(ToXXX);
+            //ilg.Call(ToXXX);
         }
 
         [RequiresUnreferencedCode("XmlSerializationReader methods have RequiresUnreferencedCode")]

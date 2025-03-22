@@ -758,22 +758,24 @@ namespace System.Xml.Serialization
 
         private object? ReadTypedPrimitive(XmlQualifiedName type, bool elementCanBeType)
         {
-            object? value;
-            if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
-            {
-                return ReadXmlNodes(elementCanBeType);
-            }
+            throw new NotImplementedException("HelloWorld");
 
-            if (TypeMappers.TryGetValue(type, out Mapper? mapper))
-            {
-                value = mapper.ReadPrimitiveValue();
-            }
-            else
-            {
-                value = ReadXmlNodes(elementCanBeType);
-            }
+            //object? value;
+            //if (!IsPrimitiveNamespace(type.Namespace) || type.Name == _urTypeID)
+            //{
+            //    return ReadXmlNodes(elementCanBeType);
+            //}
 
-            return value;
+            //if (TypeMappers.TryGetValue(type, out Mapper? mapper))
+            //{
+            //    value = mapper.ReadPrimitiveValue();
+            //}
+            //else
+            //{
+            //    value = ReadXmlNodes(elementCanBeType);
+            //}
+
+            //return value;
         }
 
         protected object? ReadTypedNull(XmlQualifiedName type)
