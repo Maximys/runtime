@@ -51,7 +51,7 @@ namespace System.Xml
         {
             if (_hash == 0)
             {
-                _hash = Name.GetHashCode(); /*+ Namespace.GetHashCode()*/ // for perf reasons we are not taking ns's hashcode.
+                _hash = Name.GetHashCode() ^ Namespace.GetHashCode();
             }
             return _hash;
         }

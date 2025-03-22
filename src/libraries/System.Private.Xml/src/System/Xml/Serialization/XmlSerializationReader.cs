@@ -71,220 +71,12 @@ namespace System.Xml.Serialization
 
             Environment ??= PrepareEnvironment();
             TypeMappers ??= PrepareTypeMappers();
-        }
-
-        protected bool DecodeName
-        {
-            get
-            {
-                return _decodeName;
-            }
-            set
-            {
-                _decodeName = value;
-            }
-        }
-
-        protected XmlReader Reader
-        {
-            get
-            {
-                return _r;
-            }
-        }
-
-        protected int ReaderCount
-        {
-            get { return 0; }
-        }
-
-        protected XmlDocument Document
-        {
-            get
-            {
-                if (_d == null)
-                {
-                    _d = new XmlDocument(_r.NameTable);
-                    _d.SetBaseURI(_r.BaseURI);
-                }
-                return _d;
-            }
-        }
-
-        ///<internalonly/>
-        protected static Assembly? ResolveDynamicAssembly(string assemblyFullName)
-        {
-            return DynamicAssemblies.Get(assemblyFullName);
-        }
-
-        private PrimitiveTypesEnvironment PreparePrimitiveTypes()
-        {
-            PrimitiveTypesEnvironment returnValue;
-
-            returnValue = new PrimitiveTypesEnvironment
-            {
-                AnyUriId = _r.NameTable.Add(DataTypeNames.AnyUri),
-                Base64Id = _r.NameTable.Add(DataTypeNames.Base64),
-                BooleanId = _r.NameTable.Add(DataTypeNames.Boolean),
-                ByteArrayBase64Id = _r.NameTable.Add(DataTypeNames.ByteArrayBase64),
-                ByteArrayHexId = _r.NameTable.Add(DataTypeNames.ByteArrayHex),
-                ByteId = _r.NameTable.Add(DataTypeNames.Byte),
-                CharId = _r.NameTable.Add(DataTypeNames.Char),
-                DateId = _r.NameTable.Add(DataTypeNames.Date),
-                DateTimeId = _r.NameTable.Add(DataTypeNames.DateTime),
-                DateTimeOffsetId = _r.NameTable.Add(DataTypeNames.DateTimeOffset),
-                DecimalId = _r.NameTable.Add(DataTypeNames.Decimal),
-                DoubleId = _r.NameTable.Add(DataTypeNames.Double),
-                DurationId = _r.NameTable.Add(DataTypeNames.Duration),
-                EntitiesId = _r.NameTable.Add(DataTypeNames.Entities),
-                EntityId = _r.NameTable.Add(DataTypeNames.Entity),
-                GDayId = _r.NameTable.Add(DataTypeNames.GDay),
-                GMonthDayId = _r.NameTable.Add(DataTypeNames.GMonthDay),
-                GMonthId = _r.NameTable.Add(DataTypeNames.GMonth),
-                GuidId = _r.NameTable.Add(DataTypeNames.Guid),
-                GYearId = _r.NameTable.Add(DataTypeNames.GYear),
-                GYearMonthId = _r.NameTable.Add(DataTypeNames.GYearMonth),
-                IdId = _r.NameTable.Add(DataTypeNames.Id),
-                IdRefId = _r.NameTable.Add(DataTypeNames.IdRef),
-                IdRefsId = _r.NameTable.Add(DataTypeNames.IdRefs),
-                Int16Id = _r.NameTable.Add(DataTypeNames.Int16),
-                Int32Id = _r.NameTable.Add(DataTypeNames.Int32),
-                Int64Id = _r.NameTable.Add(DataTypeNames.Int64),
-                IntegerId = _r.NameTable.Add(DataTypeNames.Integer),
-                LanguageId = _r.NameTable.Add(DataTypeNames.Language),
-                NegativeIntegerId = _r.NameTable.Add(DataTypeNames.NegativeInteger),
-                NoncolonizedNameId = _r.NameTable.Add(DataTypeNames.NoncolonizedName),
-                NonNegativeIntegerId = _r.NameTable.Add(DataTypeNames.NonNegativeInteger),
-                NonPositiveIntegerId = _r.NameTable.Add(DataTypeNames.NonPositiveInteger),
-                NormalizedStringId = _r.NameTable.Add(DataTypeNames.NormalizedString),
-                NotationId = _r.NameTable.Add(DataTypeNames.Notation),
-                OldTimeInstantId = _r.NameTable.Add(DataTypeNames.OldTimeInstant),
-                PositiveIntegerId = _r.NameTable.Add(DataTypeNames.PositiveInteger),
-                SByteId = _r.NameTable.Add(DataTypeNames.SByte),
-                SingleId = _r.NameTable.Add(DataTypeNames.Single),
-                StringId = _r.NameTable.Add(DataTypeNames.String),
-                TimeId = _r.NameTable.Add(DataTypeNames.Time),
-                TimeSpanId = _r.NameTable.Add(DataTypeNames.TimeSpan),
-                TokenId = _r.NameTable.Add(DataTypeNames.Token),
-                UInt16Id = _r.NameTable.Add(DataTypeNames.UInt16),
-                UInt32Id = _r.NameTable.Add(DataTypeNames.UInt32),
-                UInt64Id = _r.NameTable.Add(DataTypeNames.UInt64),
-                XmlNameId = _r.NameTable.Add(DataTypeNames.XmlName),
-                XmlNmTokenId = _r.NameTable.Add(DataTypeNames.XmlNmToken),
-                XmlNmTokensId = _r.NameTable.Add(DataTypeNames.XmlNmTokens),
-                XmlQualifiedNameId = _r.NameTable.Add(DataTypeNames.XmlQualifiedName),
-            };
-
-            return returnValue;
-        }
-
-        /// <devdoc>
-        ///    <para>[To be supplied.]</para>
-        /// </devdoc>
-        protected XmlQualifiedName? GetXsiType()
-        {
-            string? type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.NamespaceId);
-            if (type == null)
-            {
-                type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace2000Id);
-                if (type == null)
-                {
-                    type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace1999Id);
-                    if (type == null)
-                        return null;
-                }
-            }
-            return XmlCustomFormatter.ToXmlQualifiedName(type, false, Reader);
-        }
-
-        // throwOnUnknown flag controls whether this method throws an exception or just returns
-        // null if typeName.Namespace is unknown. the method still throws if typeName.Namespace
-        // is recognized but typeName.Name isn't.
-        private Type? GetPrimitiveType(XmlQualifiedName typeName, bool throwOnUnknown)
-        {
-            Type? returnValue;
-
-            if (TypeMappers.TryGetValue(typeName, out Mapper? mapper))
-            {
-                returnValue = mapper.PrimitiveType;
-            }
-            else
-            {
-                if ((typeName.Namespace == Environment.Schemas.NamespaceId)
-                    || (typeName.Namespace == Environment.Schemas.SoapNamespaceId)
-                    || (typeName.Namespace == Environment.Schemas.Soap12NamespaceId)
-                    || (typeName.Namespace == Environment.Schemas.Namespace2000Id)
-                    || (typeName.Namespace == Environment.Schemas.Namespace1999Id))
-                {
-                    throw CreateUnknownTypeException(typeName);
-                }
-                else
-                {
-                    if (throwOnUnknown)
-                    {
-                        throw CreateUnknownTypeException(typeName);
-                    }
-                    else
-                    {
-                        returnValue = null;
-                    }
-                }
-            }
-
-            return returnValue;
-        }
-
-        private bool IsPrimitiveNamespace(string ns)
-        {
-            return Environment.Schemas.PrimitiveNamespaceIds.Value.Contains(ns);
-        }
-
-        internal XmlEnvironment PrepareEnvironment()
-        {
-            InstancesEnvironment instances;
-            SchemasEnvironment schemas;
-            TypesEnvironment types;
-            ValuesEnvironment values;
-            XmlEnvironment returnValue;
-
-            instances = new InstancesEnvironment
-            {
-                NamespaceId = _r.NameTable.Add(XmlSchema.InstanceNamespace),
-                Namespace1999Id = _r.NameTable.Add(XmlReservedNs.InstanceNamespace1999),
-                Namespace2000Id = _r.NameTable.Add(XmlReservedNs.InstanceNamespace2000)
-            };
-
-            schemas = new SchemasEnvironment
-            {
-                Instances = instances,
-                NamespaceId = _r.NameTable.Add(XmlSchema.Namespace),
-                Namespace1999Id = _r.NameTable.Add(XmlReservedNs.Namespace1999),
-                Namespace2000Id = _r.NameTable.Add(XmlReservedNs.Namespace2000),
-                NonXsdTypesNamespaceId = _r.NameTable.Add(UrtTypes.Namespace),
-                SoapNamespaceId = _r.NameTable.Add(Soap.Encoding),
-                Soap12NamespaceId = _r.NameTable.Add(Soap12.Encoding)
-            };
-
-            types = new TypesEnvironment
-            {
-                PrimitiveTypes = PreparePrimitiveTypes()
-            };
-
-            values = new ValuesEnvironment
-            {
-                NilId = _r.NameTable.Add("nil"),
-                NullId = _r.NameTable.Add("null"),
-            };
-
-            returnValue = new XmlEnvironment(schemas, types, values);
-
-            return returnValue;
+            TypeMappers = PrepareTypeMappers();
         }
 
         internal FrozenDictionary<XmlQualifiedName, Mapper> PrepareTypeMappers()
         {
             Mapper mapperForAnyUriId,
-                mapperForBase64Id,
                 mapperForBooleanId,
                 mapperForByteArrayBase64Id,
                 mapperForByteArrayHexId,
@@ -292,7 +84,6 @@ namespace System.Xml.Serialization
                 mapperForCharId,
                 mapperForDateId,
                 mapperForDateTimeId,
-                mapperForDateTimeOffsetId,
                 mapperForDecimalId,
                 mapperForDoubleId,
                 mapperForDurationId,
@@ -324,7 +115,6 @@ namespace System.Xml.Serialization
                 mapperForSingleId,
                 mapperForStringId,
                 mapperForTimeId,
-                mapperForTimeSpanId,
                 mapperForTokenId,
                 mapperForUInt16Id,
                 mapperForUInt32Id,
@@ -336,56 +126,53 @@ namespace System.Xml.Serialization
             IReadOnlyList<KeyValuePair<XmlQualifiedName, Mapper>> rawTypeMappers;
             FrozenDictionary<XmlQualifiedName, Mapper> returnValue;
 
-            mapperForAnyUriId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForBase64Id = new Mapper(null, typeof(byte[]), () => ReadByteArray(true));
-            mapperForBooleanId = new Mapper(default(Nullable<bool>), typeof(bool), () => XmlConvert.ToBoolean(ReadStringValue()));
-            mapperForByteArrayBase64Id = new Mapper(null, typeof(byte[]), () => ReadByteArray(true));
-            mapperForByteArrayHexId = new Mapper(null, typeof(byte[]), () => ReadByteArray(false));
-            mapperForByteId = new Mapper(default(Nullable<byte>), typeof(byte), () => XmlConvert.ToByte(ReadStringValue()));
-            mapperForCharId = new Mapper(default(Nullable<char>), typeof(char), () => XmlCustomFormatter.ToChar(ReadStringValue()));
-            mapperForDateId = new Mapper(default(Nullable<DateTime>), typeof(DateTime), () => XmlCustomFormatter.ToDate(ReadStringValue()));
-            mapperForDateTimeId = new Mapper(default(Nullable<DateTime>), typeof(DateTime), () => XmlCustomFormatter.ToDateTime(ReadStringValue()));
-            mapperForDateTimeOffsetId = new Mapper(default(Nullable<DateTimeOffset>), typeof(DateTimeOffset), () => XmlConvert.ToDateTimeOffset(ReadStringValue()));
-            mapperForDecimalId = new Mapper(default(Nullable<decimal>), typeof(decimal), () => XmlConvert.ToDecimal(ReadStringValue()));
-            mapperForDoubleId = new Mapper(default(Nullable<double>), typeof(double), () => XmlConvert.ToDouble(ReadStringValue()));
-            mapperForDurationId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForEntitiesId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForEntityId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForGDayId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForGMonthDayId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForGMonthId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForGuidId = new Mapper(default(Nullable<Guid>), typeof(Guid), () => new Guid(CollapseWhitespace(ReadStringValue())));
-            mapperForGYearId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForGYearMonthId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForIdId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForIdRefId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForIdRefsId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForInt16Id = new Mapper(default(Nullable<short>), typeof(short), () => XmlConvert.ToInt16(ReadStringValue()));
-            mapperForInt32Id = new Mapper(default(Nullable<int>), typeof(int), () => XmlConvert.ToInt32(ReadStringValue()));
-            mapperForInt64Id = new Mapper(default(Nullable<long>), typeof(long), () => XmlConvert.ToInt64(ReadStringValue()));
-            mapperForIntegerId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForLanguageId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForNegativeIntegerId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForNoncolonizedNameId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForNonNegativeIntegerId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForNonPositiveIntegerId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForNormalizedStringId = new Mapper(null, typeof(string), ReadStringValue);
-            mapperForNotationId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForOldTimeInstantId = new Mapper(null, typeof(DateTime), () => XmlCustomFormatter.ToDateTime(ReadStringValue()));
-            mapperForPositiveIntegerId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForSByteId = new Mapper(default(Nullable<sbyte>), typeof(sbyte), () => XmlConvert.ToSByte(ReadStringValue()));
-            mapperForSingleId = new Mapper(default(Nullable<float>), typeof(float), () => XmlConvert.ToSingle(ReadStringValue()));
-            mapperForStringId = new Mapper(null, typeof(string), ReadStringValue);
-            mapperForTimeId = new Mapper(default(Nullable<DateTime>), typeof(DateTime), () => XmlCustomFormatter.ToTime(ReadStringValue()));
-            mapperForTimeSpanId = new Mapper(default(Nullable<TimeSpan>), typeof(TimeSpan), () => XmlConvert.ToTimeSpan(ReadStringValue()));
-            mapperForTokenId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForUInt16Id = new Mapper(default(Nullable<ushort>), typeof(ushort), () => XmlConvert.ToUInt16(ReadStringValue()));
-            mapperForUInt32Id = new Mapper(default(Nullable<uint>), typeof(uint), () => XmlConvert.ToUInt32(ReadStringValue()));
-            mapperForUInt64Id = new Mapper(default(Nullable<ulong>), typeof(ulong), () => XmlConvert.ToUInt64(ReadStringValue()));
-            mapperForXmlNameId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForXmlNmTokenId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForXmlNmTokensId = new Mapper(null, typeof(string), () => CollapseWhitespace(ReadStringValue()));
-            mapperForXmlQualifiedNameId = new Mapper(null, typeof(XmlQualifiedName), ReadXmlQualifiedName);
+            mapperForAnyUriId = new Mapper(typeof(string));
+            mapperForBooleanId = new Mapper(typeof(bool));
+            mapperForByteArrayBase64Id = new Mapper(typeof(byte[]));
+            mapperForByteArrayHexId = new Mapper(typeof(byte[]));
+            mapperForByteId = new Mapper(typeof(byte));
+            mapperForCharId = new Mapper(typeof(char));
+            mapperForDateId = new Mapper(typeof(DateTime));
+            mapperForDateTimeId = new Mapper(typeof(DateTime));
+            mapperForDecimalId = new Mapper(typeof(decimal));
+            mapperForDoubleId = new Mapper(typeof(double));
+            mapperForDurationId = new Mapper(typeof(string));
+            mapperForEntitiesId = new Mapper(typeof(string));
+            mapperForEntityId = new Mapper(typeof(string));
+            mapperForGDayId = new Mapper(typeof(string));
+            mapperForGMonthDayId = new Mapper(typeof(string));
+            mapperForGMonthId = new Mapper(typeof(string));
+            mapperForGuidId = new Mapper(typeof(Guid));
+            mapperForGYearId = new Mapper(typeof(string));
+            mapperForGYearMonthId = new Mapper(typeof(string));
+            mapperForIdId = new Mapper(typeof(string));
+            mapperForIdRefId = new Mapper(typeof(string));
+            mapperForIdRefsId = new Mapper(typeof(string));
+            mapperForInt16Id = new Mapper(typeof(short));
+            mapperForInt32Id = new Mapper(typeof(int));
+            mapperForInt64Id = new Mapper(typeof(long));
+            mapperForIntegerId = new Mapper(typeof(string));
+            mapperForLanguageId = new Mapper(typeof(string));
+            mapperForNegativeIntegerId = new Mapper(typeof(string));
+            mapperForNoncolonizedNameId = new Mapper(typeof(string));
+            mapperForNonNegativeIntegerId = new Mapper(typeof(string));
+            mapperForNonPositiveIntegerId = new Mapper(typeof(string));
+            mapperForNormalizedStringId = new Mapper(typeof(string));
+            mapperForNotationId = new Mapper(typeof(string));
+            mapperForOldTimeInstantId = new Mapper(typeof(DateTime));
+            mapperForPositiveIntegerId = new Mapper(typeof(string));
+            mapperForSByteId = new Mapper(typeof(sbyte));
+            mapperForSingleId = new Mapper(typeof(float));
+            mapperForStringId = new Mapper(typeof(string));
+            mapperForTimeId = new Mapper(typeof(DateTime));
+            mapperForTokenId = new Mapper(typeof(string));
+            mapperForUInt16Id = new Mapper(typeof(ushort));
+            mapperForUInt32Id = new Mapper(typeof(uint));
+            mapperForUInt64Id = new Mapper(typeof(ulong));
+            mapperForXmlNameId = new Mapper(typeof(string));
+            mapperForXmlNmTokenId = new Mapper(typeof(string));
+            mapperForXmlNmTokensId = new Mapper(typeof(string));
+            mapperForXmlQualifiedNameId = new Mapper(typeof(XmlQualifiedName));
 
             rawTypeMappers = new List<KeyValuePair<XmlQualifiedName, Mapper>>
             {
@@ -394,9 +181,6 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Namespace2000Id), mapperForAnyUriId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.SoapNamespaceId), mapperForAnyUriId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.AnyUriId, Environment.Schemas.Soap12NamespaceId), mapperForAnyUriId),
-
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Base64Id, Environment.Schemas.SoapNamespaceId), mapperForBase64Id),
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.Base64Id, Environment.Schemas.Soap12NamespaceId), mapperForBase64Id),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.NamespaceId), mapperForBooleanId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.BooleanId, Environment.Schemas.Namespace1999Id), mapperForBooleanId),
@@ -429,8 +213,6 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.NamespaceId), mapperForDateTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.SoapNamespaceId), mapperForDateTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeId, Environment.Schemas.Soap12NamespaceId), mapperForDateTimeId),
-
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DateTimeOffsetId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForDateTimeOffsetId),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.NamespaceId), mapperForDecimalId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.DecimalId, Environment.Schemas.Namespace1999Id), mapperForDecimalId),
@@ -578,8 +360,8 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.SoapNamespaceId), mapperForNotationId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.NotationId, Environment.Schemas.Soap12NamespaceId), mapperForNotationId),
 
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.Namespace1999Id), mapperForOldTimeInstantId),
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.Namespace2000Id), mapperForOldTimeInstantId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.NamespaceId), mapperForOldTimeInstantId),
+                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.OldTimeInstantId, Environment.Schemas.NamespaceId), mapperForOldTimeInstantId),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.NamespaceId), mapperForPositiveIntegerId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.PositiveIntegerId, Environment.Schemas.Namespace1999Id), mapperForPositiveIntegerId),
@@ -610,8 +392,6 @@ namespace System.Xml.Serialization
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Namespace2000Id), mapperForTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.SoapNamespaceId), mapperForTimeId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeId, Environment.Schemas.Soap12NamespaceId), mapperForTimeId),
-
-                new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TimeSpanId, Environment.Schemas.NonXsdTypesNamespaceId), mapperForTimeSpanId),
 
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.NamespaceId), mapperForTokenId),
                 new KeyValuePair<XmlQualifiedName, Mapper>(new XmlQualifiedName(Environment.Types.PrimitiveTypes.TokenId, Environment.Schemas.Namespace1999Id), mapperForTokenId),
@@ -665,6 +445,164 @@ namespace System.Xml.Serialization
             returnValue = FrozenDictionary.ToFrozenDictionary(rawTypeMappers, new XmlQualifiedNameComparer());
 
             return returnValue;
+        }
+
+        protected bool DecodeName
+        {
+            get
+            {
+                return _decodeName;
+            }
+            set
+            {
+                _decodeName = value;
+            }
+        }
+
+        protected XmlReader Reader
+        {
+            get
+            {
+                return _r;
+            }
+        }
+
+        protected int ReaderCount
+        {
+            get { return 0; }
+        }
+
+        protected XmlDocument Document
+        {
+            get
+            {
+                if (_d == null)
+                {
+                    _d = new XmlDocument(_r.NameTable);
+                    _d.SetBaseURI(_r.BaseURI);
+                }
+                return _d;
+            }
+        }
+
+        ///<internalonly/>
+        protected static Assembly? ResolveDynamicAssembly(string assemblyFullName)
+        {
+            return DynamicAssemblies.Get(assemblyFullName);
+        }
+
+        private PrimitiveTypesEnvironment PreparePrimitiveTypes()
+        {
+            PrimitiveTypesEnvironment returnValue;
+
+            returnValue = new PrimitiveTypesEnvironment
+            {
+                AnyUriId = _r.NameTable.Add(DataTypeNames.AnyUri),
+                Base64Id = _r.NameTable.Add(DataTypeNames.Base64),
+                BooleanId = _r.NameTable.Add(DataTypeNames.Boolean),
+                ByteArrayBase64Id = _r.NameTable.Add(DataTypeNames.ByteArrayBase64),
+                ByteArrayHexId = _r.NameTable.Add(DataTypeNames.ByteArrayHex),
+                ByteId = _r.NameTable.Add(DataTypeNames.Byte),
+                CharId = _r.NameTable.Add(DataTypeNames.Char),
+                DateId = _r.NameTable.Add(DataTypeNames.Date),
+                DateTimeId = _r.NameTable.Add(DataTypeNames.DateTime),
+                DateTimeOffsetId = _r.NameTable.Add(DataTypeNames.DateTimeOffset),
+                DecimalId = _r.NameTable.Add(DataTypeNames.Decimal),
+                DoubleId = _r.NameTable.Add(DataTypeNames.Double),
+                DurationId = _r.NameTable.Add(DataTypeNames.Duration),
+                EntitiesId = _r.NameTable.Add(DataTypeNames.Entities),
+                EntityId = _r.NameTable.Add(DataTypeNames.Entity),
+                GDayId = _r.NameTable.Add(DataTypeNames.GDay),
+                GMonthDayId = _r.NameTable.Add(DataTypeNames.GMonthDay),
+                GMonthId = _r.NameTable.Add(DataTypeNames.GMonth),
+                GuidId = _r.NameTable.Add(DataTypeNames.Guid),
+                GYearId = _r.NameTable.Add(DataTypeNames.GYear),
+                GYearMonthId = _r.NameTable.Add(DataTypeNames.GYearMonth),
+                IdId = _r.NameTable.Add(DataTypeNames.Id),
+                IdRefId = _r.NameTable.Add(DataTypeNames.IdRef),
+                IdRefsId = _r.NameTable.Add(DataTypeNames.IdRefs),
+                Int16Id = _r.NameTable.Add(DataTypeNames.Int16),
+                Int32Id = _r.NameTable.Add(DataTypeNames.Int32),
+                Int64Id = _r.NameTable.Add(DataTypeNames.Int64),
+                IntegerId = _r.NameTable.Add(DataTypeNames.Integer),
+                LanguageId = _r.NameTable.Add(DataTypeNames.Language),
+                NegativeIntegerId = _r.NameTable.Add(DataTypeNames.NegativeInteger),
+                NoncolonizedNameId = _r.NameTable.Add(DataTypeNames.NoncolonizedName),
+                NonNegativeIntegerId = _r.NameTable.Add(DataTypeNames.NonNegativeInteger),
+                NonPositiveIntegerId = _r.NameTable.Add(DataTypeNames.NonPositiveInteger),
+                NormalizedStringId = _r.NameTable.Add(DataTypeNames.NormalizedString),
+                NotationId = _r.NameTable.Add(DataTypeNames.Notation),
+                OldTimeInstantId = _r.NameTable.Add(DataTypeNames.OldTimeInstant),
+                PositiveIntegerId = _r.NameTable.Add(DataTypeNames.PositiveInteger),
+                SByteId = _r.NameTable.Add(DataTypeNames.SByte),
+                SingleId = _r.NameTable.Add(DataTypeNames.Single),
+                StringId = _r.NameTable.Add(DataTypeNames.String),
+                TimeId = _r.NameTable.Add(DataTypeNames.Time),
+                TimeSpanId = _r.NameTable.Add(DataTypeNames.TimeSpan),
+                TokenId = _r.NameTable.Add(DataTypeNames.Token),
+                UInt16Id = _r.NameTable.Add(DataTypeNames.UInt16),
+                UInt32Id = _r.NameTable.Add(DataTypeNames.UInt32),
+                UInt64Id = _r.NameTable.Add(DataTypeNames.UInt64),
+                XmlNameId = _r.NameTable.Add(DataTypeNames.XmlName),
+                XmlNmTokenId = _r.NameTable.Add(DataTypeNames.XmlNmToken),
+                XmlNmTokensId = _r.NameTable.Add(DataTypeNames.XmlNmTokens),
+                XmlQualifiedNameId = _r.NameTable.Add(DataTypeNames.XmlQualifiedName),
+            };
+
+            return returnValue;
+        }
+
+        /// <devdoc>
+        ///    <para>[To be supplied.]</para>
+        /// </devdoc>
+        protected XmlQualifiedName? GetXsiType()
+        {
+            string? type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.NamespaceId);
+            if (type == null)
+            {
+                type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace2000Id);
+                if (type == null)
+                {
+                    type = _r.GetAttribute(_typeID, Environment.Schemas.Instances.Namespace1999Id);
+                    if (type == null)
+                        return null;
+                }
+            }
+            return XmlCustomFormatter.ToXmlQualifiedName(type, false, Reader);
+        }
+
+        // throwOnUnknown flag controls whether this method throws an exception or just returns
+        // null if typeName.Namespace is unknown. the method still throws if typeName.Namespace
+        // is recognized but typeName.Name isn't.
+        private Type? GetPrimitiveType(XmlQualifiedName typeName, bool throwOnUnknown)
+        {
+            if (Environment.Schemas.PrimitiveNamespaceIds.Value.Contains(typeName.Namespace))
+            {
+                if (TypeMappers.TryGetValue(typeName, out Mapper? mapper))
+                {
+                    return mapper.PrimitiveType;
+                }
+                else
+                {
+                    throw CreateUnknownTypeException(typeName);
+                }
+            }
+            else
+            {
+                if (throwOnUnknown)
+                {
+                    throw CreateUnknownTypeException(typeName);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private bool IsPrimitiveNamespace(string ns)
+        {
+            return Environment.Schemas.PrimitiveNamespaceIds.Value.Contains(ns);
         }
 
         private string ReadStringValue()
