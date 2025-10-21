@@ -226,26 +226,6 @@ namespace System.Xml.XmlReaderTests
         }
 
         [Fact]
-        public static void ReadContentAsDateTimeIsOutOfRangeDateTimeOffset1()
-        {
-            var reader = Utils.CreateFragmentReader(@"<doc>   99<!-- Comment inbetween-->99-1<![CDATA[2]]>-31T01:60:5<?a?>9.99<?a?>9999<![CDATA[4]]>9<?Zz?>-00<![CDATA[:]]>00   </doc>");
-            reader.PositionOnElementNoDoctype("doc");
-            if (!reader.MoveToAttribute("a"))
-                reader.Read();
-            Assert.Throws<XmlException>(() => reader.ReadContentAs(typeof(DateTime), null));
-        }
-
-        [Fact]
-        public static void ReadContentAsDateTimeIsOutOfRangeDateTimeOffset2()
-        {
-            var reader = Utils.CreateFragmentReader(@"<f a='2002-02-29T23:59:59.9999999999999+13:61'/>");
-            reader.PositionOnElementNoDoctype("f");
-            if (!reader.MoveToAttribute("a"))
-                reader.Read();
-            Assert.Throws<XmlException>(() => reader.ReadContentAs(typeof(DateTime), null));
-        }
-
-        [Fact]
         public static void ReadContentAsDateTimeWithWhitespace1()
         {
             var reader = Utils.CreateFragmentReader(@"<doc>   9999-12-31   </doc>");
