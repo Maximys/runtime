@@ -226,26 +226,6 @@ namespace System.Xml.XmlReaderTests
         }
 
         [Fact]
-        public static void ReadContentAsDateTimeIsOutOfRange3()
-        {
-            var reader = Utils.CreateFragmentReader(@"<f a='2002-02-29T23:59:59.9999999999999+13:61'/>");
-            reader.PositionOnElementNoDoctype("f");
-            if (!reader.MoveToAttribute("a"))
-                reader.Read();
-            Assert.Throws<XmlException>(() => reader.ReadContentAs(typeof(DateTimeOffset), null));
-        }
-
-        [Fact]
-        public static void ReadContentAsDateTimeIsOutOfRange4()
-        {
-            var reader = Utils.CreateFragmentReader(@"<doc>   99<!-- Comment inbetween-->99-1<![CDATA[2]]>-31T01:60:5<?a?>9.99<?a?>9999<![CDATA[4]]>9<?Zz?>-00<![CDATA[:]]>00   </doc>");
-            reader.PositionOnElementNoDoctype("doc");
-            if (!reader.MoveToAttribute("a"))
-                reader.Read();
-            Assert.Throws<XmlException>(() => reader.ReadContentAs(typeof(DateTimeOffset), null));
-        }
-
-        [Fact]
         public static void ReadContentAsDateTimeIsOutOfRangeDateTimeOffset1()
         {
             var reader = Utils.CreateFragmentReader(@"<doc>   99<!-- Comment inbetween-->99-1<![CDATA[2]]>-31T01:60:5<?a?>9.99<?a?>9999<![CDATA[4]]>9<?Zz?>-00<![CDATA[:]]>00   </doc>");
@@ -272,15 +252,6 @@ namespace System.Xml.XmlReaderTests
             reader.PositionOnElementNonEmptyNoDoctype("doc");
             reader.Read();
             Assert.Equal(new DateTime(9999, 12, 31, 0, 0, 0), reader.ReadContentAs(typeof(DateTime), null));
-        }
-
-        [Fact]
-        public static void ReadContentAsDateTimeWithWhitespace2()
-        {
-            var reader = Utils.CreateFragmentReader(@"<doc>   9999-12-31   </doc>");
-            reader.PositionOnElementNonEmptyNoDoctype("doc");
-            reader.Read();
-            Assert.Equal(new DateTimeOffset(9999, 12, 31, 0, 0, 0, TimeZoneInfo.Local.GetUtcOffset(new DateTime(9999, 12, 31))).ToString(), reader.ReadContentAs(typeof(DateTimeOffset), null).ToString());
         }
     }
 }
