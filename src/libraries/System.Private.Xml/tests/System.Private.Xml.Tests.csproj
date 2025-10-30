@@ -132,6 +132,7 @@
     <Compile Include="Writers\XmlWriterApi\TCWriteNode_XPathNavigator.cs" />
     <Compile Include="Writers\XmlWriterApi\TCWriterSettingsMisc.cs" />
     <Compile Include="Writers\XmlWriterApi\TCWriterWithMemoryStream.cs" />
+    <Compile Include="Writers\XmlWriterApi\TCWriteValue.cs" />
     <Compile Include="Writers\XmlWriterApi\TestExtensions.cs" />
     <Compile Include="Writers\XmlWriterApi\WriteEndDocumentOnCloseTest.cs" />
     <Compile Include="Writers\XmlWriterApi\XmlWriterTestCaseBase.cs" />
